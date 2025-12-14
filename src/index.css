@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen;
+  }
+}
+
+@layer components {
+  .scripture-text {
+    @apply font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-relaxed;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .verse-reference {
+    @apply font-display text-xl md:text-2xl text-amber-400/90 tracking-wide;
+  }
+
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg
+           transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/25
+           focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white/10 hover:bg-white/20 text-white/90 font-medium rounded-lg
+           transition-all duration-200 border border-white/20
+           focus:outline-none focus:ring-2 focus:ring-white/30;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white
+           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50
+           focus:border-amber-400/50 transition-all duration-200;
+  }
+}
+
+/* Fullscreen mode styles */
+.fullscreen-mode {
+  cursor: none;
+}
+
+.fullscreen-mode:hover {
+  cursor: default;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
