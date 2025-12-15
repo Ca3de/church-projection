@@ -5,6 +5,7 @@ interface HymnDisplayProps {
   currentIndex: number;
   totalItems: number;
   isFullscreen: boolean;
+  isCursorHidden?: boolean;
   onNext: () => void;
   onPrevious: () => void;
   onToggleFullscreen: () => void;
@@ -18,6 +19,7 @@ export function HymnDisplay({
   currentIndex,
   totalItems,
   isFullscreen,
+  isCursorHidden = false,
   onNext,
   onPrevious,
   onToggleFullscreen,
@@ -29,7 +31,7 @@ export function HymnDisplay({
     <div
       className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
         isFullscreen ? 'fullscreen-mode' : ''
-      }`}
+      } ${isCursorHidden ? 'cursor-none' : ''}`}
     >
       {/* Main hymn content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full overflow-hidden">

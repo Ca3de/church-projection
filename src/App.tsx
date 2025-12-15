@@ -21,6 +21,7 @@ import {
 } from './services/hymnService';
 import { useFullscreen } from './hooks/useFullscreen';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useCursorAutoHide } from './hooks/useCursorAutoHide';
 
 type ContentMode = 'scripture' | 'hymn';
 type AppView = 'search' | 'display';
@@ -42,6 +43,7 @@ function App() {
   const [hymnDisplayIndex, setHymnDisplayIndex] = useState(0);
 
   const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
+  const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
 
   // Scripture handlers
   const handleScriptureSearch = useCallback(async (reference: string) => {
@@ -286,8 +288,10 @@ function App() {
         </div>
       ) : contentMode === 'scripture' && currentVerse ? (
         <VerseDisplay
+          key={`${currentVerse.book}-${currentVerse.chapter}-${currentVerse.verse}`}
           verse={currentVerse}
           isFullscreen={isFullscreen}
+          isCursorHidden={isCursorHidden}
           onNext={handleScriptureNext}
           onPrevious={handleScripturePrevious}
           onToggleFullscreen={toggleFullscreen}
@@ -297,10 +301,12 @@ function App() {
         />
       ) : contentMode === 'hymn' && currentHymnDisplayItem ? (
         <HymnDisplay
+          key={`${currentHymn?.number}-${hymnDisplayIndex}`}
           displayItem={currentHymnDisplayItem}
           currentIndex={hymnDisplayIndex}
           totalItems={hymnTotalItems}
           isFullscreen={isFullscreen}
+          isCursorHidden={isCursorHidden}
           onNext={handleHymnNext}
           onPrevious={handleHymnPrevious}
           onToggleFullscreen={toggleFullscreen}

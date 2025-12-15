@@ -4,6 +4,7 @@ import { formatReference } from '../services/bibleApi';
 interface VerseDisplayProps {
   verse: Verse;
   isFullscreen: boolean;
+  isCursorHidden?: boolean;
   onNext: () => void;
   onPrevious: () => void;
   onToggleFullscreen: () => void;
@@ -15,6 +16,7 @@ interface VerseDisplayProps {
 export function VerseDisplay({
   verse,
   isFullscreen,
+  isCursorHidden = false,
   onNext,
   onPrevious,
   onToggleFullscreen,
@@ -26,7 +28,7 @@ export function VerseDisplay({
     <div
       className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
         isFullscreen ? 'fullscreen-mode' : ''
-      }`}
+      } ${isCursorHidden ? 'cursor-none' : ''}`}
     >
       {/* Main verse content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full">
