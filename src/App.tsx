@@ -6,6 +6,9 @@ import {
   HymnInput,
   HymnDisplay,
   ThemeSelector,
+  LiturgyDisplay,
+  QuickDisplay,
+  QuickActions,
 } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
@@ -25,8 +28,9 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useCursorAutoHide } from './hooks/useCursorAutoHide';
 import { themes, getThemeById, getThemeCSSVariables, type Theme } from './config/themes';
 import { ThemeAnimation } from './animations';
+import type { LiturgyItem } from './data/liturgy';
 
-type ContentMode = 'scripture' | 'hymn';
+type ContentMode = 'scripture' | 'hymn' | 'liturgy' | 'quick';
 type AppView = 'search' | 'display';
 
 function App() {
@@ -50,6 +54,13 @@ function App() {
   // Hymn state
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
   const [hymnDisplayIndex, setHymnDisplayIndex] = useState(0);
+
+  // Liturgy state
+  const [currentLiturgy, setCurrentLiturgy] = useState<LiturgyItem | null>(null);
+
+  // Quick display state
+  const [quickContent, setQuickContent] = useState<string>('');
+  const [quickContentType, setQuickContentType] = useState<'text' | 'image'>('text');
 
   const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
@@ -171,6 +182,107 @@ function App() {
     }
   }, [currentHymn, hymnDisplayIndex]);
 
+  // Liturgy handlers
+  const handleSelectLiturgy = useCallback((item: LiturgyItem) => {
+    setCurrentLiturgy(item);
+    setContentMode('liturgy');
+    setView('display');
+  }, []);
+
+  // Quick paste handlers
+  const handlePasteContent = useCallback(async () => {
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+
+      for (const item of clipboardItems) {
+        // Check for image
+        const imageTypes = item.types.filter((type) => type.startsWith('image/'));
+        if (imageTypes.length > 0) {
+          const blob = await item.getType(imageTypes[0]);
+          const url = URL.createObjectURL(blob);
+          setQuickContent(url);
+          setQuickContentType('image');
+          setContentMode('quick');
+          setView('display');
+          return;
+        }
+
+        // Check for text
+        if (item.types.includes('text/plain')) {
+          const blob = await item.getType('text/plain');
+          const text = await blob.text();
+          if (text.trim()) {
+            setQuickContent(text);
+            setQuickContentType('text');
+            setContentMode('quick');
+            setView('display');
+            return;
+          }
+        }
+      }
+    } catch {
+      // Fallback to text-only paste
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text.trim()) {
+          setQuickContent(text);
+          setQuickContentType('text');
+          setContentMode('quick');
+          setView('display');
+        }
+      } catch (err) {
+        console.error('Failed to read clipboard:', err);
+      }
+    }
+  }, []);
+
+  // Listen for paste events when on search view
+  useEffect(() => {
+    const handlePaste = async (e: ClipboardEvent) => {
+      if (view !== 'search') return;
+
+      // Check if we're in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      e.preventDefault();
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of items) {
+        // Check for image
+        if (item.type.startsWith('image/')) {
+          const blob = item.getAsFile();
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            setQuickContent(url);
+            setQuickContentType('image');
+            setContentMode('quick');
+            setView('display');
+            return;
+          }
+        }
+
+        // Check for text
+        if (item.type === 'text/plain') {
+          item.getAsString((text) => {
+            if (text.trim()) {
+              setQuickContent(text);
+              setQuickContentType('text');
+              setContentMode('quick');
+              setView('display');
+            }
+          });
+          return;
+        }
+      }
+    };
+
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [view]);
+
   // Shared handlers
   const handleNewSearch = useCallback(() => {
     setView('search');
@@ -194,7 +306,7 @@ function App() {
     }
   }, [view, handleNewSearch]);
 
-  const handleTabChange = useCallback((tab: ContentMode) => {
+  const handleTabChange = useCallback((tab: 'scripture' | 'hymn') => {
     setContentMode(tab);
     setError(null);
   }, []);
@@ -284,12 +396,15 @@ function App() {
           </div>
 
           {/* Tab Switcher */}
-          <TabSwitcher activeTab={contentMode} onTabChange={handleTabChange} />
+          <TabSwitcher
+            activeTab={contentMode === 'scripture' || contentMode === 'hymn' ? contentMode : 'scripture'}
+            onTabChange={handleTabChange}
+          />
 
           {/* Search input */}
           <div className="w-full max-w-2xl animate-slide-up">
             <div className="glass-panel p-8">
-              {contentMode === 'scripture' ? (
+              {(contentMode === 'scripture' || contentMode === 'liturgy' || contentMode === 'quick') ? (
                 <ScriptureInput
                   onSubmit={handleScriptureSearch}
                   isLoading={isLoading}
@@ -310,6 +425,14 @@ function App() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8">
+            <QuickActions
+              onSelectLiturgy={handleSelectLiturgy}
+              onPasteContent={handlePasteContent}
+            />
           </div>
 
           {/* Quick tips */}
@@ -359,6 +482,24 @@ function App() {
           onNewSearch={handleNewSearch}
           canGoNext={canGoNextHymn}
           canGoPrevious={canGoPreviousHymn}
+        />
+      ) : contentMode === 'liturgy' && currentLiturgy ? (
+        <LiturgyDisplay
+          key={currentLiturgy.id}
+          item={currentLiturgy}
+          isFullscreen={isFullscreen}
+          isCursorHidden={isCursorHidden}
+          onToggleFullscreen={toggleFullscreen}
+          onClose={handleNewSearch}
+        />
+      ) : contentMode === 'quick' && quickContent ? (
+        <QuickDisplay
+          content={quickContent}
+          contentType={quickContentType}
+          isFullscreen={isFullscreen}
+          isCursorHidden={isCursorHidden}
+          onToggleFullscreen={toggleFullscreen}
+          onClose={handleNewSearch}
         />
       ) : null}
     </div>

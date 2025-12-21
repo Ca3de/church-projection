@@ -4,3 +4,6 @@ export { TabSwitcher } from './TabSwitcher';
 export { HymnInput } from './HymnInput';
 export { HymnDisplay } from './HymnDisplay';
 export { ThemeSelector } from './ThemeSelector';
+export { LiturgyDisplay } from './LiturgyDisplay';
+export { QuickDisplay } from './QuickDisplay';
+export { QuickActions } from './QuickActions';

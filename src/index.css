@@ -41,6 +41,16 @@
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
 
+  .liturgy-text {
+    @apply font-serif text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-relaxed;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .quick-display-text {
+    @apply font-serif text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
   .verse-reference {
     @apply font-display text-xl md:text-2xl tracking-wide;
     color: var(--theme-accent);
