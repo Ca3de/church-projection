@@ -197,6 +197,14 @@ function App() {
     setView('display');
   }, []);
 
+  // Image display handler
+  const handleImageContent = useCallback((url: string) => {
+    setQuickContent(url);
+    setQuickContentType('image');
+    setContentMode('quick');
+    setView('display');
+  }, []);
+
   // Check if text is a video URL
   const isVideoUrl = useCallback((text: string): boolean => {
     const trimmed = text.trim();
@@ -472,6 +480,7 @@ function App() {
               onSelectLiturgy={handleSelectLiturgy}
               onPasteContent={handlePasteContent}
               onVideoContent={handleVideoContent}
+              onImageContent={handleImageContent}
             />
           </div>
 

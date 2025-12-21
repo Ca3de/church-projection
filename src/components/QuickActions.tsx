@@ -5,9 +5,10 @@ interface QuickActionsProps {
   onSelectLiturgy: (item: LiturgyItem) => void;
   onPasteContent: () => void;
   onVideoContent: (url: string) => void;
+  onImageContent: (url: string) => void;
 }
 
-export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent }: QuickActionsProps) {
+export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, onImageContent }: QuickActionsProps) {
   const [videoUrl, setVideoUrl] = useState('');
   const [showVideoInput, setShowVideoInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +26,12 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent }
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      onVideoContent(url);
+      // Check if it's an image or video
+      if (file.type.startsWith('image/')) {
+        onImageContent(url);
+      } else if (file.type.startsWith('video/')) {
+        onVideoContent(url);
+      }
     }
     // Reset input
     if (fileInputRef.current) {
@@ -137,7 +143,7 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent }
           <input
             ref={fileInputRef}
             type="file"
-            accept="video/*"
+            accept="image/*,video/*"
             onChange={handleFileUpload}
             className="hidden"
           />
