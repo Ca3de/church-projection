@@ -200,10 +200,14 @@ function App() {
   // Check if text is a video URL
   const isVideoUrl = useCallback((text: string): boolean => {
     const trimmed = text.trim();
-    // YouTube
-    if (trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)/)) return true;
+    // YouTube (multiple formats including shorts)
+    if (trimmed.match(/(?:youtube\.com\/(?:watch|shorts|embed)|youtu\.be\/)/)) return true;
     // Vimeo
     if (trimmed.match(/vimeo\.com\/\d+/)) return true;
+    // Instagram (reels, posts, tv)
+    if (trimmed.match(/instagram\.com\/(?:reel|p|tv)\//)) return true;
+    // Facebook (videos, watch, reel)
+    if (trimmed.match(/facebook\.com/) && (trimmed.includes('/video') || trimmed.includes('/watch') || trimmed.includes('/reel'))) return true;
     // Direct video files
     if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) return true;
     return false;

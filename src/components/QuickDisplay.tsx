@@ -61,28 +61,83 @@ function parseTextIntoPages(text: string): TextPage[] {
   return pages;
 }
 
-// Check if URL is a video URL
-function getVideoEmbedUrl(url: string): string | null {
-  // YouTube
-  const youtubeMatch = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-  );
-  if (youtubeMatch) {
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&rel=0`;
+interface VideoEmbed {
+  type: 'youtube' | 'vimeo' | 'instagram' | 'facebook' | 'direct' | 'unsupported';
+  url: string;
+}
+
+// Parse video URL and return embed info
+function getVideoEmbed(url: string): VideoEmbed {
+  const trimmedUrl = url.trim();
+
+  // YouTube - handle multiple formats
+  // youtube.com/watch?v=ID, youtube.com/watch?v=ID&list=..., youtu.be/ID, youtube.com/shorts/ID, youtube.com/embed/ID
+  const youtubePatterns = [
+    /(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.+&v=)([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of youtubePatterns) {
+    const match = trimmedUrl.match(pattern);
+    if (match) {
+      return {
+        type: 'youtube',
+        url: `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`,
+      };
+    }
   }
 
   // Vimeo
-  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  const vimeoMatch = trimmedUrl.match(/vimeo\.com\/(\d+)/);
   if (vimeoMatch) {
-    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    return {
+      type: 'vimeo',
+      url: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
+    };
   }
 
-  // Direct video file
-  if (url.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) {
-    return url;
+  // Instagram - reels, posts with video, tv
+  // instagram.com/reel/ID, instagram.com/p/ID, instagram.com/tv/ID
+  const instagramMatch = trimmedUrl.match(/instagram\.com\/(?:reel|p|tv)\/([a-zA-Z0-9_-]+)/);
+  if (instagramMatch) {
+    return {
+      type: 'instagram',
+      url: `https://www.instagram.com/p/${instagramMatch[1]}/embed`,
+    };
   }
 
-  return null;
+  // Facebook - videos, watch, reel
+  // facebook.com/watch?v=ID, facebook.com/reel/ID, facebook.com/*/videos/ID
+  const facebookVideoMatch = trimmedUrl.match(/facebook\.com\/(?:watch\/?\?v=|reel\/|[^\/]+\/videos\/)(\d+)/);
+  if (facebookVideoMatch) {
+    return {
+      type: 'facebook',
+      url: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(trimmedUrl)}&show_text=false`,
+    };
+  }
+
+  // Facebook general video URL (just contains facebook.com and video-related path)
+  if (trimmedUrl.includes('facebook.com') && (trimmedUrl.includes('/video') || trimmedUrl.includes('/watch') || trimmedUrl.includes('/reel'))) {
+    return {
+      type: 'facebook',
+      url: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(trimmedUrl)}&show_text=false`,
+    };
+  }
+
+  // Direct video file (including blob URLs from file upload)
+  if (trimmedUrl.match(/\.(mp4|webm|ogg|mov)(\?|$)/i) || trimmedUrl.startsWith('blob:')) {
+    return {
+      type: 'direct',
+      url: trimmedUrl,
+    };
+  }
+
+  return {
+    type: 'unsupported',
+    url: trimmedUrl,
+  };
 }
 
 export function QuickDisplay({
@@ -134,10 +189,8 @@ export function QuickDisplay({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, canGoNext, canGoPrevious, shouldPaginate]);
 
-  // Get video embed URL
-  const videoEmbedUrl = contentType === 'video' ? getVideoEmbedUrl(content) : null;
-  const isDirectVideo = videoEmbedUrl && !videoEmbedUrl.includes('youtube') && !videoEmbedUrl.includes('vimeo');
-  const isEmbedVideo = videoEmbedUrl && !isDirectVideo;
+  // Get video embed info
+  const videoEmbed = contentType === 'video' ? getVideoEmbed(content) : null;
 
   return (
     <div
@@ -155,26 +208,63 @@ export function QuickDisplay({
               className="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl"
             />
           </div>
-        ) : contentType === 'video' ? (
-          <div className="animate-fade-in w-full max-w-4xl aspect-video">
-            {isEmbedVideo ? (
-              <iframe
-                src={videoEmbedUrl}
-                className="w-full h-full rounded-lg shadow-2xl"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : isDirectVideo ? (
-              <video
-                ref={videoRef}
-                src={content}
-                className="w-full h-full rounded-lg shadow-2xl object-contain"
-                controls
-                autoPlay
-              />
+        ) : contentType === 'video' && videoEmbed ? (
+          <div className="animate-fade-in w-full max-w-4xl">
+            {videoEmbed.type === 'direct' ? (
+              <div className="aspect-video">
+                <video
+                  ref={videoRef}
+                  src={videoEmbed.url}
+                  className="w-full h-full rounded-lg shadow-2xl object-contain"
+                  controls
+                  autoPlay
+                />
+              </div>
+            ) : videoEmbed.type === 'youtube' || videoEmbed.type === 'vimeo' ? (
+              <div className="aspect-video">
+                <iframe
+                  src={videoEmbed.url}
+                  className="w-full h-full rounded-lg shadow-2xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : videoEmbed.type === 'instagram' ? (
+              <div className="aspect-[9/16] max-h-[80vh] mx-auto">
+                <iframe
+                  src={videoEmbed.url}
+                  className="w-full h-full rounded-lg shadow-2xl"
+                  allowFullScreen
+                  scrolling="no"
+                />
+              </div>
+            ) : videoEmbed.type === 'facebook' ? (
+              <div className="aspect-video">
+                <iframe
+                  src={videoEmbed.url}
+                  className="w-full h-full rounded-lg shadow-2xl"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-lg">
-                <p className="text-white/50">Unable to play this video format</p>
+              <div className="aspect-video flex flex-col items-center justify-center bg-white/5 rounded-lg p-8">
+                <svg className="w-16 h-16 text-white/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <p className="text-white/50 text-center mb-2">Unable to embed this video</p>
+                <p className="text-white/30 text-sm text-center max-w-md">
+                  Try pasting a YouTube, Vimeo, Instagram Reel, or Facebook video link.
+                  You can also upload a video file directly.
+                </p>
+                <a
+                  href={content}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 btn-secondary text-sm"
+                >
+                  Open in New Tab
+                </a>
               </div>
             )}
           </div>
