@@ -205,6 +205,14 @@ function App() {
     setView('display');
   }, []);
 
+  // Text display handler (for uploaded text files)
+  const handleTextContent = useCallback((text: string) => {
+    setQuickContent(text);
+    setQuickContentType('text');
+    setContentMode('quick');
+    setView('display');
+  }, []);
+
   // Check if text is a video URL
   const isVideoUrl = useCallback((text: string): boolean => {
     const trimmed = text.trim();
@@ -481,6 +489,7 @@ function App() {
               onPasteContent={handlePasteContent}
               onVideoContent={handleVideoContent}
               onImageContent={handleImageContent}
+              onTextContent={handleTextContent}
             />
           </div>
 

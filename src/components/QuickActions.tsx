@@ -6,31 +6,67 @@ interface QuickActionsProps {
   onPasteContent: () => void;
   onVideoContent: (url: string) => void;
   onImageContent: (url: string) => void;
+  onTextContent: (text: string) => void;
 }
 
-export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, onImageContent }: QuickActionsProps) {
-  const [videoUrl, setVideoUrl] = useState('');
-  const [showVideoInput, setShowVideoInput] = useState(false);
+export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, onImageContent, onTextContent }: QuickActionsProps) {
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleVideoSubmit = (e: React.FormEvent) => {
+  // Detect URL type
+  const getUrlType = (url: string): 'video' | 'image' | 'unknown' => {
+    const trimmed = url.trim().toLowerCase();
+
+    // Video platforms
+    if (trimmed.match(/(?:youtube\.com|youtu\.be|vimeo\.com|instagram\.com\/(?:reel|p|tv)|facebook\.com)/)) {
+      return 'video';
+    }
+
+    // Direct video files
+    if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/)) {
+      return 'video';
+    }
+
+    // Direct image files
+    if (trimmed.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/)) {
+      return 'image';
+    }
+
+    return 'unknown';
+  };
+
+  const handleUrlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (videoUrl.trim()) {
-      onVideoContent(videoUrl.trim());
-      setVideoUrl('');
-      setShowVideoInput(false);
+    if (mediaUrl.trim()) {
+      const urlType = getUrlType(mediaUrl);
+      if (urlType === 'video') {
+        onVideoContent(mediaUrl.trim());
+      } else if (urlType === 'image') {
+        onImageContent(mediaUrl.trim());
+      } else {
+        // Try as video first (most common use case for URLs)
+        onVideoContent(mediaUrl.trim());
+      }
+      setMediaUrl('');
+      setShowUrlInput(false);
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      // Check if it's an image or video
+      // Check file type
       if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
         onImageContent(url);
       } else if (file.type.startsWith('video/')) {
+        const url = URL.createObjectURL(file);
         onVideoContent(url);
+      } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        // Read text file content
+        const text = await file.text();
+        onTextContent(text);
       }
     }
     // Reset input
@@ -93,10 +129,10 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
             <span>Paste</span>
           </button>
 
-          {/* Video URL button */}
+          {/* Media URL button */}
           <button
-            onClick={() => setShowVideoInput(!showVideoInput)}
-            className={`btn-secondary py-3 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform ${showVideoInput ? 'bg-white/20' : ''}`}
+            onClick={() => setShowUrlInput(!showUrlInput)}
+            className={`btn-secondary py-3 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform ${showUrlInput ? 'bg-white/20' : ''}`}
           >
             <svg
               className="w-5 h-5"
@@ -108,16 +144,10 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
               />
             </svg>
-            <span>Video URL</span>
+            <span>URL</span>
           </button>
 
           {/* Upload video button */}
@@ -143,38 +173,39 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*,video/*"
+            accept="image/*,video/*,.txt,text/plain"
             onChange={handleFileUpload}
             className="hidden"
           />
         </div>
 
-        {/* Video URL input */}
-        {showVideoInput && (
-          <form onSubmit={handleVideoSubmit} className="mb-4 animate-fade-in">
+        {/* Media URL input */}
+        {showUrlInput && (
+          <form onSubmit={handleUrlSubmit} className="mb-4 animate-fade-in">
             <div className="flex gap-2">
               <input
                 type="text"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="YouTube, Vimeo, or video file URL..."
+                value={mediaUrl}
+                onChange={(e) => setMediaUrl(e.target.value)}
+                placeholder="Image or video URL (YouTube, Instagram, direct link...)"
                 className="input-field flex-1"
                 autoFocus
               />
               <button
                 type="submit"
-                disabled={!videoUrl.trim()}
+                disabled={!mediaUrl.trim()}
                 className="btn-primary disabled:opacity-50"
               >
-                Play
+                Display
               </button>
             </div>
           </form>
         )}
 
         <p className="text-white/40 text-xs text-center">
-          Paste text/image with <kbd className="px-1 py-0.5 bg-white/10 rounded text-xs">Ctrl+V</kbd>,
-          or enter YouTube/Vimeo URL to display
+          Paste with <kbd className="px-1 py-0.5 bg-white/10 rounded text-xs">Ctrl+V</kbd> |
+          Upload images, videos, or text files |
+          Enter any media URL
         </p>
       </div>
     </div>
