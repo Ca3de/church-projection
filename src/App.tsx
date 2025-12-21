@@ -60,7 +60,7 @@ function App() {
 
   // Quick display state
   const [quickContent, setQuickContent] = useState<string>('');
-  const [quickContentType, setQuickContentType] = useState<'text' | 'image'>('text');
+  const [quickContentType, setQuickContentType] = useState<'text' | 'image' | 'video'>('text');
 
   const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
@@ -189,6 +189,26 @@ function App() {
     setView('display');
   }, []);
 
+  // Video display handler
+  const handleVideoContent = useCallback((url: string) => {
+    setQuickContent(url);
+    setQuickContentType('video');
+    setContentMode('quick');
+    setView('display');
+  }, []);
+
+  // Check if text is a video URL
+  const isVideoUrl = useCallback((text: string): boolean => {
+    const trimmed = text.trim();
+    // YouTube
+    if (trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)/)) return true;
+    // Vimeo
+    if (trimmed.match(/vimeo\.com\/\d+/)) return true;
+    // Direct video files
+    if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) return true;
+    return false;
+  }, []);
+
   // Quick paste handlers
   const handlePasteContent = useCallback(async () => {
     try {
@@ -207,13 +227,18 @@ function App() {
           return;
         }
 
-        // Check for text
+        // Check for text (might be video URL)
         if (item.types.includes('text/plain')) {
           const blob = await item.getType('text/plain');
           const text = await blob.text();
           if (text.trim()) {
-            setQuickContent(text);
-            setQuickContentType('text');
+            if (isVideoUrl(text)) {
+              setQuickContent(text.trim());
+              setQuickContentType('video');
+            } else {
+              setQuickContent(text);
+              setQuickContentType('text');
+            }
             setContentMode('quick');
             setView('display');
             return;
@@ -225,8 +250,13 @@ function App() {
       try {
         const text = await navigator.clipboard.readText();
         if (text.trim()) {
-          setQuickContent(text);
-          setQuickContentType('text');
+          if (isVideoUrl(text)) {
+            setQuickContent(text.trim());
+            setQuickContentType('video');
+          } else {
+            setQuickContent(text);
+            setQuickContentType('text');
+          }
           setContentMode('quick');
           setView('display');
         }
@@ -234,7 +264,7 @@ function App() {
         console.error('Failed to read clipboard:', err);
       }
     }
-  }, []);
+  }, [isVideoUrl]);
 
   // Listen for paste events when on search view
   useEffect(() => {
@@ -264,12 +294,17 @@ function App() {
           }
         }
 
-        // Check for text
+        // Check for text (might be video URL)
         if (item.type === 'text/plain') {
           item.getAsString((text) => {
             if (text.trim()) {
-              setQuickContent(text);
-              setQuickContentType('text');
+              if (isVideoUrl(text)) {
+                setQuickContent(text.trim());
+                setQuickContentType('video');
+              } else {
+                setQuickContent(text);
+                setQuickContentType('text');
+              }
               setContentMode('quick');
               setView('display');
             }
@@ -281,7 +316,7 @@ function App() {
 
     document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
-  }, [view]);
+  }, [view, isVideoUrl]);
 
   // Shared handlers
   const handleNewSearch = useCallback(() => {
@@ -432,6 +467,7 @@ function App() {
             <QuickActions
               onSelectLiturgy={handleSelectLiturgy}
               onPasteContent={handlePasteContent}
+              onVideoContent={handleVideoContent}
             />
           </div>
 

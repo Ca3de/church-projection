@@ -1,4 +1,5 @@
-import type { LiturgyItem } from '../data/liturgy';
+import { useState, useEffect } from 'react';
+import type { LiturgyItem, LiturgyVerse } from '../data/liturgy';
 
 interface LiturgyDisplayProps {
   item: LiturgyItem;
@@ -8,6 +9,31 @@ interface LiturgyDisplayProps {
   onClose: () => void;
 }
 
+interface DisplayPage {
+  type: 'verse' | 'paragraph';
+  verseNumber?: number;
+  isRefrain?: boolean;
+  lines?: string[];
+  text?: string;
+}
+
+function getPages(item: LiturgyItem): DisplayPage[] {
+  if (item.type === 'hymn' && item.verses) {
+    return item.verses.map((verse: LiturgyVerse) => ({
+      type: 'verse',
+      verseNumber: verse.number,
+      isRefrain: verse.isRefrain,
+      lines: verse.lines,
+    }));
+  } else if (item.paragraphs) {
+    return item.paragraphs.map((text: string) => ({
+      type: 'paragraph',
+      text,
+    }));
+  }
+  return [];
+}
+
 export function LiturgyDisplay({
   item,
   isFullscreen,
@@ -15,6 +41,43 @@ export function LiturgyDisplay({
   onToggleFullscreen,
   onClose,
 }: LiturgyDisplayProps) {
+  const pages = getPages(item);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const currentPage = pages[currentIndex];
+  const canGoNext = currentIndex < pages.length - 1;
+  const canGoPrevious = currentIndex > 0;
+
+  const handleNext = () => {
+    if (canGoNext) {
+      setCurrentIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (canGoPrevious) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'n') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace' || e.key === 'p') {
+        e.preventDefault();
+        handlePrevious();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, canGoNext, canGoPrevious]);
+
+  if (!currentPage) return null;
+
   return (
     <div
       className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
@@ -24,48 +87,55 @@ export function LiturgyDisplay({
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full overflow-hidden">
         {/* Title */}
-        <div className="text-center mb-8 animate-fade-in flex-shrink-0">
-          <h1 className="verse-reference text-2xl md:text-3xl lg:text-4xl font-display theme-accent">
+        <div className="text-center mb-6 animate-fade-in flex-shrink-0">
+          <h1 className="verse-reference text-xl md:text-2xl lg:text-3xl font-display theme-accent">
             {item.title}
           </h1>
         </div>
 
-        {/* Content - scrollable container */}
-        <div className="text-center animate-fade-in flex-1 overflow-y-auto max-h-[70vh] w-full px-4 scrollbar-thin">
-          {item.type === 'hymn' && item.verses ? (
-            <div className="space-y-8">
-              {item.verses.map((verse, index) => (
-                <div key={index} className="space-y-2">
-                  {verse.number && (
-                    <p className="text-white/50 text-sm md:text-base font-medium mb-3">
-                      {verse.isRefrain ? 'Refrain' : `Verse ${verse.number}`}
-                    </p>
-                  )}
-                  <div className="space-y-1">
-                    {verse.lines.map((line, lineIndex) => (
-                      <p
-                        key={lineIndex}
-                        className="liturgy-text text-white/95 leading-relaxed"
-                      >
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : item.paragraphs ? (
-            <div className="space-y-6 text-left max-w-4xl mx-auto">
-              {item.paragraphs.map((paragraph, index) => (
+        {/* Page content */}
+        <div
+          key={currentIndex}
+          className="text-center animate-fade-in flex-1 flex flex-col items-center justify-center w-full px-4"
+        >
+          {currentPage.type === 'verse' && currentPage.lines ? (
+            <div className="space-y-2">
+              {currentPage.lines.map((line, lineIndex) => (
                 <p
-                  key={index}
-                  className="liturgy-text text-white/95 leading-relaxed indent-8 first:indent-0"
+                  key={lineIndex}
+                  className="liturgy-text text-white/95 leading-relaxed"
                 >
-                  {paragraph}
+                  {line}
                 </p>
               ))}
             </div>
+          ) : currentPage.text ? (
+            <p className="liturgy-text text-white/95 leading-relaxed max-w-4xl text-center">
+              {currentPage.text}
+            </p>
           ) : null}
+        </div>
+
+        {/* Page indicator */}
+        <div className="animate-slide-up space-y-1 flex-shrink-0 mt-6">
+          <p className="verse-reference">
+            {currentPage.type === 'verse' ? (
+              currentPage.isRefrain ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="px-3 py-1 bg-white/20 rounded-full text-sm theme-accent">
+                    Refrain
+                  </span>
+                </span>
+              ) : (
+                <span>Verse {currentPage.verseNumber}</span>
+              )
+            ) : (
+              <span>Part {currentIndex + 1}</span>
+            )}
+          </p>
+          <p className="text-white/40 text-sm">
+            {currentIndex + 1} of {pages.length}
+          </p>
         </div>
       </div>
 
@@ -78,6 +148,29 @@ export function LiturgyDisplay({
         }`}
       >
         <div className="flex items-center justify-center gap-4 max-w-4xl mx-auto">
+          {/* Previous button */}
+          <button
+            onClick={handlePrevious}
+            disabled={!canGoPrevious}
+            className="btn-secondary flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Previous (Left arrow, P, or Backspace)"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            <span className="hidden sm:inline">Previous</span>
+          </button>
+
           {/* Close button */}
           <button
             onClick={onClose}
@@ -103,7 +196,7 @@ export function LiturgyDisplay({
           {/* Fullscreen toggle */}
           <button
             onClick={onToggleFullscreen}
-            className="btn-primary flex items-center gap-2"
+            className="btn-secondary flex items-center gap-2"
             title="Toggle fullscreen (F)"
           >
             {isFullscreen ? (
@@ -139,6 +232,29 @@ export function LiturgyDisplay({
               {isFullscreen ? 'Exit' : 'Fullscreen'}
             </span>
           </button>
+
+          {/* Next button */}
+          <button
+            onClick={handleNext}
+            disabled={!canGoNext}
+            className="btn-primary flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Next (Right arrow, N, or Space)"
+          >
+            <span className="hidden sm:inline">Next</span>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* Keyboard shortcuts hint */}
@@ -146,14 +262,23 @@ export function LiturgyDisplay({
           <div className="text-center mt-4 text-white/30 text-sm">
             <span className="hidden md:inline">
               <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
+                Space
+              </kbd>{' '}
+              or
+              <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
+                →
+              </kbd>{' '}
+              Next
+              <span className="mx-2">|</span>
+              <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
+                ←
+              </kbd>{' '}
+              Previous
+              <span className="mx-2">|</span>
+              <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
                 F
               </kbd>{' '}
               Fullscreen
-              <span className="mx-2">|</span>
-              <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
-                Esc
-              </kbd>{' '}
-              Close
             </span>
           </div>
         )}
