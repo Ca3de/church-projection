@@ -63,7 +63,7 @@ function App() {
   const [quickContent, setQuickContent] = useState<string>('');
   const [quickContentType, setQuickContentType] = useState<'text' | 'image' | 'video'>('text');
 
-  const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
+  const { isFullscreen, toggleFullscreen, exitFullscreen, hasExternalDisplay } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
   const { isWindowOpen, openPresentationWindow, closePresentationWindow, sendToPresentation } = usePresentationWindow();
 
@@ -578,6 +578,12 @@ function App() {
 
           {/* Quick tips */}
           <div className="mt-12 text-center text-white/40 text-sm max-w-lg animate-fade-in">
+            {hasExternalDisplay && (
+              <p className="mb-2 text-green-400/70">
+                <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                External display detected - Fullscreen will use projector/TV
+              </p>
+            )}
             <p className="mb-2">
               <span style={{ color: currentTheme.colors.accent, opacity: 0.6 }}>Tip:</span> Use keyboard
               shortcuts for quick navigation
