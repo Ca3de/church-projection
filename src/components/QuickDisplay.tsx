@@ -150,6 +150,24 @@ export function QuickDisplay({
 }: QuickDisplayProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoAspect, setVideoAspect] = useState<'landscape' | 'portrait' | 'square'>('landscape');
+
+  // Detect video aspect ratio when loaded
+  const handleVideoLoaded = () => {
+    if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      if (videoWidth && videoHeight) {
+        const ratio = videoWidth / videoHeight;
+        if (ratio > 1.2) {
+          setVideoAspect('landscape');
+        } else if (ratio < 0.8) {
+          setVideoAspect('portrait');
+        } else {
+          setVideoAspect('square');
+        }
+      }
+    }
+  };
 
   // Parse text into pages
   const pages = contentType === 'text' ? parseTextIntoPages(content) : [];
@@ -209,19 +227,28 @@ export function QuickDisplay({
             />
           </div>
         ) : contentType === 'video' && videoEmbed ? (
-          <div className="animate-fade-in w-full max-w-4xl">
+          <div className="animate-fade-in w-full flex items-center justify-center">
             {videoEmbed.type === 'direct' ? (
-              <div className="aspect-video">
+              <div
+                className={`${
+                  videoAspect === 'portrait'
+                    ? 'max-h-[80vh] aspect-[9/16]'
+                    : videoAspect === 'square'
+                    ? 'max-h-[80vh] aspect-square'
+                    : 'w-full max-w-5xl aspect-video'
+                }`}
+              >
                 <video
                   ref={videoRef}
                   src={videoEmbed.url}
-                  className="w-full h-full rounded-lg shadow-2xl object-contain"
+                  className="w-full h-full rounded-lg shadow-2xl object-contain bg-black"
                   controls
                   autoPlay
+                  onLoadedMetadata={handleVideoLoaded}
                 />
               </div>
             ) : videoEmbed.type === 'youtube' || videoEmbed.type === 'vimeo' ? (
-              <div className="aspect-video">
+              <div className="w-full max-w-5xl aspect-video">
                 <iframe
                   src={videoEmbed.url}
                   className="w-full h-full rounded-lg shadow-2xl"
@@ -230,7 +257,7 @@ export function QuickDisplay({
                 />
               </div>
             ) : videoEmbed.type === 'instagram' ? (
-              <div className="aspect-[9/16] max-h-[80vh] mx-auto">
+              <div className="max-h-[80vh] aspect-[9/16]">
                 <iframe
                   src={videoEmbed.url}
                   className="w-full h-full rounded-lg shadow-2xl"
@@ -239,7 +266,7 @@ export function QuickDisplay({
                 />
               </div>
             ) : videoEmbed.type === 'facebook' ? (
-              <div className="aspect-video">
+              <div className="w-full max-w-5xl aspect-video">
                 <iframe
                   src={videoEmbed.url}
                   className="w-full h-full rounded-lg shadow-2xl"
