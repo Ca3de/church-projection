@@ -1,3 +1,11 @@
+import type { AnimationType, AnimationIntensity } from '../animations/types';
+
+export interface AnimationConfig {
+  type: AnimationType;
+  intensity: AnimationIntensity;
+  color?: string;
+}
+
 export interface Theme {
   id: string;
   name: string;
@@ -12,6 +20,7 @@ export interface Theme {
     accent: string;
   };
   icon?: string;
+  animation?: AnimationConfig;
 }
 
 export const themes: Theme[] = [
@@ -43,6 +52,10 @@ export const themes: Theme[] = [
       accent: '#fbbf24',
     },
     icon: '🎄',
+    animation: {
+      type: 'snow',
+      intensity: 'normal',
+    },
   },
   {
     id: 'advent',
@@ -58,6 +71,11 @@ export const themes: Theme[] = [
       accent: '#c4b5fd',
     },
     icon: '🕯️',
+    animation: {
+      type: 'snow',
+      intensity: 'light',
+      color: 'rgba(196, 181, 253, 0.6)',
+    },
   },
   {
     id: 'lent',
@@ -88,6 +106,11 @@ export const themes: Theme[] = [
       accent: '#fde047',
     },
     icon: '🌿',
+    animation: {
+      type: 'leaves',
+      intensity: 'normal',
+      color: '#16a34a',
+    },
   },
   {
     id: 'good-friday',
@@ -118,6 +141,10 @@ export const themes: Theme[] = [
       accent: '#fef08a',
     },
     icon: '🌅',
+    animation: {
+      type: 'sparkles',
+      intensity: 'normal',
+    },
   },
   {
     id: 'pentecost',
@@ -133,6 +160,10 @@ export const themes: Theme[] = [
       accent: '#fbbf24',
     },
     icon: '🔥',
+    animation: {
+      type: 'flames',
+      intensity: 'normal',
+    },
   },
   {
     id: 'trinity',
@@ -148,6 +179,10 @@ export const themes: Theme[] = [
       accent: '#fef3c7',
     },
     icon: '☘️',
+    animation: {
+      type: 'sparkles',
+      intensity: 'light',
+    },
   },
   {
     id: 'thanksgiving',
@@ -163,6 +198,10 @@ export const themes: Theme[] = [
       accent: '#fdba74',
     },
     icon: '🍂',
+    animation: {
+      type: 'leaves',
+      intensity: 'normal',
+    },
   },
   {
     id: 'new-year',
@@ -178,6 +217,10 @@ export const themes: Theme[] = [
       accent: '#fef08a',
     },
     icon: '🎆',
+    animation: {
+      type: 'sparkles',
+      intensity: 'heavy',
+    },
   },
   {
     id: 'all-saints',
@@ -193,6 +236,11 @@ export const themes: Theme[] = [
       accent: '#fef3c7',
     },
     icon: '👼',
+    animation: {
+      type: 'sparkles',
+      intensity: 'light',
+      color: '#ffffff',
+    },
   },
   {
     id: 'ordinary',

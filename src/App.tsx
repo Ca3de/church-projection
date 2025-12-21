@@ -24,6 +24,7 @@ import { useFullscreen } from './hooks/useFullscreen';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useCursorAutoHide } from './hooks/useCursorAutoHide';
 import { themes, getThemeById, getThemeCSSVariables, type Theme } from './config/themes';
+import { ThemeAnimation } from './animations';
 
 type ContentMode = 'scripture' | 'hymn';
 type AppView = 'search' | 'display';
@@ -224,6 +225,20 @@ function App() {
 
   return (
     <div className="min-h-screen">
+      {/* Theme-specific animations */}
+      {currentTheme.animation && (
+        <ThemeAnimation
+          animationType={currentTheme.animation.type}
+          intensity={currentTheme.animation.intensity}
+          color={currentTheme.animation.color}
+          themeColors={{
+            primary: currentTheme.colors.primary,
+            secondary: currentTheme.colors.secondary,
+            accent: currentTheme.colors.accent,
+          }}
+        />
+      )}
+
       {view === 'search' ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
           {/* Theme selector in corner */}
