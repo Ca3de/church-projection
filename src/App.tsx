@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   ScriptureInput,
   VerseDisplay,
   TabSwitcher,
   HymnInput,
   HymnDisplay,
+  ThemeSelector,
 } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
@@ -22,6 +23,7 @@ import {
 import { useFullscreen } from './hooks/useFullscreen';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useCursorAutoHide } from './hooks/useCursorAutoHide';
+import { themes, getThemeById, getThemeCSSVariables, type Theme } from './config/themes';
 
 type ContentMode = 'scripture' | 'hymn';
 type AppView = 'search' | 'display';
@@ -32,6 +34,12 @@ function App() {
   const [view, setView] = useState<AppView>('search');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Theme state
+  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
+    const savedThemeId = localStorage.getItem('church-projection-theme');
+    return savedThemeId ? getThemeById(savedThemeId) : themes[0];
+  });
 
   // Scripture state
   const [currentVerse, setCurrentVerse] = useState<Verse | null>(null);
@@ -44,6 +52,19 @@ function App() {
 
   const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
+
+  // Apply theme CSS variables
+  useEffect(() => {
+    const cssVars = getThemeCSSVariables(currentTheme);
+    Object.entries(cssVars).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+    localStorage.setItem('church-projection-theme', currentTheme.id);
+  }, [currentTheme]);
+
+  const handleThemeChange = useCallback((theme: Theme) => {
+    setCurrentTheme(theme);
+  }, []);
 
   // Scripture handlers
   const handleScriptureSearch = useCallback(async (reference: string) => {
@@ -205,12 +226,21 @@ function App() {
     <div className="min-h-screen">
       {view === 'search' ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
+          {/* Theme selector in corner */}
+          <div className="fixed top-4 right-4 z-50 animate-fade-in">
+            <ThemeSelector
+              currentTheme={currentTheme}
+              onThemeChange={handleThemeChange}
+            />
+          </div>
+
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
             <div className="flex items-center justify-center gap-3 mb-4">
               {contentMode === 'scripture' ? (
                 <svg
-                  className="w-12 h-12 text-amber-500"
+                  className="w-12 h-12"
+                  style={{ color: currentTheme.colors.primary }}
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -219,7 +249,8 @@ function App() {
                 </svg>
               ) : (
                 <svg
-                  className="w-12 h-12 text-amber-500"
+                  className="w-12 h-12"
+                  style={{ color: currentTheme.colors.primary }}
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -269,7 +300,7 @@ function App() {
           {/* Quick tips */}
           <div className="mt-12 text-center text-white/40 text-sm max-w-lg animate-fade-in">
             <p className="mb-2">
-              <span className="text-amber-400/60">Tip:</span> Use keyboard
+              <span style={{ color: currentTheme.colors.accent, opacity: 0.6 }}>Tip:</span> Use keyboard
               shortcuts for quick navigation
             </p>
             <p>

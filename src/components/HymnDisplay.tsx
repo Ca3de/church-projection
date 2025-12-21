@@ -37,7 +37,7 @@ export function HymnDisplay({
       <div className="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full overflow-hidden">
         {/* Hymn title */}
         <div className="text-center mb-4 animate-fade-in flex-shrink-0">
-          <p className="text-amber-400/80 text-lg md:text-xl lg:text-2xl font-display">
+          <p className="verse-reference text-lg md:text-xl lg:text-2xl font-display">
             Hymn {displayItem.hymnNumber} - {displayItem.hymnTitle}
           </p>
         </div>
@@ -54,7 +54,7 @@ export function HymnDisplay({
           <p className="verse-reference">
             {displayItem.type === 'refrain' ? (
               <span className="inline-flex items-center gap-2">
-                <span className="px-3 py-1 bg-amber-600/30 rounded-full text-sm">
+                <span className="px-3 py-1 bg-white/20 rounded-full text-sm theme-accent">
                   Refrain
                 </span>
               </span>
