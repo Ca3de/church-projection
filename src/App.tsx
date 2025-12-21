@@ -26,6 +26,7 @@ import {
 import { useFullscreen } from './hooks/useFullscreen';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useCursorAutoHide } from './hooks/useCursorAutoHide';
+import { usePresentationWindow } from './hooks/usePresentationWindow';
 import { themes, getThemeById, getThemeCSSVariables, type Theme } from './config/themes';
 import { ThemeAnimation } from './animations';
 import type { LiturgyItem } from './data/liturgy';
@@ -64,6 +65,7 @@ function App() {
 
   const { isFullscreen, toggleFullscreen, exitFullscreen } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
+  const { isWindowOpen, openPresentationWindow, closePresentationWindow, sendToPresentation } = usePresentationWindow();
 
   // Apply theme CSS variables
   useEffect(() => {
@@ -375,6 +377,66 @@ function App() {
   const canGoNextHymn = hymnDisplayIndex < hymnTotalItems - 1;
   const canGoPreviousHymn = hymnDisplayIndex > 0;
 
+  // Sync content to presentation window
+  useEffect(() => {
+    if (!isWindowOpen) return;
+
+    const themeData = {
+      background: currentTheme.colors.background,
+      backgroundEnd: currentTheme.colors.backgroundEnd,
+      accent: currentTheme.colors.accent,
+    };
+
+    if (view === 'display') {
+      if (contentMode === 'scripture' && currentVerse) {
+        sendToPresentation({
+          type: 'scripture',
+          data: currentVerse,
+          theme: themeData,
+        });
+      } else if (contentMode === 'hymn' && currentHymnDisplayItem && currentHymn) {
+        sendToPresentation({
+          type: 'hymn',
+          data: {
+            title: `${currentHymn.number}. ${currentHymn.title}`,
+            lines: [currentHymnDisplayItem.text],
+            verseLabel: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
+            index: hymnDisplayIndex,
+            total: hymnTotalItems,
+          },
+          theme: themeData,
+        });
+      } else if (contentMode === 'liturgy' && currentLiturgy) {
+        sendToPresentation({
+          type: 'liturgy',
+          data: {
+            title: currentLiturgy.title,
+            content: currentLiturgy.paragraphs?.[0] || currentLiturgy.verses?.[0]?.lines.join(' ') || '',
+            pageLabel: 'Page',
+            index: 0,
+            total: 1,
+          },
+          theme: themeData,
+        });
+      } else if (contentMode === 'quick' && quickContent) {
+        sendToPresentation({
+          type: 'quick',
+          data: {
+            content: quickContent,
+            contentType: quickContentType,
+          },
+          theme: themeData,
+        });
+      }
+    } else {
+      sendToPresentation({ type: null, data: null, theme: themeData });
+    }
+  }, [
+    isWindowOpen, view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem,
+    hymnDisplayIndex, hymnTotalItems, currentLiturgy, quickContent, quickContentType,
+    currentTheme, sendToPresentation
+  ]);
+
   // Determine which handlers to use based on content mode
   const handleNext =
     contentMode === 'scripture' ? handleScriptureNext : handleHymnNext;
@@ -408,8 +470,29 @@ function App() {
 
       {view === 'search' ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
-          {/* Theme selector in corner */}
-          <div className="fixed top-4 right-4 z-50 animate-fade-in">
+          {/* Theme selector and Project button in corner */}
+          <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3">
+            {/* Project to external display button */}
+            <button
+              onClick={isWindowOpen ? closePresentationWindow : openPresentationWindow}
+              className={`btn-secondary flex items-center gap-2 ${isWindowOpen ? 'bg-green-500/30 border-green-500/50' : ''}`}
+              title={isWindowOpen ? 'Close presentation window' : 'Open presentation window for projector/TV'}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="hidden sm:inline">{isWindowOpen ? 'Close Display' : 'Project'}</span>
+            </button>
             <ThemeSelector
               currentTheme={currentTheme}
               onThemeChange={handleThemeChange}
