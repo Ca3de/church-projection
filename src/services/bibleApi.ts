@@ -2,6 +2,7 @@ import type { Verse, ScriptureReference } from '../types/bible';
 import { BIBLE_BOOKS } from '../types/bible';
 
 const API_BASE = 'https://bible-api.com';
+const TRANSLATION = 'kjv';
 
 interface BibleApiResponse {
   reference: string;
@@ -61,7 +62,7 @@ export async function fetchVerses(reference: ScriptureReference): Promise<Verse[
   const query = `${reference.book} ${reference.chapter}:${verseRange}`;
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}`);
+    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch scripture: ${response.statusText}`);
@@ -86,7 +87,7 @@ export async function fetchNextVerse(currentVerse: Verse): Promise<Verse | null>
   const query = `${currentVerse.book} ${currentVerse.chapter}:${nextVerseNum}`;
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}`);
+    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
 
     if (!response.ok) {
       // Try next chapter
@@ -116,7 +117,7 @@ export async function fetchPreviousVerse(currentVerse: Verse): Promise<Verse | n
     const query = `${currentVerse.book} ${currentVerse.chapter}:${prevVerseNum}`;
 
     try {
-      const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}`);
+      const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
 
       if (!response.ok) {
         return null;
@@ -149,7 +150,7 @@ async function fetchFirstVerseOfChapter(book: string, chapter: number): Promise<
   const query = `${book} ${chapter}:1`;
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}`);
+    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
 
     if (!response.ok) {
       return null;
@@ -177,7 +178,7 @@ async function fetchLastVerseOfChapter(book: string, chapter: number): Promise<V
   const query = `${book} ${chapter}`;
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}`);
+    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
 
     if (!response.ok) {
       return null;
