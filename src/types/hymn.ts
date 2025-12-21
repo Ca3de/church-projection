@@ -1,5 +1,6 @@
 export interface Hymn {
   number: number;
+  displayNumber?: string; // Original identifier like "YS1" for special hymns
   title: string;
   author?: string;
   year?: number;
@@ -10,6 +11,7 @@ export interface Hymn {
 
 export interface HymnDisplayItem {
   hymnNumber: number;
+  hymnDisplayNumber?: string; // Original identifier like "YS1"
   hymnTitle: string;
   text: string;
   type: 'verse' | 'refrain';
@@ -20,6 +22,7 @@ export interface HymnDisplayItem {
 
 export interface HymnSearchResult {
   number: number;
+  displayNumber?: string;
   title: string;
   author?: string;
 }

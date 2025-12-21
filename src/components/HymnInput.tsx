@@ -157,7 +157,7 @@ export function HymnInput({
                     : 'hover:bg-white/10 text-white/80'
                 }`}
               >
-                <span className="font-medium">#{hymn.number}</span>
+                <span className="font-medium">#{hymn.displayNumber || hymn.number}</span>
                 <span className="mx-2">-</span>
                 <span>{hymn.title}</span>
                 {hymn.author && (
@@ -172,7 +172,7 @@ export function HymnInput({
       </div>
 
       <p className="text-center text-white/40 text-sm mt-3">
-        Examples: "234", "Amazing Grace", "Holy"
+        Examples: "234", "YS1", "Amazing Grace", "Holy"
       </p>
     </form>
   );

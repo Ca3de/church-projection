@@ -9,11 +9,14 @@ interface JsonVerse {
 
 interface JsonHymn {
   title: string;
-  number: string;
+  number: string | null;
   type: string;
   verses: JsonVerse[];
   refrain?: string;
 }
+
+// Counter for auto-assigning numbers to hymns without valid numbers
+let autoNumberCounter = 8001;
 
 // Convert JSON format to our Hymn format
 function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
@@ -22,10 +25,23 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
     return null;
   }
 
-  // Parse hymn number
-  const hymnNumber = parseInt(jsonHymn.number, 10);
-  if (isNaN(hymnNumber)) {
-    return null;
+  let hymnNumber: number;
+  let displayNumber: string | undefined;
+
+  const numStr = jsonHymn.number;
+
+  if (numStr && numStr.toUpperCase().startsWith('YS')) {
+    // Special church hymns like YS1, YS2, etc.
+    // Map to 9001, 9002, etc. for internal numbering
+    const ysNum = parseInt(numStr.slice(2), 10);
+    hymnNumber = 9000 + (isNaN(ysNum) ? autoNumberCounter++ - 8000 : ysNum);
+    displayNumber = numStr.toUpperCase();
+  } else if (numStr && !isNaN(parseInt(numStr, 10))) {
+    // Regular numeric hymn
+    hymnNumber = parseInt(numStr, 10);
+  } else {
+    // Hymns with null or invalid numbers - auto-assign
+    hymnNumber = autoNumberCounter++;
   }
 
   // Extract verses in order (already numbered in the new format)
@@ -34,6 +50,7 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
 
   return {
     number: hymnNumber,
+    displayNumber,
     title: jsonHymn.title,
     verses,
     refrain: jsonHymn.refrain || null,

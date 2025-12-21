@@ -38,7 +38,7 @@ export function HymnDisplay({
         {/* Hymn title */}
         <div className="text-center mb-4 animate-fade-in flex-shrink-0">
           <p className="verse-reference text-lg md:text-xl lg:text-2xl font-display">
-            Hymn {displayItem.hymnNumber} - {displayItem.hymnTitle}
+            Hymn {displayItem.hymnDisplayNumber || displayItem.hymnNumber} - {displayItem.hymnTitle}
           </p>
         </div>
 
