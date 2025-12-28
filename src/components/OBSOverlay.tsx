@@ -73,15 +73,30 @@ export function OBSOverlay() {
   const bgStart = theme.colors?.background || '#0c0a09';
   const bgEnd = theme.colors?.backgroundEnd || '#1c1917';
 
-  // Hidden state - green screen only
+  // Hidden state - green screen only (with small status indicator)
   if (!content.visible || content.type === 'none' || !content.text) {
     return (
       <div className="obs-overlay obs-overlay-empty">
+        <div className="obs-status">
+          {content.visible === false ? 'OBS OFF - Toggle ON in main app' : 'Waiting for content...'}
+        </div>
         <style>{`
           .obs-overlay-empty {
             position: fixed;
             inset: 0;
             background: #00ff00;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+          }
+          .obs-status {
+            color: #006600;
+            font-size: 14px;
+            font-family: sans-serif;
+            padding: 5px 15px;
+            background: rgba(0,100,0,0.2);
+            border-radius: 4px;
           }
         `}</style>
       </div>
