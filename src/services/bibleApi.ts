@@ -19,6 +19,32 @@ interface VerseResponse {
   text: string;
 }
 
+// Clean up KJV margin notes and annotations from verse text
+function cleanVerseText(text: string): string {
+  let cleaned = text;
+
+  // Remove margin note patterns like "94.1 God…: Heb. God of revenges"
+  // Pattern: verse reference followed by word and colon, then "Heb." annotation
+  cleaned = cleaned.replace(/\d+\.\d+\s+[^:]+:\s*Heb\.[^"]*/g, '');
+
+  // Remove patterns like "1.1 word: meaning" (margin references)
+  cleaned = cleaned.replace(/\d+\.\d+\s+\w+[….]?:\s*[^.]+\./g, '');
+
+  // Remove standalone margin references like "94.1"
+  cleaned = cleaned.replace(/\b\d+\.\d+\b/g, '');
+
+  // Remove "Heb." annotations that might remain
+  cleaned = cleaned.replace(/Heb\.\s*[^.]+/g, '');
+
+  // Remove "or," and "or:" margin alternatives
+  cleaned = cleaned.replace(/\bor,?\s*[^.;]+[.;]/gi, '');
+
+  // Clean up multiple spaces and trim
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+  return cleaned;
+}
+
 export function parseScriptureReference(input: string): ScriptureReference | null {
   const cleaned = input.trim();
 
@@ -68,7 +94,7 @@ async function fetchSingleVerse(book: string, chapter: number, verse: number): P
       book,
       chapter,
       verse,
-      text: data.text.trim(),
+      text: cleanVerseText(data.text),
     };
   } catch {
     return null;
