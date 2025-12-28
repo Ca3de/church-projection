@@ -78,12 +78,12 @@ export function usePresentationWindow() {
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              padding: 1rem;
+              padding: 2vh 2vw;
               text-align: center;
             }
             #presentation-root.hymn-display {
-              padding: 0.5rem;
-              justify-content: center;
+              padding: 2vh 2vw;
+              justify-content: space-between;
             }
             .waiting-message {
               color: rgba(255, 255, 255, 0.5);
@@ -107,34 +107,37 @@ export function usePresentationWindow() {
               text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             }
             .content.hymn {
-              font-size: clamp(2rem, 5vw, 4rem);
-              line-height: 1.6;
-              max-width: 95%;
-              width: 95%;
+              font-size: clamp(3rem, 6vh, 8rem);
+              line-height: 1.4;
+              max-width: 96%;
+              width: 96%;
               display: flex;
               flex-direction: column;
               justify-content: center;
+              align-items: center;
               flex: 1;
             }
             .content.hymn p {
-              margin: 0.3em 0;
+              margin: 0.4em 0;
             }
             .content.liturgy {
-              font-size: clamp(1.8rem, 4vw, 3rem);
-              max-width: 95%;
-              width: 95%;
+              font-size: clamp(2.5rem, 5vh, 6rem);
+              max-width: 96%;
+              width: 96%;
             }
             .hymn-title {
               color: var(--accent, #fbbf24);
-              font-size: clamp(1.5rem, 3vw, 2.5rem);
-              margin-bottom: 0.5rem;
+              font-size: clamp(1.8rem, 3vh, 3rem);
+              margin: 0;
+              padding-top: 1vh;
               opacity: 0.9;
               flex-shrink: 0;
             }
             .verse-indicator {
               color: var(--accent, #fbbf24);
-              font-size: clamp(1rem, 2vw, 1.5rem);
-              margin-top: 0.5rem;
+              font-size: clamp(1.2rem, 2vh, 2rem);
+              margin: 0;
+              padding-bottom: 1vh;
               opacity: 0.7;
               flex-shrink: 0;
             }
