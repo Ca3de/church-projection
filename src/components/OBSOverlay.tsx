@@ -8,6 +8,8 @@ interface OverlayContent {
   text: string;
   subtitle?: string;
   theme?: Theme;
+  visible?: boolean;
+  mode?: 'fullscreen' | 'overlay';
 }
 
 const CHANNEL_NAME = 'church-projection-overlay';
@@ -16,6 +18,8 @@ export function OBSOverlay() {
   const [content, setContent] = useState<OverlayContent>({
     type: 'none',
     text: '',
+    visible: false,
+    mode: 'overlay',
   });
   const [theme, setTheme] = useState<Theme>(themes[0]);
 
@@ -36,7 +40,6 @@ export function OBSOverlay() {
     }
 
     // Check localStorage for initial content and poll for updates
-    // This is needed for OBS Browser Source which runs in a separate browser instance
     const checkLocalStorage = () => {
       const savedContent = localStorage.getItem('obs-overlay-content');
       if (savedContent) {
@@ -65,19 +68,28 @@ export function OBSOverlay() {
     };
   }, []);
 
-  // Don't render anything if no content
-  if (content.type === 'none' || !content.text) {
+  const isFullscreen = content.mode === 'fullscreen';
+  const accentColor = theme.colors?.accent || '#fbbf24';
+  const bgStart = theme.colors?.background || '#0c0a09';
+  const bgEnd = theme.colors?.backgroundEnd || '#1c1917';
+
+  // Hidden state - green screen only
+  if (!content.visible || content.type === 'none' || !content.text) {
     return (
       <div className="obs-overlay obs-overlay-empty">
-        {/* Transparent - nothing to show */}
+        <style>{`
+          .obs-overlay-empty {
+            position: fixed;
+            inset: 0;
+            background: #00ff00;
+          }
+        `}</style>
       </div>
     );
   }
 
-  const accentColor = theme.colors?.accent || '#fbbf24';
-
   return (
-    <div className="obs-overlay">
+    <div className={`obs-overlay ${isFullscreen ? 'obs-fullscreen' : 'obs-bottom'}`}>
       <div className="obs-content">
         {/* Title/Reference */}
         {content.title && (
@@ -109,46 +121,87 @@ export function OBSOverlay() {
         .obs-overlay {
           position: fixed;
           inset: 0;
+          font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+        }
+
+        /* Fullscreen mode - themed background, centered content */
+        .obs-fullscreen {
+          background: linear-gradient(135deg, ${bgStart} 0%, ${bgEnd} 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4vh 4vw;
+        }
+
+        .obs-fullscreen .obs-content {
+          background: transparent;
+          padding: 0;
+          max-width: 94vw;
+          text-align: center;
+        }
+
+        .obs-fullscreen .obs-title {
+          font-size: clamp(2rem, 4vh, 3.5rem);
+          margin-bottom: 3vh;
+        }
+
+        .obs-fullscreen .obs-text {
+          font-size: clamp(4rem, 8vh, 7rem);
+          line-height: 1.3;
+        }
+
+        .obs-fullscreen .obs-subtitle {
+          font-size: clamp(1.5rem, 3vh, 2.5rem);
+          margin-top: 3vh;
+        }
+
+        /* Overlay mode - green background with bottom bar */
+        .obs-bottom {
           background: #00ff00;
           display: flex;
           align-items: flex-end;
           justify-content: center;
-          padding: 2vh 4vw 6vh 4vw;
-          font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+          padding: 2vh 4vw 4vh 4vw;
         }
 
-        .obs-overlay-empty {
-          background: #00ff00;
-          display: block;
-        }
-
-        .obs-content {
+        .obs-bottom .obs-content {
           background: rgba(0, 0, 0, 0.9);
-          padding: 3vh 5vw 2vh 5vw;
+          padding: 2.5vh 4vw 2vh 4vw;
           border-radius: 1rem;
           text-align: center;
-          max-width: 92vw;
+          max-width: 94vw;
           box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
         }
 
-        .obs-title {
-          font-size: clamp(1.5rem, 3vh, 2.5rem);
-          margin-bottom: 1.5vh;
+        .obs-bottom .obs-title {
+          font-size: clamp(1.2rem, 2.5vh, 2rem);
+          margin-bottom: 1vh;
           opacity: 0.95;
+        }
+
+        .obs-bottom .obs-text {
+          font-size: clamp(2rem, 5vh, 4rem);
+          line-height: 1.3;
+        }
+
+        .obs-bottom .obs-subtitle {
+          font-size: clamp(1rem, 2vh, 1.5rem);
+          margin-top: 1vh;
+          opacity: 0.8;
+        }
+
+        /* Shared text styles */
+        .obs-title {
           font-weight: 500;
         }
 
         .obs-text {
-          font-size: clamp(2.5rem, 6vh, 5rem);
-          line-height: 1.3;
           color: white;
           text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
           white-space: pre-line;
         }
 
         .obs-subtitle {
-          font-size: clamp(1.2rem, 2.5vh, 2rem);
-          margin-top: 1.5vh;
           opacity: 0.8;
         }
       `}</style>
@@ -171,7 +224,7 @@ export function sendToOBSOverlay(content: OverlayContent) {
   }
 }
 
-// Clear overlay content
+// Clear/hide overlay content
 export function clearOBSOverlay() {
-  sendToOBSOverlay({ type: 'none', text: '' });
+  sendToOBSOverlay({ type: 'none', text: '', visible: false });
 }

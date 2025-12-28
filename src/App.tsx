@@ -73,6 +73,10 @@ function App() {
   const [quickContent, setQuickContent] = useState<string>('');
   const [quickContentType, setQuickContentType] = useState<'text' | 'image' | 'video'>('text');
 
+  // OBS overlay state
+  const [obsOverlayVisible, setObsOverlayVisible] = useState(false);
+  const [obsOverlayMode, setObsOverlayMode] = useState<'fullscreen' | 'overlay'>('overlay');
+
   const { isFullscreen, toggleFullscreen, exitFullscreen, hasExternalDisplay } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
   const { isWindowOpen, openPresentationWindow, closePresentationWindow, sendToPresentation } = usePresentationWindow();
@@ -451,13 +455,15 @@ function App() {
 
   // Sync content to OBS overlay (via BroadcastChannel)
   useEffect(() => {
-    if (view === 'display') {
+    if (view === 'display' && obsOverlayVisible) {
       if (contentMode === 'scripture' && currentVerse) {
         sendToOBSOverlay({
           type: 'scripture',
           title: `${currentVerse.book} ${currentVerse.chapter}:${currentVerse.verse}`,
           text: currentVerse.text,
           theme: currentTheme,
+          visible: true,
+          mode: obsOverlayMode,
         });
       } else if (contentMode === 'hymn' && currentHymnDisplayItem && currentHymn) {
         sendToOBSOverlay({
@@ -466,6 +472,8 @@ function App() {
           text: currentHymnDisplayItem.text,
           subtitle: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
           theme: currentTheme,
+          visible: true,
+          mode: obsOverlayMode,
         });
       } else if (contentMode === 'liturgy' && currentLiturgy) {
         sendToOBSOverlay({
@@ -473,19 +481,23 @@ function App() {
           title: currentLiturgy.title,
           text: currentLiturgy.paragraphs?.[0] || currentLiturgy.verses?.[0]?.lines.join('\n') || '',
           theme: currentTheme,
+          visible: true,
+          mode: obsOverlayMode,
         });
       } else if (contentMode === 'quick' && quickContent && quickContentType === 'text') {
         sendToOBSOverlay({
           type: 'quick',
           text: quickContent,
           theme: currentTheme,
+          visible: true,
+          mode: obsOverlayMode,
         });
       }
     } else {
-      // Clear overlay when not displaying
-      sendToOBSOverlay({ type: 'none', text: '' });
+      // Hide overlay when not displaying or overlay is toggled off
+      sendToOBSOverlay({ type: 'none', text: '', visible: false, mode: obsOverlayMode });
     }
-  }, [view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem, currentLiturgy, quickContent, quickContentType, currentTheme]);
+  }, [view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem, currentLiturgy, quickContent, quickContentType, currentTheme, obsOverlayVisible, obsOverlayMode]);
 
   // Determine which handlers to use based on content mode
   const handleNext =
@@ -521,7 +533,30 @@ function App() {
       {view === 'search' ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
           {/* Theme selector and Project button in corner */}
-          <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3">
+          <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-2">
+            {/* OBS Overlay Controls */}
+            <div className="flex items-center gap-1 mr-2">
+              <button
+                onClick={() => setObsOverlayVisible(!obsOverlayVisible)}
+                className={`btn-secondary flex items-center gap-1.5 text-sm px-2 py-1.5 ${obsOverlayVisible ? 'bg-red-500/30 border-red-500/50' : ''}`}
+                title={obsOverlayVisible ? 'Hide OBS overlay' : 'Show OBS overlay'}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span className="hidden md:inline">OBS</span>
+              </button>
+              {obsOverlayVisible && (
+                <button
+                  onClick={() => setObsOverlayMode(obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay')}
+                  className="btn-secondary text-xs px-2 py-1.5"
+                  title={`Switch to ${obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay'} mode`}
+                >
+                  {obsOverlayMode === 'overlay' ? 'Bar' : 'Full'}
+                </button>
+              )}
+            </div>
+
             {/* Project to external display button */}
             <button
               onClick={isWindowOpen ? closePresentationWindow : openPresentationWindow}
