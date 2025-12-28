@@ -21,33 +21,47 @@ export function OBSOverlay() {
 
   useEffect(() => {
     // Listen for content updates via BroadcastChannel
-    const channel = new BroadcastChannel(CHANNEL_NAME);
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel(CHANNEL_NAME);
+      channel.onmessage = (event) => {
+        const data = event.data as OverlayContent;
+        setContent(data);
+        if (data.theme) {
+          setTheme(data.theme);
+        }
+      };
+    } catch {
+      // BroadcastChannel not supported
+    }
 
-    channel.onmessage = (event) => {
-      const data = event.data as OverlayContent;
-      setContent(data);
-      if (data.theme) {
-        setTheme(data.theme);
+    // Check localStorage for initial content and poll for updates
+    // This is needed for OBS Browser Source which runs in a separate browser instance
+    const checkLocalStorage = () => {
+      const savedContent = localStorage.getItem('obs-overlay-content');
+      if (savedContent) {
+        try {
+          const parsed = JSON.parse(savedContent) as OverlayContent;
+          setContent(parsed);
+          if (parsed.theme) {
+            const themeObj = getThemeById(parsed.theme.id);
+            setTheme(themeObj);
+          }
+        } catch {
+          // Ignore parse errors
+        }
       }
     };
 
-    // Also check localStorage for initial content
-    const savedContent = localStorage.getItem('obs-overlay-content');
-    if (savedContent) {
-      try {
-        const parsed = JSON.parse(savedContent) as OverlayContent;
-        setContent(parsed);
-        if (parsed.theme) {
-          const themeObj = getThemeById(parsed.theme.id);
-          setTheme(themeObj);
-        }
-      } catch {
-        // Ignore parse errors
-      }
-    }
+    // Initial check
+    checkLocalStorage();
+
+    // Poll localStorage every 500ms for OBS Browser Source compatibility
+    const pollInterval = setInterval(checkLocalStorage, 500);
 
     return () => {
-      channel.close();
+      channel?.close();
+      clearInterval(pollInterval);
     };
   }, []);
 
@@ -95,46 +109,47 @@ export function OBSOverlay() {
         .obs-overlay {
           position: fixed;
           inset: 0;
-          background: transparent;
+          background: #00ff00;
           display: flex;
           align-items: flex-end;
           justify-content: center;
-          padding: 2vh 4vw 4vh 4vw;
+          padding: 2vh 4vw 6vh 4vw;
           font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
         }
 
         .obs-overlay-empty {
-          display: none;
+          background: #00ff00;
+          display: block;
         }
 
         .obs-content {
-          background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.7) 70%, rgba(0, 0, 0, 0) 100%);
-          padding: 3vh 4vw 2vh 4vw;
+          background: rgba(0, 0, 0, 0.9);
+          padding: 3vh 5vw 2vh 5vw;
           border-radius: 1rem;
           text-align: center;
-          max-width: 90vw;
-          backdrop-filter: blur(4px);
+          max-width: 92vw;
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
         }
 
         .obs-title {
-          font-size: clamp(1rem, 2vh, 1.5rem);
-          margin-bottom: 1vh;
-          opacity: 0.9;
+          font-size: clamp(1.5rem, 3vh, 2.5rem);
+          margin-bottom: 1.5vh;
+          opacity: 0.95;
           font-weight: 500;
         }
 
         .obs-text {
-          font-size: clamp(1.5rem, 4vh, 3rem);
-          line-height: 1.4;
+          font-size: clamp(2.5rem, 6vh, 5rem);
+          line-height: 1.3;
           color: white;
-          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
           white-space: pre-line;
         }
 
         .obs-subtitle {
-          font-size: clamp(0.875rem, 1.5vh, 1.25rem);
-          margin-top: 1vh;
-          opacity: 0.7;
+          font-size: clamp(1.2rem, 2.5vh, 2rem);
+          margin-top: 1.5vh;
+          opacity: 0.8;
         }
       `}</style>
     </div>
