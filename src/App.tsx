@@ -9,6 +9,8 @@ import {
   LiturgyDisplay,
   QuickDisplay,
   QuickActions,
+  OBSOverlay,
+  sendToOBSOverlay,
 } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
@@ -35,6 +37,14 @@ type ContentMode = 'scripture' | 'hymn' | 'liturgy' | 'quick';
 type AppView = 'search' | 'display';
 
 function App() {
+  // Check if we're in OBS overlay mode
+  const isOverlayMode = new URLSearchParams(window.location.search).get('overlay') === 'true';
+
+  // If in overlay mode, render the OBS overlay component only
+  if (isOverlayMode) {
+    return <OBSOverlay />;
+  }
+
   // Shared state
   const [contentMode, setContentMode] = useState<ContentMode>('scripture');
   const [view, setView] = useState<AppView>('search');
@@ -438,6 +448,44 @@ function App() {
     hymnDisplayIndex, hymnTotalItems, currentLiturgy, quickContent, quickContentType,
     currentTheme, sendToPresentation
   ]);
+
+  // Sync content to OBS overlay (via BroadcastChannel)
+  useEffect(() => {
+    if (view === 'display') {
+      if (contentMode === 'scripture' && currentVerse) {
+        sendToOBSOverlay({
+          type: 'scripture',
+          title: `${currentVerse.book} ${currentVerse.chapter}:${currentVerse.verse}`,
+          text: currentVerse.text,
+          theme: currentTheme,
+        });
+      } else if (contentMode === 'hymn' && currentHymnDisplayItem && currentHymn) {
+        sendToOBSOverlay({
+          type: 'hymn',
+          title: `Hymn ${currentHymn.number} - ${currentHymn.title}`,
+          text: currentHymnDisplayItem.text,
+          subtitle: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
+          theme: currentTheme,
+        });
+      } else if (contentMode === 'liturgy' && currentLiturgy) {
+        sendToOBSOverlay({
+          type: 'liturgy',
+          title: currentLiturgy.title,
+          text: currentLiturgy.paragraphs?.[0] || currentLiturgy.verses?.[0]?.lines.join('\n') || '',
+          theme: currentTheme,
+        });
+      } else if (contentMode === 'quick' && quickContent && quickContentType === 'text') {
+        sendToOBSOverlay({
+          type: 'quick',
+          text: quickContent,
+          theme: currentTheme,
+        });
+      }
+    } else {
+      // Clear overlay when not displaying
+      sendToOBSOverlay({ type: 'none', text: '' });
+    }
+  }, [view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem, currentLiturgy, quickContent, quickContentType, currentTheme]);
 
   // Determine which handlers to use based on content mode
   const handleNext =

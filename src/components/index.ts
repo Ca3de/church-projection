@@ -7,3 +7,4 @@ export { ThemeSelector } from './ThemeSelector';
 export { LiturgyDisplay } from './LiturgyDisplay';
 export { QuickDisplay } from './QuickDisplay';
 export { QuickActions } from './QuickActions';
+export { OBSOverlay, sendToOBSOverlay, clearOBSOverlay } from './OBSOverlay';

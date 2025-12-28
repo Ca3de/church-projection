@@ -49,7 +49,7 @@ export function HymnDisplay({
           isFullscreen ? 'flex-1 w-[96vw] py-[2vh]' : 'flex-1 overflow-y-auto max-h-[60vh] w-full px-4 scrollbar-thin'
         }`}>
           <p className={`text-white/95 leading-relaxed whitespace-pre-line ${
-            isFullscreen ? 'text-[6vh] leading-[1.4]' : 'hymn-text mb-6'
+            isFullscreen ? 'text-[8vh] leading-[1.3]' : 'hymn-text mb-6'
           }`}
           style={isFullscreen ? { textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)' } : undefined}>
             {displayItem.text}
