@@ -107,6 +107,7 @@ function App() {
       }
 
       setCurrentVerse(verses[0]);
+      setContentMode('scripture');
       setView('display');
     } catch (err) {
       setError(
@@ -165,6 +166,7 @@ function App() {
 
     setCurrentHymn(hymn);
     setHymnDisplayIndex(0);
+    setContentMode('hymn');
     setView('display');
     setIsLoading(false);
   }, []);
