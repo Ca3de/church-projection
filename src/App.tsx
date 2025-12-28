@@ -11,6 +11,7 @@ import {
   QuickActions,
   OBSOverlay,
   sendToOBSOverlay,
+  OBSStandalone,
 } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
@@ -37,10 +38,17 @@ type ContentMode = 'scripture' | 'hymn' | 'liturgy' | 'quick';
 type AppView = 'search' | 'display';
 
 function App() {
-  // Check if we're in OBS overlay mode
-  const isOverlayMode = new URLSearchParams(window.location.search).get('overlay') === 'true';
+  // Check URL parameters for special modes
+  const urlParams = new URLSearchParams(window.location.search);
+  const isOverlayMode = urlParams.get('overlay') === 'true';
+  const isOBSMode = urlParams.get('obs') === 'true';
 
-  // If in overlay mode, render the OBS overlay component only
+  // OBS standalone mode - self-contained with controls
+  if (isOBSMode) {
+    return <OBSStandalone />;
+  }
+
+  // OBS overlay mode - syncs with main app (requires same browser)
   if (isOverlayMode) {
     return <OBSOverlay />;
   }
