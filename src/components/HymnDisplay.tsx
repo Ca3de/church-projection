@@ -29,32 +29,39 @@ export function HymnDisplay({
 }: HymnDisplayProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
-        isFullscreen ? 'fullscreen-mode' : ''
+      className={`flex flex-col items-center min-h-screen transition-all duration-500 ${
+        isFullscreen ? 'fullscreen-mode p-[2vh_2vw] justify-between' : 'justify-center p-8'
       } ${isCursorHidden ? 'cursor-none' : ''}`}
     >
       {/* Main hymn content */}
-      <div className="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full overflow-hidden">
+      <div className={`flex flex-col items-center w-full overflow-hidden ${
+        isFullscreen ? 'flex-1 justify-between max-w-[96vw]' : 'flex-1 justify-center max-w-6xl mx-auto'
+      }`}>
         {/* Hymn title */}
-        <div className="text-center mb-4 animate-fade-in flex-shrink-0">
-          <p className="verse-reference text-lg md:text-xl lg:text-2xl font-display">
+        <div className={`text-center animate-fade-in flex-shrink-0 ${isFullscreen ? 'pt-[1vh]' : 'mb-4'}`}>
+          <p className={`verse-reference font-display ${isFullscreen ? 'text-[3vh]' : 'text-lg md:text-xl lg:text-2xl'}`}>
             Hymn {displayItem.hymnDisplayNumber || displayItem.hymnNumber} - {displayItem.hymnTitle}
           </p>
         </div>
 
-        {/* Hymn text - scrollable container */}
-        <div className="text-center animate-fade-in flex-1 overflow-y-auto max-h-[60vh] w-full px-4 scrollbar-thin">
-          <p className="hymn-text text-white/95 mb-6 leading-relaxed whitespace-pre-line">
+        {/* Hymn text - fills available space in fullscreen */}
+        <div className={`text-center animate-fade-in flex items-center justify-center ${
+          isFullscreen ? 'flex-1 w-[96vw] py-[2vh]' : 'flex-1 overflow-y-auto max-h-[60vh] w-full px-4 scrollbar-thin'
+        }`}>
+          <p className={`text-white/95 leading-relaxed whitespace-pre-line ${
+            isFullscreen ? 'text-[6vh] leading-[1.4]' : 'hymn-text mb-6'
+          }`}
+          style={isFullscreen ? { textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)' } : undefined}>
             {displayItem.text}
           </p>
         </div>
 
         {/* Verse/Refrain indicator and progress */}
-        <div className="animate-slide-up space-y-1 flex-shrink-0 mt-4">
-          <p className="verse-reference">
+        <div className={`animate-slide-up flex-shrink-0 ${isFullscreen ? 'pb-[1vh]' : 'space-y-1 mt-4'}`}>
+          <p className={`verse-reference ${isFullscreen ? 'text-[2.5vh]' : ''}`}>
             {displayItem.type === 'refrain' ? (
               <span className="inline-flex items-center gap-2">
-                <span className="px-3 py-1 bg-white/20 rounded-full text-sm theme-accent">
+                <span className={`px-3 py-1 bg-white/20 rounded-full theme-accent ${isFullscreen ? 'text-[2vh]' : 'text-sm'}`}>
                   Refrain
                 </span>
               </span>
@@ -62,7 +69,7 @@ export function HymnDisplay({
               <span>Verse {displayItem.verseNumber}</span>
             )}
           </p>
-          <p className="text-white/40 text-sm">
+          <p className={`text-white/40 ${isFullscreen ? 'text-[1.5vh]' : 'text-sm'}`}>
             {currentIndex + 1} of {totalItems}
           </p>
         </div>
