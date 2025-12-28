@@ -1,30 +1,28 @@
 import type { Verse, ScriptureReference } from '../types/bible';
 import { BIBLE_BOOKS } from '../types/bible';
 
-const API_BASE = 'https://bible-api.com';
-const TRANSLATION = 'kjv';
+// Fast CDN-based KJV Bible API
+const API_BASE = 'https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books';
 
-interface BibleApiResponse {
-  reference: string;
-  verses: Array<{
-    book_id: string;
-    book_name: string;
-    chapter: number;
-    verse: number;
-    text: string;
-  }>;
+// Map book names to API format (lowercase, no spaces)
+function bookToApiFormat(bookName: string): string {
+  return bookName
+    .toLowerCase()
+    .replace(/\s+/g, '') // Remove spaces: "1 Corinthians" -> "1corinthians"
+    .replace(/^(\d)/, '$1') // Keep numbers: "1corinthians"
+    .replace(/song of solomon/i, 'songofsolomon')
+    .replace(/psalm$/i, 'psalms'); // API uses "psalms" not "psalm"
+}
+
+interface VerseResponse {
+  verse: string;
   text: string;
-  translation_id: string;
-  translation_name: string;
-  translation_note: string;
 }
 
 export function parseScriptureReference(input: string): ScriptureReference | null {
-  // Clean up input
   const cleaned = input.trim();
 
   // Pattern: "Book Chapter:Verse" or "Book Chapter:StartVerse-EndVerse"
-  // Examples: "John 3:16", "Psalm 23:1-6", "1 Corinthians 13:4-8"
   const pattern = /^(\d?\s*[a-zA-Z]+(?:\s+[a-zA-Z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/i;
   const match = cleaned.match(pattern);
 
@@ -54,153 +52,100 @@ export function parseScriptureReference(input: string): ScriptureReference | nul
   };
 }
 
-export async function fetchVerses(reference: ScriptureReference): Promise<Verse[]> {
-  const verseRange = reference.verseEnd
-    ? `${reference.verseStart}-${reference.verseEnd}`
-    : `${reference.verseStart}`;
-
-  const query = `${reference.book} ${reference.chapter}:${verseRange}`;
+// Fetch a single verse from the fast CDN
+async function fetchSingleVerse(book: string, chapter: number, verse: number): Promise<Verse | null> {
+  const apiBook = bookToApiFormat(book);
+  const url = `${API_BASE}/${apiBook}/chapters/${chapter}/verses/${verse}.json`;
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
-
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch scripture: ${response.statusText}`);
+      return null;
     }
 
-    const data: BibleApiResponse = await response.json();
-
-    return data.verses.map(v => ({
-      book: reference.book,
-      chapter: v.chapter,
-      verse: v.verse,
-      text: v.text.trim(),
-    }));
-  } catch (error) {
-    console.error('Error fetching verses:', error);
-    throw error;
-  }
-}
-
-export async function fetchNextVerse(currentVerse: Verse): Promise<Verse | null> {
-  const nextVerseNum = currentVerse.verse + 1;
-  const query = `${currentVerse.book} ${currentVerse.chapter}:${nextVerseNum}`;
-
-  try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
-
-    if (!response.ok) {
-      // Try next chapter
-      return fetchFirstVerseOfChapter(currentVerse.book, currentVerse.chapter + 1);
-    }
-
-    const data: BibleApiResponse = await response.json();
-
-    if (data.verses.length === 0) {
-      return fetchFirstVerseOfChapter(currentVerse.book, currentVerse.chapter + 1);
-    }
-
+    const data: VerseResponse = await response.json();
     return {
-      book: currentVerse.book,
-      chapter: data.verses[0].chapter,
-      verse: data.verses[0].verse,
-      text: data.verses[0].text.trim(),
+      book,
+      chapter,
+      verse,
+      text: data.text.trim(),
     };
   } catch {
     return null;
   }
+}
+
+export async function fetchVerses(reference: ScriptureReference): Promise<Verse[]> {
+  const verses: Verse[] = [];
+  const endVerse = reference.verseEnd || reference.verseStart;
+
+  // Fetch verses in parallel for speed
+  const promises: Promise<Verse | null>[] = [];
+  for (let v = reference.verseStart; v <= endVerse; v++) {
+    promises.push(fetchSingleVerse(reference.book, reference.chapter, v));
+  }
+
+  const results = await Promise.all(promises);
+
+  for (const result of results) {
+    if (result) {
+      verses.push(result);
+    }
+  }
+
+  if (verses.length === 0) {
+    throw new Error('Scripture not found');
+  }
+
+  return verses;
+}
+
+export async function fetchNextVerse(currentVerse: Verse): Promise<Verse | null> {
+  // Try next verse in same chapter
+  const nextVerse = await fetchSingleVerse(
+    currentVerse.book,
+    currentVerse.chapter,
+    currentVerse.verse + 1
+  );
+
+  if (nextVerse) {
+    return nextVerse;
+  }
+
+  // Try first verse of next chapter
+  return fetchSingleVerse(currentVerse.book, currentVerse.chapter + 1, 1);
 }
 
 export async function fetchPreviousVerse(currentVerse: Verse): Promise<Verse | null> {
   if (currentVerse.verse > 1) {
-    const prevVerseNum = currentVerse.verse - 1;
-    const query = `${currentVerse.book} ${currentVerse.chapter}:${prevVerseNum}`;
+    // Try previous verse in same chapter
+    return fetchSingleVerse(
+      currentVerse.book,
+      currentVerse.chapter,
+      currentVerse.verse - 1
+    );
+  }
 
-    try {
-      const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
-
-      if (!response.ok) {
-        return null;
+  if (currentVerse.chapter > 1) {
+    // Try to find last verse of previous chapter by probing
+    // Start high and work down (most chapters have < 180 verses)
+    for (let v = 180; v >= 1; v--) {
+      const verse = await fetchSingleVerse(
+        currentVerse.book,
+        currentVerse.chapter - 1,
+        v
+      );
+      if (verse) {
+        return verse;
       }
-
-      const data: BibleApiResponse = await response.json();
-
-      if (data.verses.length === 0) {
-        return null;
-      }
-
-      return {
-        book: currentVerse.book,
-        chapter: data.verses[0].chapter,
-        verse: data.verses[0].verse,
-        text: data.verses[0].text.trim(),
-      };
-    } catch {
-      return null;
+      // Quick binary search optimization: if 180 fails, try 80, then 50, etc.
+      if (v === 180) v = 81;
+      else if (v === 80) v = 51;
+      else if (v === 50) v = 36;
     }
-  } else if (currentVerse.chapter > 1) {
-    // Try last verse of previous chapter
-    return fetchLastVerseOfChapter(currentVerse.book, currentVerse.chapter - 1);
   }
 
   return null;
-}
-
-async function fetchFirstVerseOfChapter(book: string, chapter: number): Promise<Verse | null> {
-  const query = `${book} ${chapter}:1`;
-
-  try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data: BibleApiResponse = await response.json();
-
-    if (data.verses.length === 0) {
-      return null;
-    }
-
-    return {
-      book,
-      chapter: data.verses[0].chapter,
-      verse: data.verses[0].verse,
-      text: data.verses[0].text.trim(),
-    };
-  } catch {
-    return null;
-  }
-}
-
-async function fetchLastVerseOfChapter(book: string, chapter: number): Promise<Verse | null> {
-  // Fetch the whole chapter and get the last verse
-  const query = `${book} ${chapter}`;
-
-  try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(query)}?translation=${TRANSLATION}`);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data: BibleApiResponse = await response.json();
-
-    if (data.verses.length === 0) {
-      return null;
-    }
-
-    const lastVerse = data.verses[data.verses.length - 1];
-
-    return {
-      book,
-      chapter: lastVerse.chapter,
-      verse: lastVerse.verse,
-      text: lastVerse.text.trim(),
-    };
-  } catch {
-    return null;
-  }
 }
 
 export function formatReference(verse: Verse): string {
