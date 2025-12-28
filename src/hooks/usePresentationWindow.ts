@@ -78,8 +78,12 @@ export function usePresentationWindow() {
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              padding: 2rem;
+              padding: 1rem;
               text-align: center;
+            }
+            #presentation-root.hymn-display {
+              padding: 0.5rem;
+              justify-content: center;
             }
             .waiting-message {
               color: rgba(255, 255, 255, 0.5);
@@ -103,22 +107,36 @@ export function usePresentationWindow() {
               text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             }
             .content.hymn {
-              font-size: 2.5rem;
+              font-size: clamp(2rem, 5vw, 4rem);
+              line-height: 1.6;
+              max-width: 95%;
+              width: 95%;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              flex: 1;
+            }
+            .content.hymn p {
+              margin: 0.3em 0;
             }
             .content.liturgy {
-              font-size: 2rem;
+              font-size: clamp(1.8rem, 4vw, 3rem);
+              max-width: 95%;
+              width: 95%;
             }
             .hymn-title {
               color: var(--accent, #fbbf24);
-              font-size: 1.8rem;
-              margin-bottom: 1rem;
+              font-size: clamp(1.5rem, 3vw, 2.5rem);
+              margin-bottom: 0.5rem;
               opacity: 0.9;
+              flex-shrink: 0;
             }
             .verse-indicator {
               color: var(--accent, #fbbf24);
-              font-size: 1.2rem;
-              margin-top: 1.5rem;
+              font-size: clamp(1rem, 2vw, 1.5rem);
+              margin-top: 0.5rem;
               opacity: 0.7;
+              flex-shrink: 0;
             }
             .fullscreen-hint {
               position: fixed;
@@ -219,6 +237,9 @@ export function usePresentationWindow() {
     }
 
     // Render content based on type
+    // Reset root class
+    root.className = '';
+
     switch (state.type) {
       case 'scripture': {
         const verse = state.data as { book: string; chapter: number; verse: number; text: string };
@@ -229,6 +250,7 @@ export function usePresentationWindow() {
         break;
       }
       case 'hymn': {
+        root.className = 'hymn-display';
         const hymn = state.data as { title: string; lines: string[]; verseLabel: string; index: number; total: number };
         root.innerHTML = `
           <p class="hymn-title">${hymn.title}</p>
