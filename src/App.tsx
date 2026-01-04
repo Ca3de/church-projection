@@ -13,7 +13,10 @@ import {
   sendToOBSOverlay,
   OBSStandalone,
   HymnManager,
+  ProjectionHistory,
+  useProjectionHistory,
 } from './components';
+import type { HistoryItem } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
 import {
@@ -89,6 +92,9 @@ function App() {
   // Hymn manager state
   const [showHymnManager, setShowHymnManager] = useState(false);
 
+  // Projection history
+  const { history, addToHistory, clearHistory } = useProjectionHistory();
+
   const { isFullscreen, toggleFullscreen, exitFullscreen, hasExternalDisplay } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
   const { isWindowOpen, openPresentationWindow, closePresentationWindow, sendToPresentation } = usePresentationWindow();
@@ -135,6 +141,13 @@ function App() {
       setCurrentVerse(verses[0]);
       setContentMode('scripture');
       setView('display');
+
+      // Add to history
+      addToHistory({
+        type: 'scripture',
+        title: `${verses[0].book} ${verses[0].chapter}:${verses[0].verse}`,
+        data: verses[0],
+      });
     } catch (err) {
       setError(
         'Failed to fetch scripture. Please check your connection and try again.'
@@ -143,7 +156,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [addToHistory]);
 
   const handleScriptureNext = useCallback(async () => {
     if (!currentVerse || isLoadingNext) return;
@@ -195,7 +208,14 @@ function App() {
     setContentMode('hymn');
     setView('display');
     setIsLoading(false);
-  }, []);
+
+    // Add to history
+    addToHistory({
+      type: 'hymn',
+      title: `Hymn ${hymn.displayNumber || hymn.number} - ${hymn.title}`,
+      data: hymn,
+    });
+  }, [addToHistory]);
 
   const handleHymnNext = useCallback(() => {
     if (!currentHymn) return;
@@ -511,6 +531,33 @@ function App() {
     }
   }, [view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem, currentLiturgy, quickContent, quickContentType, currentTheme, obsOverlayVisible, obsOverlayMode]);
 
+  // Handle re-selecting from history
+  const handleHistorySelect = useCallback((item: HistoryItem) => {
+    if (item.type === 'scripture') {
+      const verse = item.data as Verse;
+      setCurrentVerse(verse);
+      setContentMode('scripture');
+      setView('display');
+    } else if (item.type === 'hymn') {
+      const hymn = item.data as Hymn;
+      setCurrentHymn(hymn);
+      setHymnDisplayIndex(0);
+      setContentMode('hymn');
+      setView('display');
+    } else if (item.type === 'liturgy') {
+      const liturgy = item.data as LiturgyItem;
+      setCurrentLiturgy(liturgy);
+      setContentMode('liturgy');
+      setView('display');
+    } else if (item.type === 'quick') {
+      const quick = item.data as { content: string; contentType: 'text' | 'image' | 'video' };
+      setQuickContent(quick.content);
+      setQuickContentType(quick.contentType);
+      setContentMode('quick');
+      setView('display');
+    }
+  }, []);
+
   // Determine which handlers to use based on content mode
   const handleNext =
     contentMode === 'scripture' ? handleScriptureNext : handleHymnNext;
@@ -706,6 +753,13 @@ function App() {
           <div className="fixed bottom-4 text-white/20 text-sm">
             Church Projection Display
           </div>
+
+          {/* Projection History */}
+          <ProjectionHistory
+            history={history}
+            onSelect={handleHistorySelect}
+            onClear={clearHistory}
+          />
         </div>
       ) : contentMode === 'scripture' && currentVerse ? (
         <VerseDisplay
