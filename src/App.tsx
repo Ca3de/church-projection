@@ -12,6 +12,7 @@ import {
   OBSOverlay,
   sendToOBSOverlay,
   OBSStandalone,
+  HymnManager,
 } from './components';
 import type { Verse } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
@@ -84,6 +85,9 @@ function App() {
   // OBS overlay state
   const [obsOverlayVisible, setObsOverlayVisible] = useState(false);
   const [obsOverlayMode, setObsOverlayMode] = useState<'fullscreen' | 'overlay'>('overlay');
+
+  // Hymn manager state
+  const [showHymnManager, setShowHymnManager] = useState(false);
 
   const { isFullscreen, toggleFullscreen, exitFullscreen, hasExternalDisplay } = useFullscreen();
   const { isCursorHidden } = useCursorAutoHide(isFullscreen && view === 'display', 2000);
@@ -642,11 +646,19 @@ function App() {
                   autoFocus
                 />
               ) : (
-                <HymnInput
-                  onSubmit={handleHymnSearch}
-                  isLoading={isLoading}
-                  autoFocus
-                />
+                <>
+                  <HymnInput
+                    onSubmit={handleHymnSearch}
+                    isLoading={isLoading}
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => setShowHymnManager(true)}
+                    className="mt-3 text-sm text-white/50 hover:text-white/80 underline"
+                  >
+                    + Add/Manage Custom Hymns
+                  </button>
+                </>
               )}
 
               {/* Error message */}
@@ -742,6 +754,11 @@ function App() {
           onClose={handleNewSearch}
         />
       ) : null}
+
+      {/* Hymn Manager Modal */}
+      {showHymnManager && (
+        <HymnManager onClose={() => setShowHymnManager(false)} />
+      )}
     </div>
   );
 }

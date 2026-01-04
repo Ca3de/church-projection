@@ -9,3 +9,4 @@ export { QuickDisplay } from './QuickDisplay';
 export { QuickActions } from './QuickActions';
 export { OBSOverlay, sendToOBSOverlay, clearOBSOverlay } from './OBSOverlay';
 export { OBSStandalone } from './OBSStandalone';
+export { HymnManager } from './HymnManager';
