@@ -1538,10 +1538,57 @@
         }
       ],
       "refrain": "Lord, lift me up and let me stand,\nBy faith, on Heaven's table land;\nA higher plane than I have found;\nLord, plant my feet on higher ground."
+    },
+    {
+      "title": "O God, the Rock of Ages",
+      "number": "165",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "O God, the Rock of Ages,\nWho evermore hast been,\nWhat time the tempest rages,\nOur dwelling place serene:\nBefore Thy first creations,\nO Lord, the same as now,\nTo endless generations\nThe Everlasting Thou!"
+        },
+        {
+          "verse": 2,
+          "text": "Our years are like the shadows\nOn sunny hills that lie,\nOr grasses in the meadows\nThat blossom but to die:\nA sleep, a dream, a story\nBy strangers quickly told,\nAn unremaining glory\nOf things that soon are old."
+        },
+        {
+          "verse": 3,
+          "text": "O Thou, who canst not slumber,\nWhose light grows never pale,\nTeach us aright to number\nOur years before they fail.\nOn us Thy mercy lighten,\nOn us Thy goodness rest,\nAnd let Thy Spirit brighten\nThe hearts Thyself hast blessed."
+        },
+        {
+          "verse": 4,
+          "text": "Lord, crown our faith's endeavour\nWith beauty and with grace,\nTill, clothed in light for ever,\nWe see Thee face to face:\nA joy no language measures;\nA fountain brimming o'er;\nAn endless flow of pleasures;\nAn ocean without shore."
+        }
+      ]
+    },
+    {
+      "title": "Standing at the Portal (of the Opening Year)",
+      "number": "168",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Standing at the portal of the opening year,\nWords of comfort meet us, hushing every fear.\nSpoken through the silence, by our Father's voice,\nTender, strong, and faithful, making us rejoice."
+        },
+        {
+          "verse": 2,
+          "text": "For the year before us, O what rich supplies!\nFor the poor and needy, living streams shall rise.\nFor the sad and sinful shall His grace abound;\nFor the faint and feeble perfect strength be found."
+        },
+        {
+          "verse": 3,
+          "text": "He will never fail us, He will not forsake;\nHis eternal covenant He will never break.\nResting on His promise, what have we to fear?\nGod is all-sufficient for the coming year."
+        },
+        {
+          "verse": 4,
+          "text": "If in life we serve Him, by His truth made free,\nIn our death we bless Him for eternity.\nKnowing past and future, He will bring us through;\nHis almighty power will our strength renew."
+        }
+      ],
+      "refrain": "Onward, then, and fear not, children of the day,\nFor his word shall never, never pass away."
     }
   ],
   "summary": {
-    "total_hymns": 63,
+    "total_hymns": 65,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
