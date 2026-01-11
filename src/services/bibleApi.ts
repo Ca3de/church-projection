@@ -39,6 +39,16 @@ function cleanVerseText(text: string): string {
   // Remove "or," and "or:" margin alternatives
   cleaned = cleaned.replace(/\bor,?\s*[^.;]+[.;]/gi, '');
 
+  // Remove footnote patterns like "word…: explanation" or "word...: explanation"
+  // This catches patterns where a word is followed by ellipsis and colon
+  cleaned = cleaned.replace(/\w+[….]+:\s*[^.;!?]+[.;]?/g, '');
+
+  // Remove any remaining patterns with ellipsis followed by colon
+  cleaned = cleaned.replace(/[….]+:\s*[^.;!?]+/g, '');
+
+  // Remove all quotation marks (single and double quotes)
+  cleaned = cleaned.replace(/['"'""`]/g, '');
+
   // Clean up multiple spaces and trim
   cleaned = cleaned.replace(/\s+/g, ' ').trim();
 
