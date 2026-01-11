@@ -23,8 +23,11 @@ interface VerseResponse {
 function cleanVerseText(text: string): string {
   let cleaned = text;
 
+  // Remove end-of-verse footnotes like ".5 forces: or, wealth" or "5 word: or, meaning"
+  // Pattern: optional period, number, word, colon, then explanation
+  cleaned = cleaned.replace(/\.?\d+\s+\w+:\s*(or,?\s*)?[^.]*$/gi, '');
+
   // Remove margin note patterns like "94.1 God…: Heb. God of revenges"
-  // Pattern: verse reference followed by word and colon, then "Heb." annotation
   cleaned = cleaned.replace(/\d+\.\d+\s+[^:]+:\s*Heb\.[^"]*/g, '');
 
   // Remove patterns like "1.1 word: meaning" (margin references)
@@ -36,11 +39,7 @@ function cleanVerseText(text: string): string {
   // Remove "Heb." annotations that might remain
   cleaned = cleaned.replace(/Heb\.\s*[^.]+/g, '');
 
-  // Remove "or," and "or:" margin alternatives
-  cleaned = cleaned.replace(/\bor,?\s*[^.;]+[.;]/gi, '');
-
   // Remove footnote patterns like "word…: explanation" or "word...: explanation"
-  // This catches patterns where a word is followed by ellipsis and colon
   cleaned = cleaned.replace(/\w+[….]+:\s*[^.;!?]+[.;]?/g, '');
 
   // Remove any remaining patterns with ellipsis followed by colon
