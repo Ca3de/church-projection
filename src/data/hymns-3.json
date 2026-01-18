@@ -1585,10 +1585,42 @@
         }
       ],
       "refrain": "Onward, then, and fear not, children of the day,\nFor his word shall never, never pass away."
+    },
+    {
+      "title": "Rejoice the Lord is King",
+      "number": "73",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Rejoice, the Lord is King:\nYour Lord and King adore!\nRejoice, give thanks and sing,\nAnd triumph evermore."
+        },
+        {
+          "verse": 2,
+          "text": "Jesus, the Savior, reigns,\nThe God of truth and love;\nWhen He has purged our stains,\nHe took his seat above;"
+        },
+        {
+          "verse": 3,
+          "text": "His kingdom cannot fail,\nHe rules o'er earth and heav'n;\nThe keys of death and hell\nAre to our Jesus giv'n:"
+        },
+        {
+          "verse": 4,
+          "text": "He sits at God's right hand\nTill all His foes submit,\nAnd bow to His command\nAnd fall beneath His feet."
+        },
+        {
+          "verse": 5,
+          "text": "He all His foes shall quell,\nShall all our sins destroy,\nAnd every bosom swell\nWith pure seraphic joy;"
+        },
+        {
+          "verse": 6,
+          "text": "Rejoice in glorious hope!\nJesus, the judge shall come\nAnd take His servants up\nTo their eternal home:"
+        }
+      ],
+      "refrain": "Lift up your heart,\nLift up your voice!\nRejoice, again I say, rejoice!"
     }
   ],
   "summary": {
-    "total_hymns": 65,
+    "total_hymns": 66,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
