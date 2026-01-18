@@ -42,7 +42,14 @@
   }
 
   .liturgy-text {
-    @apply font-serif text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-relaxed;
+    @apply font-serif text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-relaxed;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .liturgy-text-fullscreen {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-size: 6vh;
+    line-height: 1.4;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
 

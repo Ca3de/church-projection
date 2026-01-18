@@ -99,18 +99,22 @@ export function LiturgyDisplay({
           className="text-center animate-fade-in flex-1 flex flex-col items-center justify-center w-full px-4"
         >
           {currentPage.type === 'verse' && currentPage.lines ? (
-            <div className="space-y-2">
+            <div className={isFullscreen ? 'space-y-4' : 'space-y-2'}>
               {currentPage.lines.map((line, lineIndex) => (
                 <p
                   key={lineIndex}
-                  className="liturgy-text text-white/95 leading-relaxed"
+                  className={`text-white/95 leading-relaxed ${
+                    isFullscreen ? 'liturgy-text-fullscreen' : 'liturgy-text'
+                  }`}
                 >
                   {line}
                 </p>
               ))}
             </div>
           ) : currentPage.text ? (
-            <p className="liturgy-text text-white/95 leading-relaxed max-w-4xl text-center">
+            <p className={`text-white/95 leading-relaxed text-center ${
+              isFullscreen ? 'liturgy-text-fullscreen max-w-[90vw]' : 'liturgy-text max-w-4xl'
+            }`}>
               {currentPage.text}
             </p>
           ) : null}
