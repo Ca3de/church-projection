@@ -1617,10 +1617,41 @@
         }
       ],
       "refrain": "Lift up your heart,\nLift up your voice!\nRejoice, again I say, rejoice!"
+    },
+    {
+      "title": "Forth In Thy Name O Lord I Go",
+      "number": "120",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Forth in your name, O Lord, I go,\nMy daily labor to pursue,\nThee only thee to know\nIn all I think or speak or do."
+        },
+        {
+          "verse": 2,
+          "text": "Preserve me from my calling's snare,\nAnd hide my simple heart above,\nAbove the thorns of choking care,\nThe gilded baits of worldly love."
+        },
+        {
+          "verse": 3,
+          "text": "The task thine wisdom has assigned,\nO let me cheerfully fulfill;\nIn all my works your presence find,\nAnd prove your good and perfect will."
+        },
+        {
+          "verse": 4,
+          "text": "Thee I have set at my right hand,\nWhose eyes mine inmost substance see,\nAnd labor on at your command,\nAnd for thee all my works shall be."
+        },
+        {
+          "verse": 5,
+          "text": "Give me to bear your easy yoke\nAnd ev'ry moment watch and pray\nAnd still to things eternal look,\nAnd hasten to your glorious day."
+        },
+        {
+          "verse": 6,
+          "text": "For thy delightful employ\nWhate'er thy bounteous grace have giv'n:\nAnd run my course with even joy\nAnd closely walk with thee to heav'n."
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 66,
+    "total_hymns": 67,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
