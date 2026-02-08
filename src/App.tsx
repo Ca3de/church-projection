@@ -590,53 +590,55 @@ function App() {
       )}
 
       {view === 'search' ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6">
-          {/* Theme selector and Project button in corner */}
-          <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-2">
-            {/* OBS Overlay Controls */}
-            <div className="flex items-center gap-1 mr-2">
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
+          {/* Top toolbar */}
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-1.5" style={{ animation: 'fadeIn 0.6s ease-out' }}>
+            {/* OBS Controls */}
+            <button
+              onClick={() => setObsOverlayVisible(!obsOverlayVisible)}
+              className="p-2 rounded-lg text-white/30 hover:text-white/70 transition-all duration-200"
+              style={{
+                background: obsOverlayVisible ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${obsOverlayVisible ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.04)'}`,
+              }}
+              title={obsOverlayVisible ? 'Hide OBS overlay' : 'Show OBS overlay'}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+            {obsOverlayVisible && (
               <button
-                onClick={() => setObsOverlayVisible(!obsOverlayVisible)}
-                className={`btn-secondary flex items-center gap-1.5 text-sm px-2 py-1.5 ${obsOverlayVisible ? 'bg-red-500/30 border-red-500/50' : ''}`}
-                title={obsOverlayVisible ? 'Hide OBS overlay' : 'Show OBS overlay'}
+                onClick={() => setObsOverlayMode(obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay')}
+                className="px-2 py-1.5 rounded-lg text-white/30 hover:text-white/60 text-[10px] font-medium tracking-wider uppercase transition-all duration-200"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.04)',
+                }}
+                title={`Switch to ${obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay'} mode`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span className="hidden md:inline">OBS</span>
+                {obsOverlayMode === 'overlay' ? 'Bar' : 'Full'}
               </button>
-              {obsOverlayVisible && (
-                <button
-                  onClick={() => setObsOverlayMode(obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay')}
-                  className="btn-secondary text-xs px-2 py-1.5"
-                  title={`Switch to ${obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay'} mode`}
-                >
-                  {obsOverlayMode === 'overlay' ? 'Bar' : 'Full'}
-                </button>
-              )}
-            </div>
+            )}
 
-            {/* Project to external display button */}
+            <div className="w-px h-5 mx-1" style={{ background: 'rgba(255, 255, 255, 0.06)' }} />
+
+            {/* Project button */}
             <button
               onClick={isWindowOpen ? closePresentationWindow : openPresentationWindow}
-              className={`btn-secondary flex items-center gap-2 ${isWindowOpen ? 'bg-green-500/30 border-green-500/50' : ''}`}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/30 hover:text-white/70 transition-all duration-200 text-sm font-sans"
+              style={{
+                background: isWindowOpen ? 'rgba(74, 222, 128, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${isWindowOpen ? 'rgba(74, 222, 128, 0.2)' : 'rgba(255, 255, 255, 0.04)'}`,
+              }}
               title={isWindowOpen ? 'Close presentation window' : 'Open presentation window for projector/TV'}
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="hidden sm:inline">{isWindowOpen ? 'Close Display' : 'Project'}</span>
+              <span className="hidden sm:inline text-xs">{isWindowOpen ? 'Close' : 'Project'}</span>
             </button>
+
             <ThemeSelector
               currentTheme={currentTheme}
               onThemeChange={handleThemeChange}
@@ -644,36 +646,13 @@ function App() {
           </div>
 
           {/* Header */}
-          <div className="text-center mb-8 animate-fade-in">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              {contentMode === 'scripture' ? (
-                <svg
-                  className="w-12 h-12"
-                  style={{ color: currentTheme.colors.primary }}
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M6 4v16h12V4H6zm10 14H8V6h8v12zm-1-9H9v1h6V9zm0 2H9v1h6v-1zm0 2H9v1h6v-1zm-6 2h3v1H9v-1z" />
-                  <path d="M4 2v20h16V2H4zm14 18H6V4h12v16z" />
-                </svg>
-              ) : (
-                <svg
-                  className="w-12 h-12"
-                  style={{ color: currentTheme.colors.primary }}
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6zm-2 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
-                </svg>
-              )}
-              <h1 className="text-4xl md:text-5xl font-display font-bold text-white">
-                {contentMode === 'scripture' ? 'Scripture Display' : 'Hymn Display'}
-              </h1>
-            </div>
-            <p className="text-white/60 text-lg">
-              {contentMode === 'scripture'
-                ? 'Enter a Bible verse to display on screen'
-                : 'Enter a hymn number or title to display'}
+          <div className="text-center mb-10" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+            <h1 className="text-3xl md:text-4xl font-display font-semibold tracking-wider text-white/90 mb-2"
+                style={{ letterSpacing: '0.1em' }}>
+              Sanctum
+            </h1>
+            <p className="text-white/25 text-sm font-sans tracking-widest uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.25em' }}>
+              Church Projection
             </p>
           </div>
 
@@ -684,7 +663,7 @@ function App() {
           />
 
           {/* Search input */}
-          <div className="w-full max-w-2xl animate-slide-up">
+          <div className="w-full max-w-2xl" style={{ animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}>
             <div className="glass-panel p-8">
               {(contentMode === 'scripture' || contentMode === 'liturgy' || contentMode === 'quick') ? (
                 <ScriptureInput
@@ -699,18 +678,25 @@ function App() {
                     isLoading={isLoading}
                     autoFocus
                   />
-                  <button
-                    onClick={() => setShowHymnManager(true)}
-                    className="mt-3 text-sm text-white/50 hover:text-white/80 underline"
-                  >
-                    + Add/Manage Custom Hymns
-                  </button>
+                  <div className="text-center mt-4">
+                    <button
+                      onClick={() => setShowHymnManager(true)}
+                      className="text-xs text-white/25 hover:text-white/50 transition-colors duration-200 font-sans tracking-wide"
+                    >
+                      Manage Custom Hymns
+                    </button>
+                  </div>
                 </>
               )}
 
               {/* Error message */}
               {error && (
-                <div className="mt-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-center animate-fade-in">
+                <div className="mt-4 p-4 rounded-xl text-center text-sm font-sans animate-scale-in"
+                     style={{
+                       background: 'rgba(239, 68, 68, 0.08)',
+                       border: '1px solid rgba(239, 68, 68, 0.15)',
+                       color: 'rgba(252, 165, 165, 0.9)',
+                     }}>
                   {error}
                 </div>
               )}
@@ -728,30 +714,30 @@ function App() {
             />
           </div>
 
-          {/* Quick tips */}
-          <div className="mt-12 text-center text-white/40 text-sm max-w-lg animate-fade-in">
+          {/* Tips */}
+          <div className="mt-10 text-center max-w-md font-sans" style={{ animation: 'fadeIn 1.2s ease-out' }}>
             {hasExternalDisplay && (
-              <p className="mb-2 text-green-400/70">
-                <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                External display detected - Fullscreen will use projector/TV
+              <p className="mb-3 text-xs" style={{ color: 'rgba(74, 222, 128, 0.5)' }}>
+                <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-pulse" style={{ background: 'rgba(74, 222, 128, 0.6)' }} />
+                External display detected
               </p>
             )}
-            <p className="mb-2">
-              <span style={{ color: currentTheme.colors.accent, opacity: 0.6 }}>Tip:</span> Use keyboard
-              shortcuts for quick navigation
-            </p>
-            <p>
+            <p className="text-white/15 text-xs">
               Press{' '}
-              <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs mx-1">
-                F
-              </kbd>{' '}
-              for fullscreen during display
+              <kbd className="px-1 py-0.5 rounded text-[10px] mx-0.5"
+                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>F</kbd>
+              {' '}fullscreen{' '}
+              <span className="mx-1.5" style={{ color: 'rgba(255,255,255,0.08)' }}>&middot;</span>
+              {' '}
+              <kbd className="px-1 py-0.5 rounded text-[10px] mx-0.5"
+                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>/</kbd>
+              {' '}search
             </p>
           </div>
 
           {/* Footer */}
-          <div className="fixed bottom-4 text-white/20 text-sm">
-            Church Projection Display
+          <div className="fixed bottom-4 text-white/10 text-[10px] font-sans tracking-widest uppercase">
+            Sanctum
           </div>
 
           {/* Projection History */}

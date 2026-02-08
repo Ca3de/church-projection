@@ -14,25 +14,11 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
   const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Detect URL type
   const getUrlType = (url: string): 'video' | 'image' | 'unknown' => {
     const trimmed = url.trim().toLowerCase();
-
-    // Video platforms
-    if (trimmed.match(/(?:youtube\.com|youtu\.be|vimeo\.com|instagram\.com\/(?:reel|p|tv)|facebook\.com)/)) {
-      return 'video';
-    }
-
-    // Direct video files
-    if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/)) {
-      return 'video';
-    }
-
-    // Direct image files
-    if (trimmed.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/)) {
-      return 'image';
-    }
-
+    if (trimmed.match(/(?:youtube\.com|youtu\.be|vimeo\.com|instagram\.com\/(?:reel|p|tv)|facebook\.com)/)) return 'video';
+    if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/)) return 'video';
+    if (trimmed.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/)) return 'image';
     return 'unknown';
   };
 
@@ -45,7 +31,6 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
       } else if (urlType === 'image') {
         onImageContent(mediaUrl.trim());
       } else {
-        // Try as video first (most common use case for URLs)
         onVideoContent(mediaUrl.trim());
       }
       setMediaUrl('');
@@ -56,7 +41,6 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file type
       if (file.type.startsWith('image/')) {
         const url = URL.createObjectURL(file);
         onImageContent(url);
@@ -64,12 +48,10 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
         const url = URL.createObjectURL(file);
         onVideoContent(url);
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        // Read text file content
         const text = await file.text();
         onTextContent(text);
       }
     }
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -78,97 +60,81 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
   return (
     <div className="w-full max-w-2xl animate-slide-up">
       <div className="glass-panel p-6">
-        <h3 className="text-white/70 text-sm font-medium mb-4 text-center uppercase tracking-wider">
-          Quick Actions
-        </h3>
+        {/* Liturgy Section */}
+        <div className="ornament-divider mb-5">
+          <span>Liturgy</span>
+        </div>
 
-        {/* Liturgy buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
           {liturgyItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onSelectLiturgy(item)}
-              className="btn-secondary py-3 px-4 text-sm font-medium flex flex-col items-center gap-1 hover:scale-105 transition-transform"
+              className="group relative py-3 px-4 rounded-xl text-sm font-sans font-medium text-white/50 hover:text-white transition-all duration-300 flex flex-col items-center gap-1.5"
+              style={{
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.04)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.06)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.02)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255, 255, 255, 0.04)';
+              }}
               title={item.title}
             >
-              <span className="text-lg">
-                {item.type === 'creed' ? '✝️' : '🎵'}
+              <span className="text-base opacity-60 group-hover:opacity-100 transition-opacity">
+                {item.type === 'creed' ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z" />
+                  </svg>
+                )}
               </span>
-              <span>{item.shortTitle}</span>
+              <span className="text-xs">{item.shortTitle}</span>
             </button>
           ))}
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4 my-4">
-          <div className="flex-1 h-px bg-white/10"></div>
-          <span className="text-white/30 text-xs uppercase tracking-wider">Media</span>
-          <div className="flex-1 h-px bg-white/10"></div>
+        {/* Media Section */}
+        <div className="ornament-divider mb-5">
+          <span>Media</span>
         </div>
 
-        {/* Media buttons row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          {/* Paste button */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
           <button
             onClick={onPasteContent}
-            className="btn-secondary py-3 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+            className="btn-secondary py-3 flex items-center justify-center gap-2 text-sm"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9.75a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
             </svg>
-            <span>Paste</span>
+            Paste
           </button>
 
-          {/* Media URL button */}
           <button
             onClick={() => setShowUrlInput(!showUrlInput)}
-            className={`btn-secondary py-3 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform ${showUrlInput ? 'bg-white/20' : ''}`}
+            className={`btn-secondary py-3 flex items-center justify-center gap-2 text-sm ${showUrlInput ? '!border-white/20 !bg-white/10' : ''}`}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
             </svg>
-            <span>URL</span>
+            URL
           </button>
 
-          {/* Upload video button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="btn-secondary py-3 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+            className="btn-secondary py-3 flex items-center justify-center gap-2 text-sm"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
             </svg>
-            <span>Upload</span>
+            Upload
           </button>
           <input
             ref={fileInputRef}
@@ -179,22 +145,22 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
           />
         </div>
 
-        {/* Media URL input */}
+        {/* URL Input */}
         {showUrlInput && (
-          <form onSubmit={handleUrlSubmit} className="mb-4 animate-fade-in">
+          <form onSubmit={handleUrlSubmit} className="mb-4 animate-scale-in">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={mediaUrl}
                 onChange={(e) => setMediaUrl(e.target.value)}
-                placeholder="Image or video URL (YouTube, Instagram, direct link...)"
-                className="input-field flex-1"
+                placeholder="Image or video URL..."
+                className="input-field flex-1 !py-3 !text-sm"
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={!mediaUrl.trim()}
-                className="btn-primary disabled:opacity-50"
+                className="btn-primary disabled:opacity-40 !py-3 text-sm"
               >
                 Display
               </button>
@@ -202,10 +168,12 @@ export function QuickActions({ onSelectLiturgy, onPasteContent, onVideoContent, 
           </form>
         )}
 
-        <p className="text-white/40 text-xs text-center">
-          Paste with <kbd className="px-1 py-0.5 bg-white/10 rounded text-xs">Ctrl+V</kbd> |
-          Upload images, videos, or text files |
-          Enter any media URL
+        <p className="text-white/20 text-xs text-center font-sans">
+          <kbd className="px-1 py-0.5 rounded text-[10px]"
+               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            Ctrl+V
+          </kbd>
+          <span className="mx-2">to paste anywhere</span>
         </p>
       </div>
     </div>

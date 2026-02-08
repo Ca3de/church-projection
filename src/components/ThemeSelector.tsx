@@ -31,46 +31,32 @@ export function ThemeSelector({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white/80 hover:text-white"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-white/50 hover:text-white/80"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
         title="Change theme"
       >
+        <div className="flex gap-0.5">
+          <div className="w-2.5 h-5 rounded-l-sm" style={{ backgroundColor: currentTheme.colors.primary }} />
+          <div className="w-2.5 h-5 rounded-r-sm" style={{ backgroundColor: currentTheme.colors.secondary }} />
+        </div>
+        <span className="hidden sm:inline text-xs font-sans">{currentTheme.name}</span>
+        {currentTheme.icon && <span className="text-xs">{currentTheme.icon}</span>}
         <svg
-          className="w-5 h-5"
+          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-          />
-        </svg>
-        <span className="hidden sm:inline">{currentTheme.name}</span>
-        {currentTheme.icon && (
-          <span className="text-sm">{currentTheme.icon}</span>
-        )}
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 max-h-96 overflow-y-auto bg-stone-900/95 backdrop-blur-sm border border-white/10 rounded-lg shadow-xl z-50 animate-fade-in">
+        <div className="absolute right-0 mt-2 w-64 max-h-[420px] overflow-y-auto z-50 animate-scale-in rounded-xl scrollbar-thin"
+             style={{ background: 'rgba(12, 12, 20, 0.97)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="p-2">
-            <p className="text-xs text-white/40 uppercase tracking-wider px-2 py-1">
-              Church Themes
+            <p className="text-[10px] text-white/25 uppercase tracking-[0.2em] px-3 py-2 font-sans font-medium">
+              Church Seasons
             </p>
             {themes.map((theme) => (
               <button
@@ -79,44 +65,31 @@ export function ThemeSelector({
                   onThemeChange(theme);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left ${
                   currentTheme.id === theme.id
-                    ? 'bg-white/20 text-white'
-                    : 'hover:bg-white/10 text-white/70 hover:text-white'
+                    ? 'text-white'
+                    : 'text-white/50 hover:text-white/80'
                 }`}
+                style={currentTheme.id === theme.id ? {
+                  background: 'rgba(255,255,255,0.06)',
+                } : {}}
               >
-                <div className="flex-shrink-0 flex gap-0.5">
-                  <div
-                    className="w-3 h-6 rounded-l"
-                    style={{ backgroundColor: theme.colors.primary }}
-                  />
-                  <div
-                    className="w-3 h-6 rounded-r"
-                    style={{ backgroundColor: theme.colors.secondary }}
-                  />
+                <div className="flex-shrink-0 flex gap-px">
+                  <div className="w-2.5 h-5 rounded-l-sm" style={{ backgroundColor: theme.colors.primary }} />
+                  <div className="w-2.5 h-5 rounded-r-sm" style={{ backgroundColor: theme.colors.secondary }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium truncate">{theme.name}</span>
-                    {theme.icon && <span>{theme.icon}</span>}
+                    <span className="font-sans text-sm truncate">{theme.name}</span>
+                    {theme.icon && <span className="text-xs">{theme.icon}</span>}
                   </div>
-                  <p className="text-xs text-white/40 truncate">
+                  <p className="text-[10px] text-white/25 truncate font-sans">
                     {theme.description}
                   </p>
                 </div>
                 {currentTheme.id === theme.id && (
-                  <svg
-                    className="w-5 h-5 flex-shrink-0 text-green-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--theme-accent)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </button>

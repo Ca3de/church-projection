@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,96 +7,186 @@
 :root {
   --theme-primary: #f59e0b;
   --theme-secondary: #d97706;
-  --theme-background: #0c0a09;
-  --theme-background-end: #1c1917;
+  --theme-background: #08080c;
+  --theme-background-end: #12121a;
   --theme-text: #ffffff;
-  --theme-text-muted: rgba(255, 255, 255, 0.6);
-  --theme-accent: #fbbf24;
+  --theme-text-muted: rgba(255, 255, 255, 0.5);
+  --theme-accent: #d4a847;
 }
 
 @layer base {
   html {
-    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply text-white min-h-screen;
     background: linear-gradient(
-      135deg,
+      160deg,
       var(--theme-background) 0%,
-      var(--theme-background-end) 100%
+      var(--theme-background-end) 50%,
+      var(--theme-background) 100%
     );
-    transition: background 0.5s ease;
+    transition: background 0.8s ease;
+  }
+
+  /* Subtle ambient glow behind main content */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(
+      circle,
+      var(--theme-primary) 0%,
+      transparent 70%
+    );
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
 @layer components {
+  /* ─── Display Text Classes (projection screen) ─── */
+
   .scripture-text {
     @apply font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-relaxed;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   }
 
   .hymn-text {
     @apply font-serif text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   }
 
   .liturgy-text {
     @apply font-serif text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-relaxed;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   }
 
   .liturgy-text-fullscreen {
-    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 6vh;
     line-height: 1.4;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   }
 
   .quick-display-text {
     @apply font-serif text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   }
 
   .verse-reference {
-    @apply font-display text-xl md:text-2xl tracking-wide;
+    @apply font-display text-xl md:text-2xl tracking-widest;
     color: var(--theme-accent);
-    opacity: 0.9;
+    opacity: 0.85;
   }
 
+  /* ─── UI Components ─── */
+
   .glass-panel {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 20px 60px -15px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   .btn-primary {
-    @apply px-6 py-3 text-white font-medium rounded-lg
-           transition-all duration-200 hover:shadow-lg
+    @apply px-6 py-3 font-sans font-medium rounded-lg
+           transition-all duration-300
            focus:outline-none focus:ring-2 focus:ring-offset-2;
-    background-color: var(--theme-primary);
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    color: white;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 12px -2px var(--theme-primary);
   }
 
   .btn-primary:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.15);
+    box-shadow: 0 4px 20px -2px var(--theme-primary);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
   }
 
   .btn-secondary {
-    @apply px-4 py-2 bg-white/10 hover:bg-white/20 text-white/90 font-medium rounded-lg
-           transition-all duration-200 border border-white/20
-           focus:outline-none focus:ring-2 focus:ring-white/30;
+    @apply px-4 py-2 text-white/80 font-sans font-medium rounded-lg
+           transition-all duration-200
+           focus:outline-none focus:ring-1 focus:ring-white/20;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: white;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white
-           placeholder-white/50 focus:outline-none focus:ring-2
-           focus:border-transparent transition-all duration-200;
+    @apply w-full px-5 py-4 text-white text-lg font-sans
+           placeholder-white/30
+           focus:outline-none
+           transition-all duration-300;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+  }
+
+  .input-field:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 0 3px rgba(212, 168, 71, 0.1), 0 0 30px -10px var(--theme-primary);
   }
 
   .theme-accent {
     color: var(--theme-accent);
   }
+
+  /* ─── Ornamental Divider ─── */
+
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ornament-divider::before,
+  .ornament-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(212, 168, 71, 0.2),
+      transparent
+    );
+  }
+
+  .ornament-divider span {
+    color: rgba(212, 168, 71, 0.4);
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
 }
 
-/* Fullscreen mode styles */
+/* ─── Fullscreen Mode ─── */
+
 .fullscreen-mode {
   cursor: none;
 }
@@ -105,27 +195,27 @@
   cursor: default;
 }
 
-/* Scrollbar styling */
+/* ─── Scrollbar ─── */
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Thin scrollbar for hymn content */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -133,10 +223,25 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+/* ─── Selection Color ─── */
+
+::selection {
+  background: var(--theme-primary);
+  color: white;
+}
+
+/* ─── Keyframe Animations ─── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
