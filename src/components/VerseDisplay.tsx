@@ -10,7 +10,7 @@ interface VerseDisplayProps {
   onPrevious: () => void;
   onToggleFullscreen: () => void;
   onNewSearch: () => void;
-  onJumpToVerse: (verseNumber: number) => void;
+  onJumpTo: (chapter: number, verse: number) => void;
   isLoadingNext: boolean;
   isLoadingPrevious: boolean;
 }
@@ -23,7 +23,7 @@ export function VerseDisplay({
   onPrevious,
   onToggleFullscreen,
   onNewSearch,
-  onJumpToVerse,
+  onJumpTo,
   isLoadingNext,
   isLoadingPrevious,
 }: VerseDisplayProps) {
@@ -31,10 +31,25 @@ export function VerseDisplay({
 
   const handleJump = (e: React.FormEvent) => {
     e.preventDefault();
-    const num = parseInt(jumpValue, 10);
-    if (!isNaN(num) && num > 0) {
-      onJumpToVerse(num);
-      setJumpValue('');
+    const trimmed = jumpValue.trim();
+    if (!trimmed) return;
+
+    if (trimmed.includes(':')) {
+      // Chapter:verse format (e.g., "6:1" or "29:13")
+      const [chStr, vStr] = trimmed.split(':');
+      const ch = parseInt(chStr, 10);
+      const v = parseInt(vStr, 10);
+      if (!isNaN(ch) && ch > 0 && !isNaN(v) && v > 0) {
+        onJumpTo(ch, v);
+        setJumpValue('');
+      }
+    } else {
+      // Just a verse number in the current chapter
+      const num = parseInt(trimmed, 10);
+      if (!isNaN(num) && num > 0) {
+        onJumpTo(verse.chapter, num);
+        setJumpValue('');
+      }
     }
   };
 
@@ -110,21 +125,20 @@ export function VerseDisplay({
             <span className="hidden sm:inline">Previous</span>
           </button>
 
-          {/* Jump to verse */}
+          {/* Jump to chapter:verse */}
           <form onSubmit={handleJump} className="flex items-center gap-1.5">
             <label className="text-white/30 text-xs font-sans hidden sm:inline">Go to</label>
             <input
               type="text"
-              inputMode="numeric"
               value={jumpValue}
               onChange={(e) => setJumpValue(e.target.value)}
-              placeholder={`v${verse.verse}`}
-              className="w-14 px-2 py-1.5 rounded-lg text-center text-sm text-white font-sans"
+              placeholder={`${verse.chapter}:${verse.verse}`}
+              className="w-16 px-2 py-1.5 rounded-lg text-center text-sm text-white font-sans"
               style={{
                 background: 'rgba(255, 255, 255, 0.06)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
               }}
-              title="Type a verse number and press Enter to jump"
+              title="Verse number (e.g. 29) or chapter:verse (e.g. 6:1)"
             />
           </form>
 

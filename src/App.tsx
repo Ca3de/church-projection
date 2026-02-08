@@ -233,12 +233,12 @@ function App() {
     }
   }, [currentHymn, hymnDisplayIndex]);
 
-  // Jump to specific scripture verse
-  const handleScriptureJump = useCallback(async (verseNumber: number) => {
+  // Jump to specific scripture chapter:verse
+  const handleScriptureJump = useCallback(async (chapter: number, verseNumber: number) => {
     if (!currentVerse) return;
     setIsLoadingNext(true);
     try {
-      const jumpedVerse = await fetchSingleVerse(currentVerse.book, currentVerse.chapter, verseNumber);
+      const jumpedVerse = await fetchSingleVerse(currentVerse.book, chapter, verseNumber);
       if (jumpedVerse) {
         setCurrentVerse(jumpedVerse);
       }
@@ -787,7 +787,7 @@ function App() {
           onPrevious={handleScripturePrevious}
           onToggleFullscreen={toggleFullscreen}
           onNewSearch={handleNewSearch}
-          onJumpToVerse={handleScriptureJump}
+          onJumpTo={handleScriptureJump}
           isLoadingNext={isLoadingNext}
           isLoadingPrevious={isLoadingPrevious}
         />
