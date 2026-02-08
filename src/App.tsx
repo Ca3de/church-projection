@@ -24,6 +24,7 @@ import {
   fetchVerses,
   fetchNextVerse,
   fetchPreviousVerse,
+  fetchSingleVerse,
 } from './services/bibleApi';
 import {
   getHymnByNumber,
@@ -231,6 +232,35 @@ function App() {
       setHymnDisplayIndex((prev) => prev - 1);
     }
   }, [currentHymn, hymnDisplayIndex]);
+
+  // Jump to specific scripture verse
+  const handleScriptureJump = useCallback(async (verseNumber: number) => {
+    if (!currentVerse) return;
+    setIsLoadingNext(true);
+    try {
+      const jumpedVerse = await fetchSingleVerse(currentVerse.book, currentVerse.chapter, verseNumber);
+      if (jumpedVerse) {
+        setCurrentVerse(jumpedVerse);
+      }
+    } catch (err) {
+      console.error('Error jumping to verse:', err);
+    } finally {
+      setIsLoadingNext(false);
+    }
+  }, [currentVerse]);
+
+  // Jump to specific hymn verse
+  const handleHymnJump = useCallback((verseNumber: number) => {
+    if (!currentHymn) return;
+    // Convert verse number to display index
+    const targetIndex = currentHymn.refrain
+      ? (verseNumber - 1) * 2  // With refrain: verse N is at index (N-1)*2
+      : verseNumber - 1;       // Without refrain: verse N is at index N-1
+    const totalItems = getTotalDisplayItems(currentHymn);
+    if (targetIndex >= 0 && targetIndex < totalItems) {
+      setHymnDisplayIndex(targetIndex);
+    }
+  }, [currentHymn]);
 
   // Liturgy handlers
   const handleSelectLiturgy = useCallback((item: LiturgyItem) => {
@@ -757,6 +787,7 @@ function App() {
           onPrevious={handleScripturePrevious}
           onToggleFullscreen={toggleFullscreen}
           onNewSearch={handleNewSearch}
+          onJumpToVerse={handleScriptureJump}
           isLoadingNext={isLoadingNext}
           isLoadingPrevious={isLoadingPrevious}
         />
@@ -772,6 +803,7 @@ function App() {
           onPrevious={handleHymnPrevious}
           onToggleFullscreen={toggleFullscreen}
           onNewSearch={handleNewSearch}
+          onJumpToVerse={handleHymnJump}
           canGoNext={canGoNextHymn}
           canGoPrevious={canGoPreviousHymn}
         />

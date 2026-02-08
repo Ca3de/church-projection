@@ -88,7 +88,7 @@ export function parseScriptureReference(input: string): ScriptureReference | nul
 }
 
 // Fetch a single verse from the fast CDN
-async function fetchSingleVerse(book: string, chapter: number, verse: number): Promise<Verse | null> {
+export async function fetchSingleVerse(book: string, chapter: number, verse: number): Promise<Verse | null> {
   const apiBook = bookToApiFormat(book);
   const url = `${API_BASE}/${apiBook}/chapters/${chapter}/verses/${verse}.json`;
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Verse } from '../types/bible';
 import { formatReference } from '../services/bibleApi';
 
@@ -9,6 +10,7 @@ interface VerseDisplayProps {
   onPrevious: () => void;
   onToggleFullscreen: () => void;
   onNewSearch: () => void;
+  onJumpToVerse: (verseNumber: number) => void;
   isLoadingNext: boolean;
   isLoadingPrevious: boolean;
 }
@@ -21,9 +23,21 @@ export function VerseDisplay({
   onPrevious,
   onToggleFullscreen,
   onNewSearch,
+  onJumpToVerse,
   isLoadingNext,
   isLoadingPrevious,
 }: VerseDisplayProps) {
+  const [jumpValue, setJumpValue] = useState('');
+
+  const handleJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const num = parseInt(jumpValue, 10);
+    if (!isNaN(num) && num > 0) {
+      onJumpToVerse(num);
+      setJumpValue('');
+    }
+  };
+
   return (
     <div
       className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
@@ -95,6 +109,24 @@ export function VerseDisplay({
             )}
             <span className="hidden sm:inline">Previous</span>
           </button>
+
+          {/* Jump to verse */}
+          <form onSubmit={handleJump} className="flex items-center gap-1.5">
+            <label className="text-white/30 text-xs font-sans hidden sm:inline">Go to</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={jumpValue}
+              onChange={(e) => setJumpValue(e.target.value)}
+              placeholder={`v${verse.verse}`}
+              className="w-14 px-2 py-1.5 rounded-lg text-center text-sm text-white font-sans"
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+              title="Type a verse number and press Enter to jump"
+            />
+          </form>
 
           {/* New search button */}
           <button
