@@ -1648,10 +1648,57 @@
           "text": "For thy delightful employ\nWhate'er thy bounteous grace have giv'n:\nAnd run my course with even joy\nAnd closely walk with thee to heav'n."
         }
       ]
+    },
+    {
+      "title": "Rescue The Perishing, Care For The Dying",
+      "number": "431",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Rescue the perishing, care for the dying,\nSnatch them in pity from sin and the grave;\nWeep on the erring one, lift up the fallen,\nTell them of Jesus the mighty to save."
+        },
+        {
+          "verse": 2,
+          "text": "Though they are slighting Him, still He is waiting,\nWaiting the penitent child to receive;\nPlead with them earnestly, plead with them gently;\nHe will forgive if they only believe."
+        },
+        {
+          "verse": 3,
+          "text": "Down in the human heart, crushed by the tempter,\nFeelings lie buried that grace can restore;\nTouched by a loving heart, wakened by kindness,\nCords that are broken will vibrate once more."
+        },
+        {
+          "verse": 4,
+          "text": "Rescue the perishing, duty demands it—\nStrength for your labor the Lord will provide;\nBack to the narrow way patiently win them,\nTell them Christ died and rose to give them life."
+        }
+      ],
+      "refrain": "Rescue the perishing, care for the dying;\nJesus is merciful, Jesus will save."
+    },
+    {
+      "title": "Stand Up, Stand Up For Jesus",
+      "number": "477",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Stand up, stand up for Jesus,\nYe soldiers of the cross;\nLift high His royal banner,\nIt must not suffer loss.\nFrom vict'ry unto vict'ry\nHis army shall He lead,\nTill ev'ry foe is vanquished,\nAnd Christ is Lord indeed."
+        },
+        {
+          "verse": 2,
+          "text": "Stand up, stand up for Jesus,\nThe trumpet call obey;\nForth to the mighty conflict,\nIn this His glorious day.\nYe that are men now serve him\nAgainst unnumbered foes;\nLet courage rise with danger,\nAnd strength to strength oppose."
+        },
+        {
+          "verse": 3,
+          "text": "Stand up, stand up for Jesus,\nStand in His strength alone;\nThe arm of flesh will fail you,\nYe dare not trust your own.\nPut on the gospel armor,\nEach piece put on with prayer;\nWhere duty calls or danger,\nBe never wanting there."
+        },
+        {
+          "verse": 4,
+          "text": "Stand up, stand up for Jesus,\nThe strife will not be long;\nThis day the noise of battle,\nThe next the victor's song.\nTo him who over-cometh\nA crown of life shall be;\nHe with the King of Glory\nShall reign eternally."
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 67,
+    "total_hymns": 69,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
