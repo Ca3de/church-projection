@@ -74,6 +74,32 @@ export function VerseDisplay({
         </div>
       </div>
 
+      {/* Fullscreen jump input - fixed top right */}
+      {isFullscreen && (
+        <form
+          onSubmit={handleJump}
+          className="fixed top-4 right-4 z-50 flex items-center gap-2"
+          style={{ opacity: jumpValue ? 1 : 0.3, transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+          onMouseLeave={(e) => { if (!jumpValue) e.currentTarget.style.opacity = '0.3'; }}
+        >
+          <label className="text-white/40 text-xs font-sans">Go to</label>
+          <input
+            type="text"
+            value={jumpValue}
+            onChange={(e) => setJumpValue(e.target.value)}
+            placeholder={`${verse.chapter}:${verse.verse}`}
+            className="w-20 px-3 py-2 rounded-lg text-center text-sm text-white font-sans"
+            style={{
+              background: 'rgba(0, 0, 0, 0.5)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            }}
+            title="Verse number (e.g. 29) or chapter:verse (e.g. 6:1)"
+          />
+        </form>
+      )}
+
       {/* Navigation controls - hidden in fullscreen but appear on hover/tap */}
       <div
         className={`fixed bottom-0 left-0 right-0 p-6 transition-all duration-300 ${
