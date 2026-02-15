@@ -1695,10 +1695,37 @@
           "text": "Stand up, stand up for Jesus,\nThe strife will not be long;\nThis day the noise of battle,\nThe next the victor's song.\nTo him who over-cometh\nA crown of life shall be;\nHe with the King of Glory\nShall reign eternally."
         }
       ]
+    },
+    {
+      "title": "Come Labor On",
+      "number": "548",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Come, labor on.\nWho dares stand idle on the harvest plain\nwhile all around him waves the golden grain?\nAnd to each servant does the Master say,\n\"Go work today.\""
+        },
+        {
+          "verse": 2,
+          "text": "Come, labor on.\nClaim the high calling angels cannot share;\nto young and old the gospel gladness bear.\nRedeem the time; its hours too swiftly fly.\nThe night draws nigh."
+        },
+        {
+          "verse": 3,
+          "text": "Come, labor on.\nAway with gloomy doubt and faithless fear!\nNo arm so weak but may do service here.\nBy hands the feeblest can our God fulfill\nHis righteous will."
+        },
+        {
+          "verse": 4,
+          "text": "Come, labor on!\nThe labourers are few, the field is wide,\nNew stations must be filled and blanks supplied\nFrom voices distant far or near at home\nThe call is \"Come.\""
+        },
+        {
+          "verse": 5,
+          "text": "Come, labor on.\nNo time for rest, till glows the western sky,\ntill the long shadows on our pathway lie,\nand a glad sound comes with the setting sun,\n\"Servant, well done!\""
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 69,
+    "total_hymns": 70,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
