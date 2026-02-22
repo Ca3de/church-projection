@@ -1722,10 +1722,41 @@
           "text": "Come, labor on.\nNo time for rest, till glows the western sky,\ntill the long shadows on our pathway lie,\nand a glad sound comes with the setting sun,\n\"Servant, well done!\""
         }
       ]
+    },
+    {
+      "title": "Sinful, Sighing to Be Blessed",
+      "number": "293",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Sinful, sighing to be blessed,\nBound, and longing to be free;\nWeary, waiting for my rest;\nGod be merciful to me."
+        },
+        {
+          "verse": 2,
+          "text": "Goodness I have none to plead,\nSinfulness in all I see,\nI can only bring a need;\nGod be merciful to me."
+        },
+        {
+          "verse": 3,
+          "text": "Broken heart and downcast eyes\nDare not life themselves to Thee;\nYet Thou canst interpret sighs:\nGod be merciful to me."
+        },
+        {
+          "verse": 4,
+          "text": "From this sinful heart of mine\nTo Thy bosom I would flee:\nI am not my own but Thine:\nGod be merciful to me."
+        },
+        {
+          "verse": 5,
+          "text": "There is One beside thy throne,\nAnd my only hope and plea\nAre in Him, and Him alone:\nGod be merciful to me."
+        },
+        {
+          "verse": 6,
+          "text": "He my cause will undertake,\nMy interpreter will be;\nHe's my all; and for His sake\nGod be merciful to me."
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 70,
+    "total_hymns": 71,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
