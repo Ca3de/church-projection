@@ -13,6 +13,7 @@ interface JsonHymn {
   type: string;
   verses: JsonVerse[];
   refrain?: string;
+  expiresAt?: string; // ISO date string (YYYY-MM-DD) — hymn hidden after this date
 }
 
 // Counter for auto-assigning numbers to hymns without valid numbers
@@ -57,8 +58,10 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
   };
 }
 
-// Convert all JSON hymns
+// Filter out expired hymns, then convert
+const today = new Date().toISOString().split('T')[0];
 const convertedHymns: Hymn[] = (hymnsJson.hymns as JsonHymn[])
+  .filter((h) => !h.expiresAt || h.expiresAt >= today)
   .map((h) => convertJsonHymn(h))
   .filter((h): h is Hymn => h !== null);
 

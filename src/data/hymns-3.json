@@ -1753,10 +1753,35 @@
           "text": "He my cause will undertake,\nMy interpreter will be;\nHe's my all; and for His sake\nGod be merciful to me."
         }
       ]
+    },
+    {
+      "title": "Ancient Words (Chorus Before Sermon)",
+      "number": null,
+      "type": "hymn",
+      "expiresAt": "2026-03-04",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Holy words long preserved\nfor our walk in this world,\nThey resound with God's own heart\nOh, let the Ancient words impart."
+        },
+        {
+          "verse": 2,
+          "text": "Words of Life, words of Hope\nGive us strength, help us cope\nIn this world, where e'er we roam\nAncient words will guide us Home."
+        },
+        {
+          "verse": 3,
+          "text": "Holy words of our Faith\nHanded down to this age.\nCame to us through sacrifice\nOh heed the faithful words of Christ."
+        },
+        {
+          "verse": 4,
+          "text": "Holy words long preserved\nFor our walk in this world.\nThey resound with God's own heart\nOh let the ancient words impart."
+        }
+      ],
+      "refrain": "Ancient words ever true\nChanging me, and changing you.\nWe have come with open hearts\nOh let the ancient words impart."
     }
   ],
   "summary": {
-    "total_hymns": 71,
+    "total_hymns": 72,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
