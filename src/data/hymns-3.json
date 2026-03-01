@@ -1778,10 +1778,22 @@
         }
       ],
       "refrain": "Ancient words ever true\nChanging me, and changing you.\nWe have come with open hearts\nOh let the ancient words impart."
+    },
+    {
+      "title": "I Serve a God (Miracle Papa)",
+      "number": null,
+      "type": "hymn",
+      "expiresAt": "2026-03-02",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "I serve a God who is powerful eh, Hallelujah eh\nI serve a God who is mighty eh …yoh yoh yoh\nThis God is a good God oh, Halleluyah eh\nYou can call Him a miracle, Miracle Papa"
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 72,
+    "total_hymns": 73,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
