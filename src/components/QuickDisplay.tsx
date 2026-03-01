@@ -62,7 +62,7 @@ function parseTextIntoPages(text: string): TextPage[] {
 }
 
 interface VideoEmbed {
-  type: 'youtube' | 'vimeo' | 'instagram' | 'facebook' | 'direct' | 'unsupported';
+  type: 'youtube' | 'vimeo' | 'instagram' | 'facebook' | 'tiktok' | 'direct' | 'unsupported';
   url: string;
 }
 
@@ -123,6 +123,18 @@ function getVideoEmbed(url: string): VideoEmbed {
     return {
       type: 'facebook',
       url: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(trimmedUrl)}&show_text=false`,
+    };
+  }
+
+  // TikTok - tiktok.com/@user/video/ID or vm.tiktok.com/ID
+  const tiktokMatch = trimmedUrl.match(/tiktok\.com\/(?:@[^\/]+\/video\/|v\/)(\d+)/) ||
+    trimmedUrl.match(/tiktok\.com\/(\w+)/);
+  if (tiktokMatch) {
+    // TikTok embed uses their oEmbed iframe
+    const videoId = tiktokMatch[1];
+    return {
+      type: 'tiktok',
+      url: `https://www.tiktok.com/embed/v2/${videoId}`,
     };
   }
 
@@ -274,6 +286,16 @@ export function QuickDisplay({
                   allowFullScreen
                 />
               </div>
+            ) : videoEmbed.type === 'tiktok' ? (
+              <div className="max-h-[80vh] aspect-[9/16]">
+                <iframe
+                  src={videoEmbed.url}
+                  className="w-full h-full rounded-lg shadow-2xl"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  scrolling="no"
+                />
+              </div>
             ) : (
               <div className="aspect-video flex flex-col items-center justify-center bg-white/5 rounded-lg p-8">
                 <svg className="w-16 h-16 text-white/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +303,7 @@ export function QuickDisplay({
                 </svg>
                 <p className="text-white/50 text-center mb-2">Unable to embed this video</p>
                 <p className="text-white/30 text-sm text-center max-w-md">
-                  Try pasting a YouTube, Vimeo, Instagram Reel, or Facebook video link.
+                  Try pasting a YouTube, Vimeo, Instagram Reel, TikTok, or Facebook video link.
                   You can also upload a video file directly.
                 </p>
                 <a

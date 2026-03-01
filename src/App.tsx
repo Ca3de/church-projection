@@ -304,6 +304,8 @@ function App() {
     if (trimmed.match(/instagram\.com\/(?:reel|p|tv)\//)) return true;
     // Facebook (videos, watch, reel)
     if (trimmed.match(/facebook\.com/) && (trimmed.includes('/video') || trimmed.includes('/watch') || trimmed.includes('/reel'))) return true;
+    // TikTok
+    if (trimmed.match(/tiktok\.com\//)) return true;
     // Direct video files
     if (trimmed.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) return true;
     return false;
