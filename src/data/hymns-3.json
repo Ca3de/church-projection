@@ -1829,10 +1829,39 @@
           "text": "Love of God, so pure and changeless!\nBlood of Christ so rich, so free!\nGrace of God, so strong and boundless!\nMagnify it all in me.\nEven me, even me,\nMagnify it all in me."
         }
       ]
+    },
+    {
+      "title": "No, Not One!",
+      "number": null,
+      "type": "hymn",
+      "expiresAt": "2026-03-09",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "There's not a Friend like the lowly Jesus:\nNo, not one! no, not one!\nNone else could heal all our souls' diseases:\nNo, not one! no, not one!"
+        },
+        {
+          "verse": 2,
+          "text": "No friend like Him is so high and holy,\nNo, not one! no, not one!\nAnd yet no friend is so meek and lowly,\nNo, not one! no, not one!"
+        },
+        {
+          "verse": 3,
+          "text": "There's not an hour that He is not near us,\nNo, not one! no, not one!\nNo night so dark, but His love can cheer us,\nNo, not one! no, not one!"
+        },
+        {
+          "verse": 4,
+          "text": "Did ever saint find this Friend forsake him?\nNo, not one! no, not one!\nOr sinner find that He would not take him?\nNo, not one! no, not one!"
+        },
+        {
+          "verse": 5,
+          "text": "Was e'er a gift like the Savior given?\nNo, not one! no, not one!\nWill He refuse us the bliss of heaven?\nNo, not one! no, not one!"
+        }
+      ],
+      "refrain": "Jesus knows all about our struggles;\nHe will guide 'til the day is done:\nThere's not a Friend like the lowly Jesus:\nNo, not one! no, not one!"
     }
   ],
   "summary": {
-    "total_hymns": 75,
+    "total_hymns": 76,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
