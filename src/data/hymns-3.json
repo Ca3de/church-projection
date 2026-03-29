@@ -1858,10 +1858,57 @@
         }
       ],
       "refrain": "Jesus knows all about our struggles;\nHe will guide 'til the day is done:\nThere's not a Friend like the lowly Jesus:\nNo, not one! no, not one!"
+    },
+    {
+      "title": "All Glory, Laud, and Honor",
+      "number": "296",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Thou art the King of Israel\nAnd David's royal Son,\nWho comest in the Lord's name\nThe King and Blessed One."
+        },
+        {
+          "verse": 2,
+          "text": "The company of angels\nAre praising Thee on high\nAnd mortal men and all things\nCreated make reply"
+        },
+        {
+          "verse": 3,
+          "text": "The people of the Hebrews\nWith palms before Thee went\nOur praise and prayer and anthems\nBefore Thee we present."
+        },
+        {
+          "verse": 4,
+          "text": "To Thee before Thy Passion,\nThey sang their hymns of praise\nTo Thee now high exalted\nOur melody we raise."
+        },
+        {
+          "verse": 5,
+          "text": "Thou didst accept their praises\nAccept the prayers we bring,\nWho in all good delightest,\nO good and gracious King."
+        }
+      ],
+      "refrain": "All glory, laud and honour,\nTo Thee Redeemer King\nTo whom the lips of children\nMade sweet Hosannas ring."
+    },
+    {
+      "title": "Hosanna, Loud Hosanna",
+      "number": "298",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Hosanna, loud hosanna\nthe little children sang;\nthrough pillared court and temple\nthe lovely anthem rang.\nTo Jesus, who had blessed them,\nclose folded to his breast,\nthe children sang their praises,\nthe simplest and the best."
+        },
+        {
+          "verse": 2,
+          "text": "From Olivet they followed\nmid an exultant crowd,\nthe victory palm branch waving,\nand chanting clear and loud.\nThe Lord of men and angels\nrode on in lowly state,\nnor scorned that little children\nshould on his bidding wait."
+        },
+        {
+          "verse": 3,
+          "text": "\"Hosanna in the highest!\"\nThat ancient song we sing,\nfor Christ is our Redeemer,\nthe Lord of heaven, our King.\nO may we ever praise him\nwith heart and life and voice,\nand in his blissful presence\neternally rejoice."
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 76,
+    "total_hymns": 78,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
