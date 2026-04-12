@@ -1905,10 +1905,38 @@
           "text": "\"Hosanna in the highest!\"\nThat ancient song we sing,\nfor Christ is our Redeemer,\nthe Lord of heaven, our King.\nO may we ever praise him\nwith heart and life and voice,\nand in his blissful presence\neternally rejoice."
         }
       ]
+    },
+    {
+      "title": "What Can Wash Away My Stain",
+      "number": "440",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "What can wash away my stain?\nNothing but the blood of Jesus,\nWhat can make me whole again?\nNothing but the blood of Jesus,"
+        },
+        {
+          "verse": 2,
+          "text": "For my cleansing this I see\nNothing but the blood of Jesus,\nFor my pardon this my plea\nNothing but the blood of Jesus,"
+        },
+        {
+          "verse": 3,
+          "text": "Nothing can for sin atone\nNothing but the blood of Jesus,\nNought of good that I have done\nNothing but the blood of Jesus."
+        },
+        {
+          "verse": 4,
+          "text": "This is all my hope and peace,\nNothing but the blood of Jesus,\nHe is all my righteousness\nNothing but the blood of Jesus,"
+        },
+        {
+          "verse": 5,
+          "text": "Now by this I overcome\nNothing but the blood of Jesus,\nNow by this I'll reach my home\nNothing but the blood of Jesus. Amen"
+        }
+      ],
+      "refrain": "Oh, precious is the flow\nThat makes me white as snow\nNo other fount I know,\nNothing but the blood of Jesus,"
     }
   ],
   "summary": {
-    "total_hymns": 78,
+    "total_hymns": 79,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
