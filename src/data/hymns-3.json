@@ -1933,6 +1933,29 @@
         }
       ],
       "refrain": "Oh, precious is the flow\nThat makes me white as snow\nNo other fount I know,\nNothing but the blood of Jesus,"
+    },
+    {
+      "title": "My Faith Looks Up To Thee",
+      "number": "821",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "My faith looks up to Thee,\nO Lamb of Calvary\nSaviour divine,\nNow hear me while I pray\nTake all my guilt away\nO let me from this day\nBe wholly Thine."
+        },
+        {
+          "verse": 2,
+          "text": "May Thy rich grace impart\nStrength to my fainting heart,\nMy zeal inspire;\nAs Thou have died for me,\nO may my love to Thee\nPure, warm and changeless be,\nA living fire."
+        },
+        {
+          "verse": 3,
+          "text": "While life's dark maze I tread\nAnd griefs around me spread\nLord, be my Guide,\nBid darkness turn to day,\nWipe sorrow's tears away\nNor let me ever stray\nFrom Thee aside."
+        },
+        {
+          "verse": 4,
+          "text": "When ends life's transient dream\nWhen death's cold, sullen stream\nShall o'er me roll,\nBlest Saviour, then in love\nFear and distrust remove\nO bear me safe above,\nA ransomed soul."
+        }
+      ]
     }
   ],
   "summary": {
