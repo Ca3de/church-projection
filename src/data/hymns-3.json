@@ -1935,6 +1935,38 @@
       "refrain": "Oh, precious is the flow\nThat makes me white as snow\nNo other fount I know,\nNothing but the blood of Jesus,"
     },
     {
+      "title": "Jerusalem On High",
+      "number": "676",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Jerusalem on high\nMy song and city is\nMy home whene'er I die\nThe center of my bliss"
+        },
+        {
+          "verse": 2,
+          "text": "There dwells my Lord, my King\nJudged here unfit to live\nThere angels to Him sing\nAnd lowly homage give."
+        },
+        {
+          "verse": 3,
+          "text": "The bleeding martyrs, they\nWithin those courts are found\nClothed in their pure array\nTheir scars with glory crowned."
+        },
+        {
+          "verse": 4,
+          "text": "The prophets I might hear\nThe mighty men of old\nThe Lord's apostles there\nI might with joy behold."
+        },
+        {
+          "verse": 5,
+          "text": "The bleeding martyrs, they\nWithin those courts are found\nClothèd in pure array,\nTheir scars with glory crowned"
+        },
+        {
+          "verse": 6,
+          "text": "Ah me!, ah me!, that I\nIn Cedar's tent here stay\nNo place like that on high\nLord, thither guide my way. Amen"
+        }
+      ],
+      "refrain": "O happy place when shall I be\nMy God with Thee to see Thy face"
+    },
+    {
       "title": "My Faith Looks Up To Thee",
       "number": "821",
       "type": "hymn",
