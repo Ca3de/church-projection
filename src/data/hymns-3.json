@@ -2006,6 +2006,52 @@
       ]
     },
     {
+      "title": "Holy, Holy, Holy! Lord God Almighty",
+      "number": "108",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Holy, Holy, Holy! Lord God Almighty!\nEarly in the morning\nour songs shall rise to Thee,\nHoly, holy, holy, Merciful and Mighty.\nGod in three Persons, Blessèd Trinity."
+        },
+        {
+          "verse": 2,
+          "text": "Holy, holy, holy, all the saints adore Thee\nCasting down their golden crowns\naround the glassy sea,\nCherubim and seraphim,\nfalling down before Thee,\nWhich wert and art, and evermore shall be."
+        },
+        {
+          "verse": 3,
+          "text": "Holy, holy, holy, though\nthe darkness hide Thee\nThough the eyes of sinful man,\nThy glory may not see,\nOnly Thou art holy, there is none beside Thee\nPerfect in power, in love and purity."
+        },
+        {
+          "verse": 4,
+          "text": "Holy, holy, holy, Lord God Almighty,\nAll Thy works shall praise Thy name\nin earth, and sky, and sea\nHoly, holy, holy, Merciful and Mighty.\nGod in three persons, Blessèd Trinity. Amen"
+        }
+      ]
+    },
+    {
+      "title": "Three In One, And One In Three",
+      "number": "113",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Three in One, and One in Three\nRuler of the earth and sea\nHear us, while we lift to Thee\nHoly chant and psalm."
+        },
+        {
+          "verse": 2,
+          "text": "Light of lights, with morning shine:\nLift on us Thy light divine;\nAnd let charity benign\nBreathe on us her balm."
+        },
+        {
+          "verse": 3,
+          "text": "Light of lights, when falls the even\nLet it close on sin forgiven;\nFold us in the peace of heaven,\nShed a holy calm"
+        },
+        {
+          "verse": 4,
+          "text": "Three in One, and One in Three\nDimly here we worship Thee;\nWith the saints hereafter we—\nHope to bear the palm. Amen"
+        }
+      ]
+    },
+    {
       "title": "My Faith Looks Up To Thee",
       "number": "821",
       "type": "hymn",
