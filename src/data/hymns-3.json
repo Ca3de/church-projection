@@ -2129,6 +2129,30 @@
       ]
     },
     {
+      "title": "Give Me Joy In My Heart",
+      "number": "1176",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Give me joy in my heart, keep me praising\nGive me joy in my heart, I pray\nGive me joy in my heart, keep me praising\nKeep me praising till the break of day."
+        },
+        {
+          "verse": 2,
+          "text": "Give me peace in my heart, keep me loving\nGive me peace in my heart, I pray\nGive me peace in my heart, keep me loving\nKeep me loving till the break of day"
+        },
+        {
+          "verse": 3,
+          "text": "Give me love in my heart, keep me serving\nGive me love in my heart, I pray\nGive me love in my heart, keep me serving\nKeep me serving till the break of day"
+        },
+        {
+          "verse": 4,
+          "text": "Give oil in my lamp, keep me burning\nGive me oil in my lamp, I pray,\nGive oil in my lamp, keep me burning;\nKeep me burning till the break of day. Amen"
+        }
+      ],
+      "refrain": "Sing hosanna, sing hosanna,\nSing hosanna to the King of kings,\nSing hosanna, sing hosanna,\nSing hosanna to the King!"
+    },
+    {
       "title": "My Faith Looks Up To Thee",
       "number": "821",
       "type": "hymn",
