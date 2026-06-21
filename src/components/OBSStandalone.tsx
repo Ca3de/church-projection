@@ -3,6 +3,7 @@ import { getHymnByNumber, getDisplayItemAtIndex, getTotalDisplayItems } from '..
 import { parseScriptureReference, fetchVerses } from '../services/bibleApi';
 import type { Hymn, HymnDisplayItem } from '../types/hymn';
 import type { Verse } from '../types/bible';
+import { BIBLE_VERSIONS, DEFAULT_BIBLE_VERSION } from '../types/bible';
 
 type DisplayMode = 'hidden' | 'hymn' | 'scripture';
 
@@ -20,6 +21,14 @@ export function OBSStandalone() {
   // Scripture state
   const [scriptureInput, setScriptureInput] = useState('');
   const [currentVerse, setCurrentVerse] = useState<Verse | null>(null);
+  const [bibleVersion, setBibleVersion] = useState<string>(() => {
+    return localStorage.getItem('church-projection-bible-version') || DEFAULT_BIBLE_VERSION;
+  });
+
+  const handleBibleVersionChange = useCallback((versionId: string) => {
+    setBibleVersion(versionId);
+    localStorage.setItem('church-projection-bible-version', versionId);
+  }, []);
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -67,7 +76,7 @@ export function OBSStandalone() {
     setError('');
 
     try {
-      const verses = await fetchVerses(ref);
+      const verses = await fetchVerses(ref, bibleVersion);
       if (verses.length > 0) {
         setCurrentVerse(verses[0]);
         setMode('scripture');
@@ -77,7 +86,7 @@ export function OBSStandalone() {
     }
 
     setIsLoading(false);
-  }, [scriptureInput]);
+  }, [scriptureInput, bibleVersion]);
 
   const nextItem = useCallback(() => {
     if (mode === 'hymn' && hymnIndex < hymnTotal - 1) {
@@ -147,6 +156,15 @@ export function OBSStandalone() {
               onChange={e => setScriptureInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && loadScripture()}
             />
+            <select
+              value={bibleVersion}
+              onChange={e => handleBibleVersionChange(e.target.value)}
+              title="Bible version"
+            >
+              {BIBLE_VERSIONS.map(v => (
+                <option key={v.id} value={v.id}>{v.name}</option>
+              ))}
+            </select>
             <button onClick={loadScripture} disabled={isLoading}>Scripture</button>
           </div>
 

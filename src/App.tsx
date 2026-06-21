@@ -18,6 +18,7 @@ import {
 } from './components';
 import type { HistoryItem } from './components';
 import type { Verse } from './types/bible';
+import { DEFAULT_BIBLE_VERSION } from './types/bible';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
 import {
   parseScriptureReference,
@@ -74,6 +75,14 @@ function App() {
   const [currentVerse, setCurrentVerse] = useState<Verse | null>(null);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
   const [isLoadingPrevious, setIsLoadingPrevious] = useState(false);
+  const [bibleVersion, setBibleVersion] = useState<string>(() => {
+    return localStorage.getItem('church-projection-bible-version') || DEFAULT_BIBLE_VERSION;
+  });
+
+  const handleBibleVersionChange = useCallback((versionId: string) => {
+    setBibleVersion(versionId);
+    localStorage.setItem('church-projection-bible-version', versionId);
+  }, []);
 
   // Hymn state
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
@@ -129,7 +138,7 @@ function App() {
         return;
       }
 
-      const verses = await fetchVerses(parsed);
+      const verses = await fetchVerses(parsed, bibleVersion);
 
       if (verses.length === 0) {
         setError(
@@ -157,14 +166,14 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [addToHistory]);
+  }, [addToHistory, bibleVersion]);
 
   const handleScriptureNext = useCallback(async () => {
     if (!currentVerse || isLoadingNext) return;
 
     setIsLoadingNext(true);
     try {
-      const nextVerse = await fetchNextVerse(currentVerse);
+      const nextVerse = await fetchNextVerse(currentVerse, bibleVersion);
       if (nextVerse) {
         setCurrentVerse(nextVerse);
       }
@@ -173,14 +182,14 @@ function App() {
     } finally {
       setIsLoadingNext(false);
     }
-  }, [currentVerse, isLoadingNext]);
+  }, [currentVerse, isLoadingNext, bibleVersion]);
 
   const handleScripturePrevious = useCallback(async () => {
     if (!currentVerse || isLoadingPrevious) return;
 
     setIsLoadingPrevious(true);
     try {
-      const prevVerse = await fetchPreviousVerse(currentVerse);
+      const prevVerse = await fetchPreviousVerse(currentVerse, bibleVersion);
       if (prevVerse) {
         setCurrentVerse(prevVerse);
       }
@@ -189,7 +198,7 @@ function App() {
     } finally {
       setIsLoadingPrevious(false);
     }
-  }, [currentVerse, isLoadingPrevious]);
+  }, [currentVerse, isLoadingPrevious, bibleVersion]);
 
   // Hymn handlers
   const handleHymnSearch = useCallback((hymnNumber: number) => {
@@ -238,7 +247,7 @@ function App() {
     if (!currentVerse) return;
     setIsLoadingNext(true);
     try {
-      const jumpedVerse = await fetchSingleVerse(currentVerse.book, chapter, verseNumber);
+      const jumpedVerse = await fetchSingleVerse(currentVerse.book, chapter, verseNumber, bibleVersion);
       if (jumpedVerse) {
         setCurrentVerse(jumpedVerse);
       }
@@ -247,7 +256,7 @@ function App() {
     } finally {
       setIsLoadingNext(false);
     }
-  }, [currentVerse]);
+  }, [currentVerse, bibleVersion]);
 
   // Jump to specific hymn verse
   const handleHymnJump = useCallback((verseNumber: number) => {
@@ -702,6 +711,8 @@ function App() {
                   onSubmit={handleScriptureSearch}
                   isLoading={isLoading}
                   autoFocus
+                  bibleVersion={bibleVersion}
+                  onBibleVersionChange={handleBibleVersionChange}
                 />
               ) : (
                 <>

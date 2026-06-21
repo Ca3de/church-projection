@@ -18,6 +18,24 @@ export interface BibleBook {
   chapters: number;
 }
 
+export interface BibleVersion {
+  id: string;
+  name: string;
+  fullName: string;
+}
+
+export const BIBLE_VERSIONS: BibleVersion[] = [
+  { id: 'en-kjv', name: 'KJV', fullName: 'King James Version' },
+  { id: 'en-asv', name: 'ASV', fullName: 'American Standard Version' },
+  { id: 'en-web', name: 'WEB', fullName: 'World English Bible' },
+  { id: 'en-ylt', name: 'YLT', fullName: "Young's Literal Translation" },
+  { id: 'en-bbe', name: 'BBE', fullName: 'Bible in Basic English' },
+  { id: 'en-darby', name: 'Darby', fullName: 'Darby Translation' },
+  { id: 'en-dra', name: 'DRA', fullName: 'Douay-Rheims American' },
+];
+
+export const DEFAULT_BIBLE_VERSION = 'en-kjv';
+
 export const BIBLE_BOOKS: BibleBook[] = [
   { name: 'Genesis', abbrev: 'Gen', chapters: 50 },
   { name: 'Exodus', abbrev: 'Exod', chapters: 40 },
