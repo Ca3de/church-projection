@@ -91,11 +91,11 @@ export function parseScriptureReference(input: string): ScriptureReference | nul
 }
 
 // Fetch a single verse from the fast CDN
-export async function fetchSingleVerse(
+async function fetchSingleVerseRaw(
   book: string,
   chapter: number,
   verse: number,
-  versionId: string = DEFAULT_BIBLE_VERSION
+  versionId: string
 ): Promise<Verse | null> {
   const apiBook = bookToApiFormat(book);
   const url = `${apiBase(versionId)}/${apiBook}/chapters/${chapter}/verses/${verse}.json`;
@@ -118,30 +118,113 @@ export async function fetchSingleVerse(
   }
 }
 
+// In-memory caches keyed by version|book|chapter
+const verseCache = new Map<string, Verse | null>();
+const chapterCache = new Map<string, Verse[]>();
+const chapterInflight = new Map<string, Promise<Verse[]>>();
+
+function verseKey(versionId: string, book: string, chapter: number, verse: number): string {
+  return `${versionId}|${book.toLowerCase()}|${chapter}|${verse}`;
+}
+
+function chapterKey(versionId: string, book: string, chapter: number): string {
+  return `${versionId}|${book.toLowerCase()}|${chapter}`;
+}
+
+async function fetchVerseCached(
+  book: string,
+  chapter: number,
+  verse: number,
+  versionId: string
+): Promise<Verse | null> {
+  const k = verseKey(versionId, book, chapter, verse);
+  if (verseCache.has(k)) return verseCache.get(k) ?? null;
+  const result = await fetchSingleVerseRaw(book, chapter, verse, versionId);
+  verseCache.set(k, result);
+  return result;
+}
+
+// Fetch all verses in a chapter by probing in parallel chunks.
+// Stops as soon as a full chunk returns no verses (chapter ended).
+async function fetchChapterCached(
+  book: string,
+  chapter: number,
+  versionId: string
+): Promise<Verse[]> {
+  const ck = chapterKey(versionId, book, chapter);
+  const cached = chapterCache.get(ck);
+  if (cached) return cached;
+  const inflight = chapterInflight.get(ck);
+  if (inflight) return inflight;
+
+  const promise = (async () => {
+    const verses: Verse[] = [];
+    const CHUNK = 50;
+    const MAX_CHUNKS = 4; // 200 verses covers every chapter (Psalm 119 = 176)
+    for (let chunk = 0; chunk < MAX_CHUNKS; chunk++) {
+      const start = chunk * CHUNK + 1;
+      const promises: Promise<Verse | null>[] = [];
+      for (let v = start; v < start + CHUNK; v++) {
+        promises.push(fetchVerseCached(book, chapter, v, versionId));
+      }
+      const results = await Promise.all(promises);
+      let chunkHadAny = false;
+      for (const r of results) {
+        if (r) {
+          verses.push(r);
+          chunkHadAny = true;
+        }
+      }
+      if (!chunkHadAny) break;
+    }
+    chapterCache.set(ck, verses);
+    chapterInflight.delete(ck);
+    return verses;
+  })();
+
+  chapterInflight.set(ck, promise);
+  return promise;
+}
+
+function prefetchChapter(book: string, chapter: number, versionId: string): void {
+  fetchChapterCached(book, chapter, versionId).catch(() => {});
+}
+
+export async function fetchSingleVerse(
+  book: string,
+  chapter: number,
+  verse: number,
+  versionId: string = DEFAULT_BIBLE_VERSION
+): Promise<Verse | null> {
+  const result = await fetchVerseCached(book, chapter, verse, versionId);
+  // Opportunistic background prefetch so subsequent nav is instant.
+  prefetchChapter(book, chapter, versionId);
+  return result;
+}
+
 export async function fetchVerses(
   reference: ScriptureReference,
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse[]> {
-  const verses: Verse[] = [];
   const endVerse = reference.verseEnd || reference.verseStart;
 
-  // Fetch verses in parallel for speed
+  // Fast path: fetch only the requested verses in parallel for snappy first display.
   const promises: Promise<Verse | null>[] = [];
   for (let v = reference.verseStart; v <= endVerse; v++) {
-    promises.push(fetchSingleVerse(reference.book, reference.chapter, v, versionId));
+    promises.push(fetchVerseCached(reference.book, reference.chapter, v, versionId));
   }
-
   const results = await Promise.all(promises);
-
+  const verses: Verse[] = [];
   for (const result of results) {
-    if (result) {
-      verses.push(result);
-    }
+    if (result) verses.push(result);
   }
 
   if (verses.length === 0) {
     throw new Error('Scripture not found');
   }
+
+  // Background-prefetch the rest of the chapter so next/prev is instant.
+  prefetchChapter(reference.book, reference.chapter, versionId);
 
   return verses;
 }
@@ -150,20 +233,26 @@ export async function fetchNextVerse(
   currentVerse: Verse,
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse | null> {
-  // Try next verse in same chapter
-  const nextVerse = await fetchSingleVerse(
+  const nextVerse = await fetchVerseCached(
     currentVerse.book,
     currentVerse.chapter,
     currentVerse.verse + 1,
     versionId
   );
 
-  if (nextVerse) {
-    return nextVerse;
-  }
+  if (nextVerse) return nextVerse;
 
-  // Try first verse of next chapter
-  return fetchSingleVerse(currentVerse.book, currentVerse.chapter + 1, 1, versionId);
+  // End of chapter — jump to verse 1 of next chapter and prefetch it.
+  const firstOfNext = await fetchVerseCached(
+    currentVerse.book,
+    currentVerse.chapter + 1,
+    1,
+    versionId
+  );
+  if (firstOfNext) {
+    prefetchChapter(currentVerse.book, currentVerse.chapter + 1, versionId);
+  }
+  return firstOfNext;
 }
 
 export async function fetchPreviousVerse(
@@ -171,8 +260,7 @@ export async function fetchPreviousVerse(
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse | null> {
   if (currentVerse.verse > 1) {
-    // Try previous verse in same chapter
-    return fetchSingleVerse(
+    return fetchVerseCached(
       currentVerse.book,
       currentVerse.chapter,
       currentVerse.verse - 1,
@@ -181,23 +269,13 @@ export async function fetchPreviousVerse(
   }
 
   if (currentVerse.chapter > 1) {
-    // Try to find last verse of previous chapter by probing
-    // Start high and work down (most chapters have < 180 verses)
-    for (let v = 180; v >= 1; v--) {
-      const verse = await fetchSingleVerse(
-        currentVerse.book,
-        currentVerse.chapter - 1,
-        v,
-        versionId
-      );
-      if (verse) {
-        return verse;
-      }
-      // Quick binary search optimization: if 180 fails, try 80, then 50, etc.
-      if (v === 180) v = 81;
-      else if (v === 80) v = 51;
-      else if (v === 50) v = 36;
-    }
+    // Use the chapter cache so this is one chunked parallel fetch instead of ~36 serial probes.
+    const prevChapterVerses = await fetchChapterCached(
+      currentVerse.book,
+      currentVerse.chapter - 1,
+      versionId
+    );
+    return prevChapterVerses[prevChapterVerses.length - 1] || null;
   }
 
   return null;
