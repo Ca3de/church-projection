@@ -1,8 +1,11 @@
 import type { Verse, ScriptureReference } from '../types/bible';
-import { BIBLE_BOOKS } from '../types/bible';
+import { BIBLE_BOOKS, DEFAULT_BIBLE_VERSION } from '../types/bible';
 
-// Fast CDN-based KJV Bible API
-const API_BASE = 'https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books';
+const API_ROOT = 'https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles';
+
+function apiBase(versionId: string): string {
+  return `${API_ROOT}/${versionId}/books`;
+}
 
 // Map book names to API format (lowercase, no spaces)
 function bookToApiFormat(bookName: string): string {
@@ -88,9 +91,14 @@ export function parseScriptureReference(input: string): ScriptureReference | nul
 }
 
 // Fetch a single verse from the fast CDN
-export async function fetchSingleVerse(book: string, chapter: number, verse: number): Promise<Verse | null> {
+export async function fetchSingleVerse(
+  book: string,
+  chapter: number,
+  verse: number,
+  versionId: string = DEFAULT_BIBLE_VERSION
+): Promise<Verse | null> {
   const apiBook = bookToApiFormat(book);
-  const url = `${API_BASE}/${apiBook}/chapters/${chapter}/verses/${verse}.json`;
+  const url = `${apiBase(versionId)}/${apiBook}/chapters/${chapter}/verses/${verse}.json`;
 
   try {
     const response = await fetch(url);
@@ -110,14 +118,17 @@ export async function fetchSingleVerse(book: string, chapter: number, verse: num
   }
 }
 
-export async function fetchVerses(reference: ScriptureReference): Promise<Verse[]> {
+export async function fetchVerses(
+  reference: ScriptureReference,
+  versionId: string = DEFAULT_BIBLE_VERSION
+): Promise<Verse[]> {
   const verses: Verse[] = [];
   const endVerse = reference.verseEnd || reference.verseStart;
 
   // Fetch verses in parallel for speed
   const promises: Promise<Verse | null>[] = [];
   for (let v = reference.verseStart; v <= endVerse; v++) {
-    promises.push(fetchSingleVerse(reference.book, reference.chapter, v));
+    promises.push(fetchSingleVerse(reference.book, reference.chapter, v, versionId));
   }
 
   const results = await Promise.all(promises);
@@ -135,12 +146,16 @@ export async function fetchVerses(reference: ScriptureReference): Promise<Verse[
   return verses;
 }
 
-export async function fetchNextVerse(currentVerse: Verse): Promise<Verse | null> {
+export async function fetchNextVerse(
+  currentVerse: Verse,
+  versionId: string = DEFAULT_BIBLE_VERSION
+): Promise<Verse | null> {
   // Try next verse in same chapter
   const nextVerse = await fetchSingleVerse(
     currentVerse.book,
     currentVerse.chapter,
-    currentVerse.verse + 1
+    currentVerse.verse + 1,
+    versionId
   );
 
   if (nextVerse) {
@@ -148,16 +163,20 @@ export async function fetchNextVerse(currentVerse: Verse): Promise<Verse | null>
   }
 
   // Try first verse of next chapter
-  return fetchSingleVerse(currentVerse.book, currentVerse.chapter + 1, 1);
+  return fetchSingleVerse(currentVerse.book, currentVerse.chapter + 1, 1, versionId);
 }
 
-export async function fetchPreviousVerse(currentVerse: Verse): Promise<Verse | null> {
+export async function fetchPreviousVerse(
+  currentVerse: Verse,
+  versionId: string = DEFAULT_BIBLE_VERSION
+): Promise<Verse | null> {
   if (currentVerse.verse > 1) {
     // Try previous verse in same chapter
     return fetchSingleVerse(
       currentVerse.book,
       currentVerse.chapter,
-      currentVerse.verse - 1
+      currentVerse.verse - 1,
+      versionId
     );
   }
 
@@ -168,7 +187,8 @@ export async function fetchPreviousVerse(currentVerse: Verse): Promise<Verse | n
       const verse = await fetchSingleVerse(
         currentVerse.book,
         currentVerse.chapter - 1,
-        v
+        v,
+        versionId
       );
       if (verse) {
         return verse;

@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { BIBLE_BOOKS } from '../types/bible';
+import { BIBLE_BOOKS, BIBLE_VERSIONS } from '../types/bible';
 
 interface ScriptureInputProps {
   onSubmit: (reference: string) => void;
   isLoading: boolean;
   autoFocus?: boolean;
+  bibleVersion?: string;
+  onBibleVersionChange?: (versionId: string) => void;
 }
 
-export function ScriptureInput({ onSubmit, isLoading, autoFocus = false }: ScriptureInputProps) {
+export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVersion, onBibleVersionChange }: ScriptureInputProps) {
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -147,6 +149,30 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false }: Scrip
           </div>
         )}
       </div>
+
+      {bibleVersion && onBibleVersionChange && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <label htmlFor="bible-version" className="text-white/30 text-xs font-sans tracking-wide">
+            Version
+          </label>
+          <select
+            id="bible-version"
+            value={bibleVersion}
+            onChange={(e) => onBibleVersionChange(e.target.value)}
+            className="px-2 py-1 rounded-md text-xs font-sans text-white/80 cursor-pointer focus:outline-none"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {BIBLE_VERSIONS.map((v) => (
+              <option key={v.id} value={v.id} style={{ background: '#0f0f19' }}>
+                {v.name} — {v.fullName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <p className="text-center text-white/25 text-xs mt-4 font-sans tracking-wide">
         John 3:16 &middot; Psalm 23:1-6 &middot; Romans 8:28
