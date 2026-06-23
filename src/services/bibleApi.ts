@@ -118,76 +118,86 @@ async function fetchSingleVerseRaw(
   }
 }
 
-// In-memory caches keyed by version|book|chapter
+// Local hosted-book JSON: /bibles/{version}/{book}.json
+// Shape: { "1": { "1": "verse text", "2": "..." }, "2": {...} }
+type BookData = Record<string, Record<string, string>>;
+
+const bookCache = new Map<string, BookData | null>();
+const bookInflight = new Map<string, Promise<BookData | null>>();
+// Per-verse fallback cache for translations/books not in local store.
 const verseCache = new Map<string, Verse | null>();
-const chapterCache = new Map<string, Verse[]>();
-const chapterInflight = new Map<string, Promise<Verse[]>>();
 
-function verseKey(versionId: string, book: string, chapter: number, verse: number): string {
-  return `${versionId}|${book.toLowerCase()}|${chapter}|${verse}`;
+function bookKey(versionId: string, book: string): string {
+  return `${versionId}|${book.toLowerCase()}`;
 }
 
-function chapterKey(versionId: string, book: string, chapter: number): string {
-  return `${versionId}|${book.toLowerCase()}|${chapter}`;
+async function fetchLocalBook(versionId: string, book: string): Promise<BookData | null> {
+  const k = bookKey(versionId, book);
+  if (bookCache.has(k)) return bookCache.get(k)!;
+  const inflight = bookInflight.get(k);
+  if (inflight) return inflight;
+
+  const promise = (async () => {
+    const slug = bookToApiFormat(book);
+    try {
+      const r = await fetch(`/bibles/${versionId}/${slug}.json`);
+      if (!r.ok) {
+        bookCache.set(k, null);
+        return null;
+      }
+      const data = (await r.json()) as BookData;
+      bookCache.set(k, data);
+      return data;
+    } catch {
+      bookCache.set(k, null);
+      return null;
+    } finally {
+      bookInflight.delete(k);
+    }
+  })();
+
+  bookInflight.set(k, promise);
+  return promise;
 }
 
-async function fetchVerseCached(
+function verseFromBookData(
+  book: string,
+  chapter: number,
+  verse: number,
+  data: BookData
+): Verse | null {
+  const text = data[String(chapter)]?.[String(verse)];
+  if (typeof text !== 'string') return null;
+  return { book, chapter, verse, text: cleanVerseText(text) };
+}
+
+function lastVerseFromBookData(
+  book: string,
+  chapter: number,
+  data: BookData
+): Verse | null {
+  const ch = data[String(chapter)];
+  if (!ch) return null;
+  const nums = Object.keys(ch)
+    .map((n) => parseInt(n, 10))
+    .filter((n) => !isNaN(n));
+  if (nums.length === 0) return null;
+  const lastNum = Math.max(...nums);
+  return verseFromBookData(book, chapter, lastNum, data);
+}
+
+// CDN fallback: same per-verse fetcher as before, with a small in-memory cache.
+async function fetchVerseFallback(
   book: string,
   chapter: number,
   verse: number,
   versionId: string
 ): Promise<Verse | null> {
-  const k = verseKey(versionId, book, chapter, verse);
+  const k = `${versionId}|${book.toLowerCase()}|${chapter}|${verse}`;
   if (verseCache.has(k)) return verseCache.get(k) ?? null;
   const result = await fetchSingleVerseRaw(book, chapter, verse, versionId);
   verseCache.set(k, result);
   return result;
-}
-
-// Fetch all verses in a chapter by probing in parallel chunks.
-// Stops as soon as a full chunk returns no verses (chapter ended).
-async function fetchChapterCached(
-  book: string,
-  chapter: number,
-  versionId: string
-): Promise<Verse[]> {
-  const ck = chapterKey(versionId, book, chapter);
-  const cached = chapterCache.get(ck);
-  if (cached) return cached;
-  const inflight = chapterInflight.get(ck);
-  if (inflight) return inflight;
-
-  const promise = (async () => {
-    const verses: Verse[] = [];
-    const CHUNK = 50;
-    const MAX_CHUNKS = 4; // 200 verses covers every chapter (Psalm 119 = 176)
-    for (let chunk = 0; chunk < MAX_CHUNKS; chunk++) {
-      const start = chunk * CHUNK + 1;
-      const promises: Promise<Verse | null>[] = [];
-      for (let v = start; v < start + CHUNK; v++) {
-        promises.push(fetchVerseCached(book, chapter, v, versionId));
-      }
-      const results = await Promise.all(promises);
-      let chunkHadAny = false;
-      for (const r of results) {
-        if (r) {
-          verses.push(r);
-          chunkHadAny = true;
-        }
-      }
-      if (!chunkHadAny) break;
-    }
-    chapterCache.set(ck, verses);
-    chapterInflight.delete(ck);
-    return verses;
-  })();
-
-  chapterInflight.set(ck, promise);
-  return promise;
-}
-
-function prefetchChapter(book: string, chapter: number, versionId: string): void {
-  fetchChapterCached(book, chapter, versionId).catch(() => {});
 }
 
 export async function fetchSingleVerse(
@@ -196,10 +206,11 @@ export async function fetchSingleVerse(
   verse: number,
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse | null> {
-  const result = await fetchVerseCached(book, chapter, verse, versionId);
-  // Opportunistic background prefetch so subsequent nav is instant.
-  prefetchChapter(book, chapter, versionId);
-  return result;
+  const data = await fetchLocalBook(versionId, book);
+  if (data) {
+    return verseFromBookData(book, chapter, verse, data);
+  }
+  return fetchVerseFallback(book, chapter, verse, versionId);
 }
 
 export async function fetchVerses(
@@ -207,24 +218,27 @@ export async function fetchVerses(
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse[]> {
   const endVerse = reference.verseEnd || reference.verseStart;
+  const data = await fetchLocalBook(versionId, reference.book);
 
-  // Fast path: fetch only the requested verses in parallel for snappy first display.
-  const promises: Promise<Verse | null>[] = [];
-  for (let v = reference.verseStart; v <= endVerse; v++) {
-    promises.push(fetchVerseCached(reference.book, reference.chapter, v, versionId));
-  }
-  const results = await Promise.all(promises);
   const verses: Verse[] = [];
-  for (const result of results) {
-    if (result) verses.push(result);
+  if (data) {
+    for (let v = reference.verseStart; v <= endVerse; v++) {
+      const verse = verseFromBookData(reference.book, reference.chapter, v, data);
+      if (verse) verses.push(verse);
+    }
+  } else {
+    // CDN fallback: parallel per-verse fetches.
+    const promises: Promise<Verse | null>[] = [];
+    for (let v = reference.verseStart; v <= endVerse; v++) {
+      promises.push(fetchVerseFallback(reference.book, reference.chapter, v, versionId));
+    }
+    const results = await Promise.all(promises);
+    for (const r of results) if (r) verses.push(r);
   }
 
   if (verses.length === 0) {
     throw new Error('Scripture not found');
   }
-
-  // Background-prefetch the rest of the chapter so next/prev is instant.
-  prefetchChapter(reference.book, reference.chapter, versionId);
 
   return verses;
 }
@@ -233,51 +247,71 @@ export async function fetchNextVerse(
   currentVerse: Verse,
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse | null> {
-  const nextVerse = await fetchVerseCached(
+  const data = await fetchLocalBook(versionId, currentVerse.book);
+  if (data) {
+    const next = verseFromBookData(
+      currentVerse.book,
+      currentVerse.chapter,
+      currentVerse.verse + 1,
+      data
+    );
+    if (next) return next;
+    return verseFromBookData(currentVerse.book, currentVerse.chapter + 1, 1, data);
+  }
+
+  // Fallback path.
+  const nextVerse = await fetchVerseFallback(
     currentVerse.book,
     currentVerse.chapter,
     currentVerse.verse + 1,
     versionId
   );
-
   if (nextVerse) return nextVerse;
-
-  // End of chapter — jump to verse 1 of next chapter and prefetch it.
-  const firstOfNext = await fetchVerseCached(
-    currentVerse.book,
-    currentVerse.chapter + 1,
-    1,
-    versionId
-  );
-  if (firstOfNext) {
-    prefetchChapter(currentVerse.book, currentVerse.chapter + 1, versionId);
-  }
-  return firstOfNext;
+  return fetchVerseFallback(currentVerse.book, currentVerse.chapter + 1, 1, versionId);
 }
 
 export async function fetchPreviousVerse(
   currentVerse: Verse,
   versionId: string = DEFAULT_BIBLE_VERSION
 ): Promise<Verse | null> {
+  const data = await fetchLocalBook(versionId, currentVerse.book);
+  if (data) {
+    if (currentVerse.verse > 1) {
+      return verseFromBookData(
+        currentVerse.book,
+        currentVerse.chapter,
+        currentVerse.verse - 1,
+        data
+      );
+    }
+    if (currentVerse.chapter > 1) {
+      return lastVerseFromBookData(currentVerse.book, currentVerse.chapter - 1, data);
+    }
+    return null;
+  }
+
+  // Fallback: per-verse from CDN.
   if (currentVerse.verse > 1) {
-    return fetchVerseCached(
+    return fetchVerseFallback(
       currentVerse.book,
       currentVerse.chapter,
       currentVerse.verse - 1,
       versionId
     );
   }
-
   if (currentVerse.chapter > 1) {
-    // Use the chapter cache so this is one chunked parallel fetch instead of ~36 serial probes.
-    const prevChapterVerses = await fetchChapterCached(
-      currentVerse.book,
-      currentVerse.chapter - 1,
-      versionId
-    );
-    return prevChapterVerses[prevChapterVerses.length - 1] || null;
+    // Probe in parallel to find the last verse of the previous chapter.
+    const promises: Promise<Verse | null>[] = [];
+    for (let v = 1; v <= 200; v++) {
+      promises.push(
+        fetchVerseFallback(currentVerse.book, currentVerse.chapter - 1, v, versionId)
+      );
+    }
+    const results = await Promise.all(promises);
+    for (let i = results.length - 1; i >= 0; i--) {
+      if (results[i]) return results[i];
+    }
   }
-
   return null;
 }
 
