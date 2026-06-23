@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 /**
- * Downloads public-domain Bible translations from the wldeh/bible-api CDN
- * and consolidates each book into a single JSON file under public/bibles/.
+ * Downloads public-domain Bible translations from bible.helloao.org
+ * and writes one JSON file per book under public/bibles/.
  *
- * Format: public/bibles/{versionId}/{bookSlug}.json
+ * Output: public/bibles/{versionId}/{bookSlug}.json
  *   { "1": { "1": "verse text", "2": "..." }, "2": {...} }
- *
- * Skips books that already have a file (incremental). Pass --force to redownload.
  *
  * Usage:
  *   node scripts/sync-bibles.mjs [--versions=en-kjv,en-asv] [--force]
@@ -19,84 +17,40 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const OUT_DIR = join(ROOT, 'public', 'bibles');
-const CDN = 'https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles';
+const API = 'https://bible.helloao.org/api';
 
-const ALL_VERSIONS = ['en-kjv', 'en-asv', 'en-web', 'en-ylt', 'en-bbe', 'en-darby', 'en-dra'];
+// Map our internal version ids to helloao translation ids.
+const VERSION_MAP = {
+  'en-kjv': 'eng_kjv',
+  'en-asv': 'eng_asv',
+  'en-web': 'eng_web',
+  'en-ylt': 'eng_ylt',
+  'en-bbe': 'eng_bbe',
+  'en-darby': 'eng_dby',
+  'en-dra': 'eng_dra',
+};
 
-const BOOKS = [
-  { slug: 'genesis', chapters: 50 },
-  { slug: 'exodus', chapters: 40 },
-  { slug: 'leviticus', chapters: 27 },
-  { slug: 'numbers', chapters: 36 },
-  { slug: 'deuteronomy', chapters: 34 },
-  { slug: 'joshua', chapters: 24 },
-  { slug: 'judges', chapters: 21 },
-  { slug: 'ruth', chapters: 4 },
-  { slug: '1samuel', chapters: 31 },
-  { slug: '2samuel', chapters: 24 },
-  { slug: '1kings', chapters: 22 },
-  { slug: '2kings', chapters: 25 },
-  { slug: '1chronicles', chapters: 29 },
-  { slug: '2chronicles', chapters: 36 },
-  { slug: 'ezra', chapters: 10 },
-  { slug: 'nehemiah', chapters: 13 },
-  { slug: 'esther', chapters: 10 },
-  { slug: 'job', chapters: 42 },
-  { slug: 'psalms', chapters: 150 },
-  { slug: 'proverbs', chapters: 31 },
-  { slug: 'ecclesiastes', chapters: 12 },
-  { slug: 'songofsolomon', chapters: 8 },
-  { slug: 'isaiah', chapters: 66 },
-  { slug: 'jeremiah', chapters: 52 },
-  { slug: 'lamentations', chapters: 5 },
-  { slug: 'ezekiel', chapters: 48 },
-  { slug: 'daniel', chapters: 12 },
-  { slug: 'hosea', chapters: 14 },
-  { slug: 'joel', chapters: 3 },
-  { slug: 'amos', chapters: 9 },
-  { slug: 'obadiah', chapters: 1 },
-  { slug: 'jonah', chapters: 4 },
-  { slug: 'micah', chapters: 7 },
-  { slug: 'nahum', chapters: 3 },
-  { slug: 'habakkuk', chapters: 3 },
-  { slug: 'zephaniah', chapters: 3 },
-  { slug: 'haggai', chapters: 2 },
-  { slug: 'zechariah', chapters: 14 },
-  { slug: 'malachi', chapters: 4 },
-  { slug: 'matthew', chapters: 28 },
-  { slug: 'mark', chapters: 16 },
-  { slug: 'luke', chapters: 24 },
-  { slug: 'john', chapters: 21 },
-  { slug: 'acts', chapters: 28 },
-  { slug: 'romans', chapters: 16 },
-  { slug: '1corinthians', chapters: 16 },
-  { slug: '2corinthians', chapters: 13 },
-  { slug: 'galatians', chapters: 6 },
-  { slug: 'ephesians', chapters: 6 },
-  { slug: 'philippians', chapters: 4 },
-  { slug: 'colossians', chapters: 4 },
-  { slug: '1thessalonians', chapters: 5 },
-  { slug: '2thessalonians', chapters: 3 },
-  { slug: '1timothy', chapters: 6 },
-  { slug: '2timothy', chapters: 4 },
-  { slug: 'titus', chapters: 3 },
-  { slug: 'philemon', chapters: 1 },
-  { slug: 'hebrews', chapters: 13 },
-  { slug: 'james', chapters: 5 },
-  { slug: '1peter', chapters: 5 },
-  { slug: '2peter', chapters: 3 },
-  { slug: '1john', chapters: 5 },
-  { slug: '2john', chapters: 1 },
-  { slug: '3john', chapters: 1 },
-  { slug: 'jude', chapters: 1 },
-  { slug: 'revelation', chapters: 22 },
-];
-
-const MAX_VERSE_PROBE = 200; // Highest possible verse number in any chapter
-const CONCURRENCY = 40;
+// Map helloao book ids (USFM codes) to our file slugs.
+const BOOK_SLUG = {
+  GEN: 'genesis', EXO: 'exodus', LEV: 'leviticus', NUM: 'numbers', DEU: 'deuteronomy',
+  JOS: 'joshua', JDG: 'judges', RUT: 'ruth', '1SA': '1samuel', '2SA': '2samuel',
+  '1KI': '1kings', '2KI': '2kings', '1CH': '1chronicles', '2CH': '2chronicles',
+  EZR: 'ezra', NEH: 'nehemiah', EST: 'esther', JOB: 'job', PSA: 'psalms',
+  PRO: 'proverbs', ECC: 'ecclesiastes', SNG: 'songofsolomon', ISA: 'isaiah',
+  JER: 'jeremiah', LAM: 'lamentations', EZK: 'ezekiel', DAN: 'daniel',
+  HOS: 'hosea', JOL: 'joel', AMO: 'amos', OBA: 'obadiah', JON: 'jonah',
+  MIC: 'micah', NAM: 'nahum', HAB: 'habakkuk', ZEP: 'zephaniah', HAG: 'haggai',
+  ZEC: 'zechariah', MAL: 'malachi', MAT: 'matthew', MRK: 'mark', LUK: 'luke',
+  JHN: 'john', ACT: 'acts', ROM: 'romans', '1CO': '1corinthians', '2CO': '2corinthians',
+  GAL: 'galatians', EPH: 'ephesians', PHP: 'philippians', COL: 'colossians',
+  '1TH': '1thessalonians', '2TH': '2thessalonians', '1TI': '1timothy', '2TI': '2timothy',
+  TIT: 'titus', PHM: 'philemon', HEB: 'hebrews', JAS: 'james', '1PE': '1peter',
+  '2PE': '2peter', '1JN': '1john', '2JN': '2john', '3JN': '3john', JUD: 'jude',
+  REV: 'revelation',
+};
 
 function parseArgs() {
-  const args = { versions: ALL_VERSIONS, force: false };
+  const args = { versions: Object.keys(VERSION_MAP), force: false };
   for (const arg of process.argv.slice(2)) {
     if (arg === '--force') args.force = true;
     else if (arg.startsWith('--versions=')) {
@@ -115,91 +69,88 @@ async function exists(path) {
   }
 }
 
-async function fetchJson(url) {
-  try {
-    const r = await fetch(url);
-    if (!r.ok) return null;
-    return await r.json();
-  } catch {
-    return null;
-  }
-}
-
-async function withConcurrency(items, fn, concurrency) {
-  const results = new Array(items.length);
-  let idx = 0;
-  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (true) {
-      const myIdx = idx++;
-      if (myIdx >= items.length) return;
-      results[myIdx] = await fn(items[myIdx], myIdx);
+// Flatten the helloao verse `content` (array of strings and {noteId} objects) into plain text.
+function verseText(content) {
+  if (!Array.isArray(content)) return '';
+  const parts = [];
+  for (const item of content) {
+    if (typeof item === 'string') {
+      parts.push(item);
+    } else if (item && typeof item === 'object') {
+      if (typeof item.text === 'string') parts.push(item.text);
+      // Skip {noteId}, line breaks, headings — we only want verse prose.
     }
-  });
-  await Promise.all(workers);
-  return results;
-}
-
-async function downloadChapter(version, book, chapter) {
-  const verseNumbers = Array.from({ length: MAX_VERSE_PROBE }, (_, i) => i + 1);
-  const verses = await withConcurrency(
-    verseNumbers,
-    async (v) => {
-      const url = `${CDN}/${version}/books/${book}/chapters/${chapter}/verses/${v}.json`;
-      const data = await fetchJson(url);
-      return data && typeof data.text === 'string' ? { verse: v, text: data.text } : null;
-    },
-    CONCURRENCY
-  );
-  const out = {};
-  for (const v of verses) if (v) out[v.verse] = v.text;
-  return out;
-}
-
-async function downloadBook(version, bookDef, force) {
-  const outFile = join(OUT_DIR, version, `${bookDef.slug}.json`);
-  if (!force && (await exists(outFile))) {
-    return { skipped: true };
   }
-  const chapters = {};
-  for (let c = 1; c <= bookDef.chapters; c++) {
-    const verses = await downloadChapter(version, bookDef.slug, c);
-    const count = Object.keys(verses).length;
-    if (count === 0) {
-      console.warn(`    chapter ${c}: empty (likely missing in this translation)`);
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+async function syncVersion(versionId, force) {
+  const helloId = VERSION_MAP[versionId];
+  if (!helloId) {
+    console.error(`Unknown version: ${versionId}`);
+    return;
+  }
+
+  const versionDir = join(OUT_DIR, versionId);
+  if (!force) {
+    // Quick check: if all 66 book files exist, skip the whole translation.
+    const expectedSlugs = Object.values(BOOK_SLUG);
+    const allPresent = (
+      await Promise.all(expectedSlugs.map((slug) => exists(join(versionDir, `${slug}.json`))))
+    ).every(Boolean);
+    if (allPresent) {
+      console.log(`${versionId}: all 66 books present, skipping`);
+      return;
     }
-    chapters[c] = verses;
   }
-  await mkdir(dirname(outFile), { recursive: true });
-  await writeFile(outFile, JSON.stringify(chapters));
-  return { skipped: false };
+
+  console.log(`${versionId}: fetching complete Bible...`);
+  const start = Date.now();
+  const r = await fetch(`${API}/${helloId}/complete.json`);
+  if (!r.ok) {
+    console.error(`${versionId}: HTTP ${r.status}`);
+    return;
+  }
+  const data = await r.json();
+  console.log(`${versionId}: downloaded in ${((Date.now() - start) / 1000).toFixed(1)}s`);
+
+  await mkdir(versionDir, { recursive: true });
+  let wrote = 0;
+  for (const book of data.books) {
+    const slug = BOOK_SLUG[book.id];
+    if (!slug) {
+      console.warn(`${versionId}: unknown book id ${book.id} (${book.commonName}), skipping`);
+      continue;
+    }
+    const out = {};
+    for (const ch of book.chapters) {
+      const chNum = ch.chapter?.number;
+      if (chNum == null) continue;
+      const verses = {};
+      for (const item of ch.chapter.content || []) {
+        if (item.type !== 'verse') continue;
+        const text = verseText(item.content);
+        if (text) verses[item.number] = text;
+      }
+      out[chNum] = verses;
+    }
+    await writeFile(join(versionDir, `${slug}.json`), JSON.stringify(out));
+    wrote++;
+  }
+  console.log(`${versionId}: wrote ${wrote} books\n`);
 }
 
 async function main() {
   const { versions, force } = parseArgs();
-  console.log(`Syncing versions: ${versions.join(', ')}${force ? ' (force)' : ''}`);
+  console.log(`Syncing: ${versions.join(', ')}${force ? ' (force)' : ''}`);
   console.log(`Output: ${OUT_DIR}\n`);
 
-  for (const version of versions) {
-    console.log(`== ${version} ==`);
-    let downloaded = 0;
-    let skipped = 0;
-    for (const book of BOOKS) {
-      process.stdout.write(`  ${book.slug.padEnd(18)} `);
-      const start = Date.now();
-      try {
-        const result = await downloadBook(version, book, force);
-        if (result.skipped) {
-          console.log('skipped');
-          skipped++;
-        } else {
-          console.log(`done (${((Date.now() - start) / 1000).toFixed(1)}s)`);
-          downloaded++;
-        }
-      } catch (err) {
-        console.log(`FAILED: ${err.message}`);
-      }
+  for (const v of versions) {
+    try {
+      await syncVersion(v, force);
+    } catch (err) {
+      console.error(`${v}: failed —`, err.message);
     }
-    console.log(`  ${version}: ${downloaded} downloaded, ${skipped} skipped\n`);
   }
 }
 
