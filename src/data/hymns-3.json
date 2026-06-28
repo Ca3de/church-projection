@@ -2153,6 +2153,53 @@
       "refrain": "Sing hosanna, sing hosanna,\nSing hosanna to the King of kings,\nSing hosanna, sing hosanna,\nSing hosanna to the King!"
     },
     {
+      "title": "My Hope Is Built On Nothing Less",
+      "number": "822",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "My hope is built on nothing less\nThan Jesus' blood and righteousness.\nI dare not trust the sweetest frame\nBut wholly lean on Jesus' name."
+        },
+        {
+          "verse": 2,
+          "text": "When darkness seems to hide His face\nI rest on His unchanging grace.\nIn every high and stormy gale\nMy anchor holds within the vale."
+        },
+        {
+          "verse": 3,
+          "text": "His oath, His covenant, His blood\nSupport me in the whelming flood\nWhen all around my soul gives way\nHe then is all my hope and stay."
+        },
+        {
+          "verse": 4,
+          "text": "When He shall come with trumpet sound\nOh, may I then in Him be found.\nDressed in His righteousness alone\nFaultless to stand before the throne. Amen."
+        }
+      ],
+      "refrain": "On Christ, the Solid Rock, I stand\nAll other ground is sinking sand"
+    },
+    {
+      "title": "Thou Whose Almighty Word",
+      "number": "570",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Thou, whose almighty Word\nChaos and darkness heard\nAnd took their flight;\nHear us, we humbly pray\nAnd, where the Gospel-day\nSheds not its glorious ray\nLet there be light."
+        },
+        {
+          "verse": 2,
+          "text": "Thou, who did come to bring\nOn Thy redeeming wing,\nHealing and sight\nHealth to the sick in mind\nSight to the inly blind\nO now, to all mankind,\nLet there be light."
+        },
+        {
+          "verse": 3,
+          "text": "Spirit of truth and love\nLife-giver from above\nSpeed forth Thy flight\nMove on the waters' face\nBearing the lamp of grace\nAnd in earth's darkest place\nLet there be light."
+        },
+        {
+          "verse": 4,
+          "text": "Holy and Blessèd Three\nGlorious Trinity,\nWisdom, Love, Might\nBoundless as ocean tide\nRolling in fullest pride\nThrough the world, far and wide\nLet there be light. Amen!"
+        }
+      ]
+    },
+    {
       "title": "My Faith Looks Up To Thee",
       "number": "821",
       "type": "hymn",
