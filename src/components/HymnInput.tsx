@@ -89,9 +89,9 @@ export function HymnInput({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="w-full">
       <div className="relative">
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -101,25 +101,24 @@ export function HymnInput({
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Enter hymn number or title..."
-              className="input-field pr-14"
+              placeholder="Hymn number or title"
+              className="input-field pr-12"
               disabled={isLoading}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              <kbd className="px-1.5 py-0.5 rounded text-xs font-sans text-white/20"
-                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>/</kbd>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+              <span className="kbd">/</span>
             </div>
           </div>
           <button
             type="submit"
             disabled={isLoading || !value.trim()}
-            className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none min-w-[110px]"
+            className="btn-primary disabled:opacity-35 disabled:cursor-not-allowed disabled:transform-none min-w-[108px] flex items-center justify-center"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+                  <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
                 <span>Loading</span>
               </span>
@@ -131,30 +130,45 @@ export function HymnInput({
 
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 overflow-hidden z-10 animate-scale-in rounded-xl max-h-72 overflow-y-auto scrollbar-thin"
-               style={{ background: 'rgba(15, 15, 25, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div
+            className="absolute top-full left-0 right-0 mt-2.5 z-20 animate-scale-in max-h-[19rem] overflow-y-auto scrollbar-thin"
+            style={{
+              background: 'rgba(12, 11, 14, 0.94)',
+              backdropFilter: 'blur(28px) saturate(1.2)',
+              WebkitBackdropFilter: 'blur(28px) saturate(1.2)',
+              border: '1px solid var(--hairline-strong)',
+              borderRadius: 'var(--r-lg)',
+              boxShadow: '0 28px 60px -20px rgba(0,0,0,0.9)',
+              padding: '0.3rem',
+            }}
+          >
             {suggestions.map((hymn, index) => (
               <button
                 key={hymn.number}
                 type="button"
                 onClick={() => handleSuggestionClick(hymn)}
-                className={`w-full px-5 py-3 text-left transition-all duration-150 font-sans text-sm flex items-center gap-3 ${
+                className="w-full px-3 py-2.5 text-left transition-colors duration-150 font-sans text-sm flex items-center gap-3 rounded-lg"
+                style={
                   index === selectedIndex
-                    ? 'text-white'
-                    : 'text-white/60 hover:text-white/90'
-                }`}
-                style={index === selectedIndex ? {
-                  background: 'rgba(255,255,255,0.06)',
-                  borderLeft: '2px solid var(--theme-accent)',
-                } : { borderLeft: '2px solid transparent' }}
+                    ? { background: 'var(--surface-3)', color: 'var(--ink-100)' }
+                    : { color: 'var(--ink-60)' }
+                }
               >
-                <span className="text-xs font-medium px-2 py-0.5 rounded shrink-0"
-                      style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--theme-accent)' }}>
-                  #{hymn.displayNumber || hymn.number}
+                <span
+                  className="text-[11px] font-medium px-1.5 py-1 rounded-md shrink-0 tabular-nums min-w-[2.6rem] text-center"
+                  style={{
+                    background: 'rgba(0,0,0,0.35)',
+                    border: '1px solid var(--hairline)',
+                    color: 'var(--theme-accent)',
+                  }}
+                >
+                  {hymn.displayNumber || hymn.number}
                 </span>
                 <span className="flex-1 truncate">{hymn.title}</span>
                 {hymn.author && (
-                  <span className="text-white/30 text-xs shrink-0">{hymn.author}</span>
+                  <span className="text-[11px] shrink-0 truncate max-w-[7rem]" style={{ color: 'var(--ink-40)' }}>
+                    {hymn.author}
+                  </span>
                 )}
               </button>
             ))}
@@ -162,8 +176,8 @@ export function HymnInput({
         )}
       </div>
 
-      <p className="text-center text-white/25 text-xs mt-4 font-sans tracking-wide">
-        234 &middot; YS1 &middot; Amazing Grace &middot; Holy
+      <p className="text-xs mt-4 font-sans" style={{ color: 'var(--ink-40)' }}>
+        821 &middot; YS1 &middot; Amazing Grace
       </p>
     </form>
   );

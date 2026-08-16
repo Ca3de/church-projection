@@ -84,9 +84,9 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="w-full">
       <div className="relative">
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -96,25 +96,24 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && !value.includes(':') && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Enter scripture reference..."
-              className="input-field pr-14"
+              placeholder="John 3:16"
+              className="input-field pr-12"
               disabled={isLoading}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              <kbd className="px-1.5 py-0.5 rounded text-xs font-sans text-white/20"
-                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>/</kbd>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+              <span className="kbd">/</span>
             </div>
           </div>
           <button
             type="submit"
             disabled={isLoading || !value.trim()}
-            className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none min-w-[110px]"
+            className="btn-primary disabled:opacity-35 disabled:cursor-not-allowed disabled:transform-none min-w-[108px] flex items-center justify-center"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
+                  <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
                 <span>Loading</span>
               </span>
@@ -126,23 +125,38 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
 
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 overflow-hidden z-10 animate-scale-in rounded-xl"
-               style={{ background: 'rgba(15, 15, 25, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div
+            className="absolute top-full left-0 right-0 mt-2.5 overflow-hidden z-20 animate-scale-in"
+            style={{
+              background: 'rgba(12, 11, 14, 0.94)',
+              backdropFilter: 'blur(28px) saturate(1.2)',
+              WebkitBackdropFilter: 'blur(28px) saturate(1.2)',
+              border: '1px solid var(--hairline-strong)',
+              borderRadius: 'var(--r-lg)',
+              boxShadow: '0 28px 60px -20px rgba(0,0,0,0.9)',
+              padding: '0.3rem',
+            }}
+          >
             {suggestions.map((suggestion, index) => (
               <button
                 key={suggestion}
                 type="button"
                 onClick={() => handleSuggestionClick(suggestion)}
-                className={`w-full px-5 py-3 text-left transition-all duration-150 font-sans text-sm ${
+                className="w-full px-4 py-2.5 text-left transition-colors duration-150 font-sans text-sm rounded-lg flex items-center gap-2.5"
+                style={
                   index === selectedIndex
-                    ? 'text-white'
-                    : 'text-white/60 hover:text-white/90'
-                }`}
-                style={index === selectedIndex ? {
-                  background: 'rgba(255,255,255,0.06)',
-                  borderLeft: '2px solid var(--theme-accent)',
-                } : { borderLeft: '2px solid transparent' }}
+                    ? { background: 'var(--surface-3)', color: 'var(--ink-100)' }
+                    : { color: 'var(--ink-60)' }
+                }
               >
+                <span
+                  className="w-1 h-1 rounded-full shrink-0"
+                  style={{
+                    background: 'var(--theme-accent)',
+                    opacity: index === selectedIndex ? 0.9 : 0,
+                    transition: 'opacity 0.15s',
+                  }}
+                />
                 {suggestion}
               </button>
             ))}
@@ -150,33 +164,36 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
         )}
       </div>
 
-      {bibleVersion && onBibleVersionChange && (
-        <div className="flex items-center justify-center gap-2 mt-4">
-          <label htmlFor="bible-version" className="text-white/30 text-xs font-sans tracking-wide">
-            Version
-          </label>
-          <select
-            id="bible-version"
-            value={bibleVersion}
-            onChange={(e) => onBibleVersionChange(e.target.value)}
-            className="px-2 py-1 rounded-md text-xs font-sans text-white/80 cursor-pointer focus:outline-none"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            {BIBLE_VERSIONS.map((v) => (
-              <option key={v.id} value={v.id} style={{ background: '#0f0f19' }}>
-                {v.name} — {v.fullName}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div className="flex items-center justify-between gap-3 mt-4 flex-wrap">
+        <p className="text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
+          Psalm 23:1-6 &middot; Romans 8:28
+        </p>
 
-      <p className="text-center text-white/25 text-xs mt-4 font-sans tracking-wide">
-        John 3:16 &middot; Psalm 23:1-6 &middot; Romans 8:28
-      </p>
+        {bibleVersion && onBibleVersionChange && (
+          <div className="flex items-center gap-2 ml-auto">
+            <label htmlFor="bible-version" className="eyebrow">
+              Version
+            </label>
+            <select
+              id="bible-version"
+              value={bibleVersion}
+              onChange={(e) => onBibleVersionChange(e.target.value)}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-sans cursor-pointer focus:outline-none transition-colors duration-200"
+              style={{
+                color: 'var(--ink-80)',
+                background: 'var(--surface-2)',
+                border: '1px solid var(--hairline)',
+              }}
+            >
+              {BIBLE_VERSIONS.map((v) => (
+                <option key={v.id} value={v.id} style={{ background: '#0f0e12', color: '#fff' }}>
+                  {v.name} — {v.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
     </form>
   );
 }

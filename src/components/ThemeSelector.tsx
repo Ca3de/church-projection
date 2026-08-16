@@ -31,69 +31,91 @@ export function ThemeSelector({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-white/50 hover:text-white/80"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+        className="btn-ghost px-2.5"
+        style={isOpen ? { color: 'var(--ink-100)', background: 'var(--surface-2)', borderColor: 'var(--hairline)' } : undefined}
         title="Change theme"
       >
-        <div className="flex gap-0.5">
-          <div className="w-2.5 h-5 rounded-l-sm" style={{ backgroundColor: currentTheme.colors.primary }} />
-          <div className="w-2.5 h-5 rounded-r-sm" style={{ backgroundColor: currentTheme.colors.secondary }} />
-        </div>
-        <span className="hidden sm:inline text-xs font-sans">{currentTheme.name}</span>
-        {currentTheme.icon && <span className="text-xs">{currentTheme.icon}</span>}
+        {/* Colour chip — a small swatch pair reading as a ribbon */}
+        <span
+          className="flex overflow-hidden rounded-[3px] shrink-0"
+          style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.12)' }}
+        >
+          <span className="w-2 h-4" style={{ backgroundColor: currentTheme.colors.primary }} />
+          <span className="w-2 h-4" style={{ backgroundColor: currentTheme.colors.secondary }} />
+        </span>
+        <span className="hidden sm:inline text-xs font-medium">{currentTheme.name}</span>
+        {currentTheme.icon && <span className="text-xs leading-none">{currentTheme.icon}</span>}
         <svg
-          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          style={{ opacity: 0.6 }}
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 max-h-[420px] overflow-y-auto z-50 animate-scale-in rounded-xl scrollbar-thin"
-             style={{ background: 'rgba(12, 12, 20, 0.97)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="p-2">
-            <p className="text-[10px] text-white/25 uppercase tracking-[0.2em] px-3 py-2 font-sans font-medium">
-              Church Seasons
-            </p>
-            {themes.map((theme) => (
-              <button
-                key={theme.id}
-                onClick={() => {
-                  onThemeChange(theme);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left ${
-                  currentTheme.id === theme.id
-                    ? 'text-white'
-                    : 'text-white/50 hover:text-white/80'
-                }`}
-                style={currentTheme.id === theme.id ? {
-                  background: 'rgba(255,255,255,0.06)',
-                } : {}}
-              >
-                <div className="flex-shrink-0 flex gap-px">
-                  <div className="w-2.5 h-5 rounded-l-sm" style={{ backgroundColor: theme.colors.primary }} />
-                  <div className="w-2.5 h-5 rounded-r-sm" style={{ backgroundColor: theme.colors.secondary }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-sans text-sm truncate">{theme.name}</span>
-                    {theme.icon && <span className="text-xs">{theme.icon}</span>}
-                  </div>
-                  <p className="text-[10px] text-white/25 truncate font-sans">
-                    {theme.description}
-                  </p>
-                </div>
-                {currentTheme.id === theme.id && (
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--theme-accent)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
+        <div
+          className="absolute right-0 mt-2.5 w-[17rem] max-h-[26rem] overflow-y-auto z-50 animate-scale-in scrollbar-thin"
+          style={{
+            background: 'rgba(12, 11, 14, 0.95)',
+            backdropFilter: 'blur(28px) saturate(1.2)',
+            WebkitBackdropFilter: 'blur(28px) saturate(1.2)',
+            border: '1px solid var(--hairline-strong)',
+            borderRadius: 'var(--r-lg)',
+            boxShadow: '0 28px 60px -20px rgba(0,0,0,0.9)',
+          }}
+        >
+          <div className="p-1.5">
+            <p className="eyebrow px-3 pt-2.5 pb-2">Church Seasons</p>
+            {themes.map((theme) => {
+              const isActive = currentTheme.id === theme.id;
+              return (
+                <button
+                  key={theme.id}
+                  onClick={() => {
+                    onThemeChange(theme);
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-2.5 py-2.5 rounded-lg transition-colors duration-150 text-left"
+                  style={
+                    isActive
+                      ? { background: 'var(--surface-3)', color: 'var(--ink-100)' }
+                      : { color: 'var(--ink-60)' }
+                  }
+                >
+                  <span
+                    className="flex overflow-hidden rounded-[3px] shrink-0"
+                    style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.12)' }}
+                  >
+                    <span className="w-2.5 h-6" style={{ backgroundColor: theme.colors.primary }} />
+                    <span className="w-2.5 h-6" style={{ backgroundColor: theme.colors.secondary }} />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center gap-1.5">
+                      <span className="font-sans text-[13px] font-medium truncate">{theme.name}</span>
+                      {theme.icon && <span className="text-[11px] leading-none">{theme.icon}</span>}
+                    </span>
+                    <span className="block text-[11px] truncate font-sans mt-0.5" style={{ color: 'var(--ink-40)' }}>
+                      {theme.description}
+                    </span>
+                  </span>
+                  {isActive && (
+                    <svg
+                      className="w-4 h-4 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      style={{ color: 'var(--theme-accent)' }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

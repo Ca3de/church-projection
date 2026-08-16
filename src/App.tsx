@@ -631,53 +631,64 @@ function App() {
       )}
 
       {view === 'search' ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
+        <div className="min-h-screen flex flex-col items-center justify-center px-5 py-24 sm:py-16 relative">
           {/* Top toolbar */}
-          <div className="fixed top-4 right-4 z-50 flex items-center gap-1.5" style={{ animation: 'fadeIn 0.6s ease-out' }}>
-            {/* OBS Controls */}
+          <div
+            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-end gap-1 px-4 py-3"
+            style={{ animation: 'fadeIn 0.9s var(--ease-out) both' }}
+          >
+            {/* OBS overlay toggle */}
             <button
               onClick={() => setObsOverlayVisible(!obsOverlayVisible)}
-              className="p-2 rounded-lg text-white/30 hover:text-white/70 transition-all duration-200"
-              style={{
-                background: obsOverlayVisible ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                border: `1px solid ${obsOverlayVisible ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.04)'}`,
-              }}
+              className="btn-ghost"
+              style={
+                obsOverlayVisible
+                  ? {
+                      color: 'rgb(248, 113, 113)',
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      borderColor: 'rgba(239, 68, 68, 0.25)',
+                    }
+                  : undefined
+              }
               title={obsOverlayVisible ? 'Hide OBS overlay' : 'Show OBS overlay'}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </button>
+
             {obsOverlayVisible && (
               <button
                 onClick={() => setObsOverlayMode(obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay')}
-                className="px-2 py-1.5 rounded-lg text-white/30 hover:text-white/60 text-[10px] font-medium tracking-wider uppercase transition-all duration-200"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
-                }}
+                className="btn-ghost eyebrow px-2.5"
+                style={{ animation: 'scaleIn 0.3s var(--ease-out) both' }}
                 title={`Switch to ${obsOverlayMode === 'overlay' ? 'fullscreen' : 'overlay'} mode`}
               >
                 {obsOverlayMode === 'overlay' ? 'Bar' : 'Full'}
               </button>
             )}
 
-            <div className="w-px h-5 mx-1" style={{ background: 'rgba(255, 255, 255, 0.06)' }} />
+            <div className="w-px h-4 mx-1.5" style={{ background: 'var(--hairline)' }} />
 
-            {/* Project button */}
+            {/* Project to second screen */}
             <button
               onClick={isWindowOpen ? closePresentationWindow : openPresentationWindow}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/30 hover:text-white/70 transition-all duration-200 text-sm font-sans"
-              style={{
-                background: isWindowOpen ? 'rgba(74, 222, 128, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-                border: `1px solid ${isWindowOpen ? 'rgba(74, 222, 128, 0.2)' : 'rgba(255, 255, 255, 0.04)'}`,
-              }}
+              className="btn-ghost px-3"
+              style={
+                isWindowOpen
+                  ? {
+                      color: 'rgb(134, 239, 172)',
+                      background: 'rgba(74, 222, 128, 0.08)',
+                      borderColor: 'rgba(74, 222, 128, 0.22)',
+                    }
+                  : undefined
+              }
               title={isWindowOpen ? 'Close presentation window' : 'Open presentation window for projector/TV'}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="hidden sm:inline text-xs">{isWindowOpen ? 'Close' : 'Project'}</span>
+              <span className="hidden sm:inline text-xs font-medium">{isWindowOpen ? 'Projecting' : 'Project'}</span>
             </button>
 
             <ThemeSelector
@@ -686,16 +697,39 @@ function App() {
             />
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-10" style={{ animation: 'fadeIn 0.8s ease-out' }}>
-            <h1 className="text-3xl md:text-4xl font-display font-semibold tracking-wider text-white/90 mb-2"
-                style={{ letterSpacing: '0.1em' }}>
-              Sanctum
+          {/* Masthead */}
+          <header className="text-center mb-9 sm:mb-11" style={{ animation: 'fadeIn 1.1s var(--ease-out) both' }}>
+            {/* Cross-lozenge mark */}
+            <div className="flex justify-center mb-5" aria-hidden="true">
+              <svg width="26" height="34" viewBox="0 0 26 34" fill="none" style={{ opacity: 0.55 }}>
+                <path
+                  d="M13 1.5 L13 32.5 M3.5 11 L22.5 11"
+                  stroke="var(--theme-accent)"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
+                <path d="M13 5.2 l2.2 2.2 -2.2 2.2 -2.2 -2.2 Z" fill="var(--theme-accent)" opacity="0.9" />
+              </svg>
+            </div>
+
+            <h1
+              className="font-display text-[2.1rem] sm:text-[2.75rem] leading-none"
+              style={{
+                fontWeight: 500,
+                letterSpacing: '0.2em',
+                textIndent: '0.2em',
+                color: 'var(--ink-100)',
+              }}
+            >
+              SANCTUM
             </h1>
-            <p className="text-white/25 text-sm font-sans tracking-widest uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.25em' }}>
-              Church Projection
-            </p>
-          </div>
+
+            <div className="ornament-rule my-4" aria-hidden="true">
+              <i />
+            </div>
+
+            <p className="eyebrow">Scripture &amp; Hymnal Projection</p>
+          </header>
 
           {/* Tab Switcher */}
           <TabSwitcher
@@ -704,8 +738,11 @@ function App() {
           />
 
           {/* Search input */}
-          <div className="w-full max-w-2xl" style={{ animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-            <div className="glass-panel p-8">
+          <div
+            className="w-full max-w-[38rem]"
+            style={{ animation: 'slideUp 0.8s var(--ease-out) 0.06s both' }}
+          >
+            <div className="panel p-6 sm:p-8">
               {(contentMode === 'scripture' || contentMode === 'liturgy' || contentMode === 'quick') ? (
                 <ScriptureInput
                   onSubmit={handleScriptureSearch}
@@ -721,12 +758,15 @@ function App() {
                     isLoading={isLoading}
                     autoFocus
                   />
-                  <div className="text-center mt-4">
+                  <div className="text-center mt-5">
                     <button
                       onClick={() => setShowHymnManager(true)}
-                      className="text-xs text-white/25 hover:text-white/50 transition-colors duration-200 font-sans tracking-wide"
+                      className="text-xs font-sans tracking-wide transition-colors duration-300"
+                      style={{ color: 'var(--ink-40)' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-80)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-40)')}
                     >
-                      Manage Custom Hymns
+                      Manage custom hymns
                     </button>
                   </div>
                 </>
@@ -734,12 +774,14 @@ function App() {
 
               {/* Error message */}
               {error && (
-                <div className="mt-4 p-4 rounded-xl text-center text-sm font-sans animate-scale-in"
-                     style={{
-                       background: 'rgba(239, 68, 68, 0.08)',
-                       border: '1px solid rgba(239, 68, 68, 0.15)',
-                       color: 'rgba(252, 165, 165, 0.9)',
-                     }}>
+                <div
+                  className="mt-5 px-4 py-3.5 rounded-xl text-center text-sm font-sans animate-scale-in"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.07)',
+                    border: '1px solid rgba(239, 68, 68, 0.18)',
+                    color: 'rgba(252, 165, 165, 0.92)',
+                  }}
+                >
                   {error}
                 </div>
               )}
@@ -747,7 +789,7 @@ function App() {
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8">
+          <div className="mt-5 w-full max-w-[38rem]" style={{ animation: 'slideUp 0.8s var(--ease-out) 0.14s both' }}>
             <QuickActions
               onSelectLiturgy={handleSelectLiturgy}
               onPasteContent={handlePasteContent}
@@ -758,29 +800,29 @@ function App() {
           </div>
 
           {/* Tips */}
-          <div className="mt-10 text-center max-w-md font-sans" style={{ animation: 'fadeIn 1.2s ease-out' }}>
+          <div
+            className="mt-9 text-center font-sans"
+            style={{ animation: 'fadeIn 1.4s var(--ease-out) 0.3s both' }}
+          >
             {hasExternalDisplay && (
-              <p className="mb-3 text-xs" style={{ color: 'rgba(74, 222, 128, 0.5)' }}>
-                <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-pulse" style={{ background: 'rgba(74, 222, 128, 0.6)' }} />
+              <p className="mb-3.5 text-xs flex items-center justify-center gap-2" style={{ color: 'rgba(134, 239, 172, 0.55)' }}>
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: 'rgba(74, 222, 128, 0.7)' }}
+                />
                 External display detected
               </p>
             )}
-            <p className="text-white/15 text-xs">
-              Press{' '}
-              <kbd className="px-1 py-0.5 rounded text-[10px] mx-0.5"
-                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>F</kbd>
-              {' '}fullscreen{' '}
-              <span className="mx-1.5" style={{ color: 'rgba(255,255,255,0.08)' }}>&middot;</span>
-              {' '}
-              <kbd className="px-1 py-0.5 rounded text-[10px] mx-0.5"
-                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>/</kbd>
-              {' '}search
+            <p className="text-xs flex items-center justify-center gap-2 flex-wrap" style={{ color: 'var(--ink-40)' }}>
+              <span className="kbd">F</span>
+              <span>fullscreen</span>
+              <span style={{ color: 'var(--ink-20)' }}>·</span>
+              <span className="kbd">/</span>
+              <span>search</span>
+              <span style={{ color: 'var(--ink-20)' }}>·</span>
+              <span className="kbd">Space</span>
+              <span>advance</span>
             </p>
-          </div>
-
-          {/* Footer */}
-          <div className="fixed bottom-4 text-white/10 text-[10px] font-sans tracking-widest uppercase">
-            Sanctum
           </div>
 
           {/* Projection History */}

@@ -1,17 +1,48 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════
+   SANCTUM — Design tokens
+   A liturgical instrument: ink, gold, and generous silence.
+   ═══════════════════════════════════════════════════════════ */
+
 :root {
+  /* Theme-driven (overwritten at runtime by the theme system) */
   --theme-primary: #f59e0b;
   --theme-secondary: #d97706;
-  --theme-background: #08080c;
-  --theme-background-end: #12121a;
+  --theme-background: #0a0908;
+  --theme-background-end: #16130f;
   --theme-text: #ffffff;
   --theme-text-muted: rgba(255, 255, 255, 0.5);
-  --theme-accent: #d4a847;
+  --theme-accent: #d9b978;
+
+  /* Structural ink scale — constant across themes */
+  --surface-1: rgba(255, 255, 255, 0.022);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-3: rgba(255, 255, 255, 0.065);
+
+  --hairline: rgba(255, 255, 255, 0.095);
+  --hairline-strong: rgba(255, 255, 255, 0.17);
+
+  /* Text scale — five deliberate steps, not a fog of opacities */
+  --ink-100: rgba(255, 255, 255, 0.97);
+  --ink-80: rgba(255, 255, 255, 0.76);
+  --ink-60: rgba(255, 255, 255, 0.54);
+  --ink-40: rgba(255, 255, 255, 0.36);
+  --ink-20: rgba(255, 255, 255, 0.18);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Radii */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
 }
 
 @layer base {
@@ -19,148 +50,339 @@
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply text-white min-h-screen;
-    background: linear-gradient(
-      160deg,
-      var(--theme-background) 0%,
-      var(--theme-background-end) 50%,
-      var(--theme-background) 100%
-    );
-    transition: background 0.8s ease;
+    @apply min-h-screen;
+    color: var(--ink-100);
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.035) 0%, transparent 55%),
+      linear-gradient(
+        168deg,
+        var(--theme-background) 0%,
+        var(--theme-background-end) 55%,
+        var(--theme-background) 100%
+      );
+    background-attachment: fixed;
+    transition: background 1s var(--ease-inout);
   }
 
-  /* Subtle ambient glow behind main content */
+  /* Clerestory — a shaft of light from above, as through a high window */
   body::before {
     content: '';
     position: fixed;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(
-      circle,
-      var(--theme-primary) 0%,
-      transparent 70%
-    );
-    opacity: 0.04;
+    inset: 0;
     pointer-events: none;
     z-index: 0;
+    background:
+      radial-gradient(
+        60% 42% at 50% -4%,
+        color-mix(in srgb, var(--theme-accent) 42%, transparent) 0%,
+        transparent 70%
+      );
+    opacity: 0.3;
+    transition: opacity 1s var(--ease-inout);
+  }
+
+  /* Grain + vignette — gives the ground a surface, so it reads as material */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(145% 125% at 50% 42%, transparent 62%, rgba(0, 0, 0, 0.3) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: auto, 240px 240px;
+    opacity: 0.32;
+    mix-blend-mode: soft-light;
+  }
+
+  /* Content sits above the atmosphere */
+  #root {
+    position: relative;
+    z-index: 1;
   }
 }
 
 @layer components {
-  /* ─── Display Text Classes (projection screen) ─── */
+  /* ─────────────────────────────────────────────
+     PROJECTION TYPE
+     Fluid across phone → laptop → 4K projector.
+     Scales on both axes so it fills 16:9 properly.
+     ───────────────────────────────────────────── */
 
   .scripture-text {
-    @apply font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-relaxed;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.9rem, 2.9vw + 1.35vh, 5.75rem);
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
   }
 
   .hymn-text {
-    @apply font-serif text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.6rem, 2.5vw + 1.35vh, 5rem);
+    line-height: 1.42;
+    letter-spacing: -0.006em;
+    text-wrap: balance;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
   }
 
   .liturgy-text {
-    @apply font-serif text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-relaxed;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.2vw + 1.2vh, 4.25rem);
+    line-height: 1.5;
+    text-wrap: pretty;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
   }
 
   .liturgy-text-fullscreen {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 6vh;
-    line-height: 1.4;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    font-size: clamp(1.5rem, 1.9vw + 1.5vh, 4.5rem);
+    line-height: 1.46;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
   }
 
   .quick-display-text {
-    @apply font-serif text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-relaxed;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.5rem, 2.2vw + 1.2vh, 4.25rem);
+    line-height: 1.45;
+    text-wrap: balance;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
   }
 
+  /* The reference line beneath scripture — small caps, gold, spaced */
   .verse-reference {
-    @apply font-display text-xl md:text-2xl tracking-widest;
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(0.75rem, 0.55vw + 0.4vh, 1.35rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
     color: var(--theme-accent);
-    opacity: 0.85;
   }
 
-  /* ─── UI Components ─── */
+  /* ─────────────────────────────────────────────
+     EYEBROW / LABEL
+     ───────────────────────────────────────────── */
 
+  .eyebrow {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+  }
+
+  /* ─────────────────────────────────────────────
+     SURFACES
+     ───────────────────────────────────────────── */
+
+  .panel,
   .glass-panel {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 40%, rgba(255, 255, 255, 0.006) 100%);
+    backdrop-filter: blur(24px) saturate(1.1);
+    -webkit-backdrop-filter: blur(24px) saturate(1.1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-xl);
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.02),
-      0 20px 60px -15px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 1px 0 0 rgba(255, 255, 255, 0.055) inset,
+      0 40px 80px -32px rgba(0, 0, 0, 0.85),
+      0 2px 8px -2px rgba(0, 0, 0, 0.5);
   }
+
+  /* Gold hairline that catches the light at the very top edge */
+  .panel::before,
+  .glass-panel::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--theme-accent) 55%, transparent),
+      transparent
+    );
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Secondary surface — present, but clearly subordinate to .panel */
+  .panel-quiet {
+    position: relative;
+    background: rgba(255, 255, 255, 0.012);
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: var(--r-xl);
+  }
+
+  .panel-inset {
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+  }
+
+  /* ─────────────────────────────────────────────
+     CONTROLS
+     ───────────────────────────────────────────── */
 
   .btn-primary {
-    @apply px-6 py-3 font-sans font-medium rounded-lg
-           transition-all duration-300
-           focus:outline-none focus:ring-2 focus:ring-offset-2;
-    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
-    color: white;
+    position: relative;
+    padding: 0.8rem 1.5rem;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
     letter-spacing: 0.02em;
-    box-shadow: 0 2px 12px -2px var(--theme-primary);
+    border-radius: var(--r-md);
+    color: #fff;
+    background: linear-gradient(150deg, var(--theme-primary), var(--theme-secondary));
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 8px 22px -10px var(--theme-primary),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), filter 0.25s ease;
   }
 
-  .btn-primary:hover {
-    filter: brightness(1.15);
-    box-shadow: 0 4px 20px -2px var(--theme-primary);
-    transform: translateY(-1px);
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.09) saturate(1.05);
+    transform: translateY(-1.5px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.32) inset,
+      0 14px 30px -12px var(--theme-primary),
+      0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  .btn-primary:active {
+  .btn-primary:active:not(:disabled) {
     transform: translateY(0);
+    filter: brightness(0.97);
+  }
+
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 0 0 2px var(--theme-background),
+      0 0 0 4px color-mix(in srgb, var(--theme-accent) 70%, transparent);
+  }
+
+  /* Disabled reads as *neutral and waiting*, never as muddy gold */
+  .btn-primary:disabled {
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    color: var(--ink-40);
+    box-shadow: none;
+    opacity: 1;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 text-white/80 font-sans font-medium rounded-lg
-           transition-all duration-200
-           focus:outline-none focus:ring-1 focus:ring-white/20;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.6rem 1rem;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 450;
+    color: var(--ink-80);
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    transition: background 0.28s var(--ease-out), border-color 0.28s var(--ease-out),
+      color 0.28s var(--ease-out), transform 0.28s var(--ease-out);
   }
 
-  .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: white;
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--surface-3);
+    border-color: var(--hairline-strong);
+    color: var(--ink-100);
+    transform: translateY(-1px);
   }
+
+  .btn-secondary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-secondary:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--theme-accent) 60%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent) 16%, transparent);
+  }
+
+  /* Quiet icon button for the toolbar */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem;
+    color: var(--ink-40);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--r-md);
+    transition: color 0.25s var(--ease-out), background 0.25s var(--ease-out),
+      border-color 0.25s var(--ease-out);
+  }
+
+  .btn-ghost:hover {
+    color: var(--ink-100);
+    background: var(--surface-2);
+    border-color: var(--hairline);
+  }
+
+  .btn-ghost:focus-visible {
+    outline: none;
+    color: var(--ink-100);
+    border-color: color-mix(in srgb, var(--theme-accent) 55%, transparent);
+  }
+
+  /* ─────────────────────────────────────────────
+     INPUT
+     ───────────────────────────────────────────── */
 
   .input-field {
-    @apply w-full px-5 py-4 text-white text-lg font-sans
-           placeholder-white/30
-           focus:outline-none
-           transition-all duration-300;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    width: 100%;
+    padding: 1.05rem 1.25rem;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 1.0625rem;
+    font-weight: 400;
+    color: var(--ink-100);
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+    transition: border-color 0.3s var(--ease-out), background 0.3s var(--ease-out),
+      box-shadow 0.3s var(--ease-out);
+  }
+
+  .input-field::placeholder {
+    color: var(--ink-40);
   }
 
   .input-field:focus {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--theme-accent);
-    box-shadow: 0 0 0 3px rgba(212, 168, 71, 0.1), 0 0 30px -10px var(--theme-primary);
+    outline: none;
+    background: rgba(0, 0, 0, 0.3);
+    border-color: color-mix(in srgb, var(--theme-accent) 62%, transparent);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04) inset,
+      0 0 0 3px color-mix(in srgb, var(--theme-accent) 13%, transparent);
   }
 
-  .theme-accent {
-    color: var(--theme-accent);
-  }
-
-  /* ─── Ornamental Divider ─── */
+  /* ─────────────────────────────────────────────
+     ORNAMENT
+     A centred label flanked by tapering rules and lozenges.
+     ───────────────────────────────────────────── */
 
   .ornament-divider {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 0.9rem;
   }
 
   .ornament-divider::before,
@@ -171,21 +393,83 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(212, 168, 71, 0.2),
-      transparent
+      color-mix(in srgb, var(--theme-accent) 30%, transparent)
+    );
+  }
+
+  .ornament-divider::after {
+    background: linear-gradient(
+      270deg,
+      transparent,
+      color-mix(in srgb, var(--theme-accent) 30%, transparent)
     );
   }
 
   .ornament-divider span {
-    color: rgba(212, 168, 71, 0.4);
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.25em;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
+    color: color-mix(in srgb, var(--theme-accent) 72%, transparent);
+    white-space: nowrap;
+  }
+
+  /* Standalone lozenge ornament — ◆ set between two rules */
+  .ornament-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .ornament-rule::before,
+  .ornament-rule::after {
+    content: '';
+    width: clamp(2rem, 6vw, 5rem);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--theme-accent) 42%, transparent));
+  }
+
+  .ornament-rule::after {
+    background: linear-gradient(270deg, transparent, color-mix(in srgb, var(--theme-accent) 42%, transparent));
+  }
+
+  .ornament-rule i {
+    width: 4px;
+    height: 4px;
+    background: var(--theme-accent);
+    opacity: 0.55;
+    transform: rotate(45deg);
+  }
+
+  .theme-accent {
+    color: var(--theme-accent);
+  }
+
+  /* Small keycap */
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    padding: 0.15rem 0.35rem;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--ink-60);
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    border-bottom-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
   }
 }
 
-/* ─── Fullscreen Mode ─── */
+/* ─────────────────────────────────────────────
+   FULLSCREEN
+   ───────────────────────────────────────────── */
 
 .fullscreen-mode {
   cursor: none;
@@ -195,10 +479,13 @@
   cursor: default;
 }
 
-/* ─── Scrollbar ─── */
+/* ─────────────────────────────────────────────
+   SCROLLBAR
+   ───────────────────────────────────────────── */
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -206,35 +493,35 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+  background-clip: padding-box;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
-  width: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
+  width: 5px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 99px;
 }
-
-/* ─── Selection Color ─── */
 
 ::selection {
-  background: var(--theme-primary);
-  color: white;
+  background: color-mix(in srgb, var(--theme-accent) 40%, transparent);
+  color: #fff;
 }
 
-/* ─── Keyframe Animations ─── */
+/* ─────────────────────────────────────────────
+   MOTION
+   ───────────────────────────────────────────── */
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -242,6 +529,64 @@
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Scripture arrival: rises and settles, with a whisper of blur lifting */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes drawWidth {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.animate-reveal {
+  animation: reveal 0.9s var(--ease-out) both;
+}
+
+/* Staggered entrance helper */
+.stagger > * {
+  animation: slideUp 0.7s var(--ease-out) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.stagger > *:nth-child(4) { animation-delay: 0.22s; }
+.stagger > *:nth-child(5) { animation-delay: 0.28s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    /* Delay must be zeroed too: with fill-mode `both`, a surviving delay
+       holds the element on its `from` keyframe (opacity 0) and content
+       never appears. */
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
 }
