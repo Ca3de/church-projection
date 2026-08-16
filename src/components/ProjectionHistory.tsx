@@ -34,32 +34,40 @@ export function ProjectionHistory({ history, onSelect, onClear }: ProjectionHist
   return (
     <div className="fixed bottom-4 left-4 z-40 animate-fade-in font-sans">
       {!isExpanded ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => onSelect(lastItem)}
-            className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-white/70 hover:text-white transition-all duration-200 text-sm"
+            className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm transition-colors duration-250"
             style={{
-              background: 'rgba(15, 15, 25, 0.85)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              color: 'var(--ink-80)',
+              background: 'rgba(12, 11, 14, 0.82)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid var(--hairline)',
             }}
-            title="Click to re-display last projection"
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-100)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-80)')}
+            title="Re-display last projection"
           >
             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: typeColors[lastItem.type] }} />
             <span className="max-w-[200px] truncate">{lastItem.title}</span>
             {lastItem.subtitle && (
-              <span className="text-white/30 text-xs">{lastItem.subtitle}</span>
+              <span className="text-xs" style={{ color: 'var(--ink-40)' }}>{lastItem.subtitle}</span>
             )}
           </button>
           {history.length > 1 && (
             <button
               onClick={() => setIsExpanded(true)}
-              className="px-2.5 py-2 rounded-xl text-white/40 hover:text-white/70 transition-all duration-200 text-xs font-medium"
+              className="px-2.5 py-2.5 rounded-xl text-xs font-medium tabular-nums transition-colors duration-250"
               style={{
-                background: 'rgba(15, 15, 25, 0.85)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                color: 'var(--ink-40)',
+                background: 'rgba(12, 11, 14, 0.82)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid var(--hairline)',
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-100)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-40)')}
               title="View history"
             >
               +{history.length - 1}
@@ -67,34 +75,44 @@ export function ProjectionHistory({ history, onSelect, onClear }: ProjectionHist
           )}
         </div>
       ) : (
-        <div className="rounded-xl p-3 max-w-sm animate-scale-in"
-             style={{
-               background: 'rgba(15, 15, 25, 0.92)',
-               backdropFilter: 'blur(20px)',
-               border: '1px solid rgba(255, 255, 255, 0.06)',
-               boxShadow: '0 20px 60px -15px rgba(0, 0, 0, 0.5)',
-             }}>
-          <div className="flex items-center justify-between mb-2.5 px-1">
-            <span className="text-white/30 text-[10px] font-medium tracking-widest uppercase font-display">Recent</span>
-            <div className="flex gap-1">
+        <div
+          className="p-1.5 w-[19rem] animate-scale-in"
+          style={{
+            background: 'rgba(12, 11, 14, 0.95)',
+            backdropFilter: 'blur(28px) saturate(1.2)',
+            WebkitBackdropFilter: 'blur(28px) saturate(1.2)',
+            border: '1px solid var(--hairline-strong)',
+            borderRadius: 'var(--r-lg)',
+            boxShadow: '0 28px 60px -20px rgba(0,0,0,0.9)',
+          }}
+        >
+          <div className="flex items-center justify-between px-2.5 pt-2 pb-2.5">
+            <span className="eyebrow">Recent</span>
+            <div className="flex items-center gap-0.5">
               <button
                 onClick={onClear}
-                className="text-white/25 hover:text-red-400/80 text-xs px-2 py-1 transition-colors duration-200"
+                className="text-[11px] px-2 py-1 rounded-md transition-colors duration-200"
+                style={{ color: 'var(--ink-40)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'rgb(248, 113, 113)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-40)')}
                 title="Clear history"
               >
                 Clear
               </button>
               <button
                 onClick={() => setIsExpanded(false)}
-                className="text-white/25 hover:text-white/60 p-1 transition-colors duration-200"
+                className="p-1.5 rounded-md transition-colors duration-200"
+                style={{ color: 'var(--ink-40)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-100)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-40)')}
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
-          <div className="space-y-0.5 max-h-60 overflow-y-auto scrollbar-thin">
+          <div className="max-h-64 overflow-y-auto scrollbar-thin">
             {history.map((item, index) => (
               <button
                 key={item.id}
@@ -102,35 +120,24 @@ export function ProjectionHistory({ history, onSelect, onClear }: ProjectionHist
                   onSelect(item);
                   setIsExpanded(false);
                 }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-150"
-                style={index === 0 ? {
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  borderLeft: '2px solid var(--theme-accent)',
-                } : {
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  borderLeft: '2px solid transparent',
-                }}
+                className="w-full text-left px-2.5 py-2 rounded-lg text-[13px] transition-colors duration-150 flex items-center gap-2.5"
+                style={
+                  index === 0
+                    ? { background: 'var(--surface-3)', color: 'var(--ink-100)' }
+                    : { color: 'var(--ink-60)' }
+                }
                 onMouseEnter={(e) => {
-                  if (index !== 0) {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.04)';
-                    (e.currentTarget as HTMLElement).style.color = 'rgba(255, 255, 255, 0.8)';
-                  }
+                  if (index !== 0) e.currentTarget.style.background = 'var(--surface-2)';
                 }}
                 onMouseLeave={(e) => {
-                  if (index !== 0) {
-                    (e.currentTarget as HTMLElement).style.background = 'transparent';
-                    (e.currentTarget as HTMLElement).style.color = 'rgba(255, 255, 255, 0.5)';
-                  }
+                  if (index !== 0) e.currentTarget.style.background = 'transparent';
                 }}
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: typeColors[item.type] }} />
-                  <span className="truncate flex-1">{item.title}</span>
-                  {item.subtitle && (
-                    <span className="text-white/25 text-xs shrink-0">{item.subtitle}</span>
-                  )}
-                </div>
+                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: typeColors[item.type] }} />
+                <span className="truncate flex-1">{item.title}</span>
+                {item.subtitle && (
+                  <span className="text-[11px] shrink-0" style={{ color: 'var(--ink-40)' }}>{item.subtitle}</span>
+                )}
               </button>
             ))}
           </div>
