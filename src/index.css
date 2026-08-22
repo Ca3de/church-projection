@@ -80,6 +80,12 @@
         60% 42% at 50% -4%,
         color-mix(in srgb, var(--theme-accent) 42%, transparent) 0%,
         transparent 70%
+      ),
+      /* the light pools on the floor, answering the window above */
+      radial-gradient(
+        75% 30% at 50% 104%,
+        color-mix(in srgb, var(--theme-accent) 20%, transparent) 0%,
+        transparent 72%
       );
     opacity: 0.3;
     transition: opacity 1s var(--ease-inout);
@@ -104,6 +110,24 @@
   #root {
     position: relative;
     z-index: 1;
+  }
+
+  /* Plate mark — the faint impression a press leaves around a printed page.
+     Purely atmospheric; hidden on small screens where margins are precious. */
+  .plate-mark::after {
+    content: '';
+    position: fixed;
+    inset: 1.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  @media (max-width: 640px) {
+    .plate-mark::after {
+      display: none;
+    }
   }
 }
 
@@ -237,30 +261,31 @@
      CONTROLS
      ───────────────────────────────────────────── */
 
+  /* Primary reads as paper on ink — letterpress, not a SaaS gradient.
+     Seasonal colour stays where it belongs: ornament, rules, projection. */
   .btn-primary {
     position: relative;
     padding: 0.8rem 1.5rem;
     font-family: 'DM Sans', system-ui, sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    border-radius: var(--r-md);
-    color: #fff;
-    background: linear-gradient(150deg, var(--theme-primary), var(--theme-secondary));
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    border-radius: var(--r-sm);
+    color: #16130e;
+    background: linear-gradient(180deg, #f4efe4 0%, #e4dccb 100%);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.28) inset,
-      0 8px 22px -10px var(--theme-primary),
-      0 1px 2px rgba(0, 0, 0, 0.3);
+      0 1px 0 rgba(255, 255, 255, 0.75) inset,
+      0 10px 24px -14px rgba(0, 0, 0, 0.9);
     transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), filter 0.25s ease;
   }
 
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.09) saturate(1.05);
+    filter: brightness(1.04);
     transform: translateY(-1.5px);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.32) inset,
-      0 14px 30px -12px var(--theme-primary),
-      0 2px 4px rgba(0, 0, 0, 0.3);
+      0 1px 0 rgba(255, 255, 255, 0.8) inset,
+      0 16px 32px -14px rgba(0, 0, 0, 0.95);
   }
 
   .btn-primary:active:not(:disabled) {
@@ -278,11 +303,45 @@
 
   /* Disabled reads as *neutral and waiting*, never as muddy gold */
   .btn-primary:disabled {
-    background: var(--surface-2);
+    background: transparent;
     border: 1px solid var(--hairline);
     color: var(--ink-40);
     box-shadow: none;
     opacity: 1;
+  }
+
+  /* ── The search field: no box. A ruled line, like writing on paper.
+     Set in the same serif the verse will be projected in, so what you
+     type already looks like what the congregation will read. ── */
+  .field {
+    width: 100%;
+    padding: 0.5rem 0.15rem 0.7rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 400;
+    letter-spacing: 0.005em;
+    color: var(--ink-100);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--hairline-strong);
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-out);
+  }
+
+  .field::placeholder {
+    color: var(--ink-20);
+    font-style: italic;
+  }
+
+  .field:focus {
+    outline: none;
+    border-bottom-color: color-mix(in srgb, var(--theme-accent) 85%, transparent);
+  }
+
+  /* A hairline that organises without enclosing */
+  .rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--hairline-strong), transparent);
   }
 
   .btn-secondary {

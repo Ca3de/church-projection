@@ -86,7 +86,7 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="relative">
-        <div className="flex gap-2.5">
+        <div className="flex items-end gap-4">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -97,25 +97,24 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
               onFocus={() => suggestions.length > 0 && !value.includes(':') && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               placeholder="John 3:16"
-              className="input-field pr-12"
+              className="field pr-9"
               disabled={isLoading}
             />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-0 bottom-3 pointer-events-none">
               <span className="kbd">/</span>
             </div>
           </div>
           <button
             type="submit"
             disabled={isLoading || !value.trim()}
-            className="btn-primary disabled:opacity-35 disabled:cursor-not-allowed disabled:transform-none min-w-[108px] flex items-center justify-center"
+            className="btn-primary disabled:cursor-not-allowed disabled:transform-none min-w-[104px] flex items-center justify-center shrink-0 mb-1"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
                   <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <span>Loading</span>
               </span>
             ) : (
               'Display'
@@ -164,7 +163,7 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-3 mt-4 flex-wrap">
+      <div className="flex items-center justify-between gap-3 mt-3.5 flex-wrap">
         <p className="text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
           Psalm 23:1-6 &middot; Romans 8:28
         </p>
@@ -178,12 +177,10 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
               id="bible-version"
               value={bibleVersion}
               onChange={(e) => onBibleVersionChange(e.target.value)}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-sans cursor-pointer focus:outline-none transition-colors duration-200"
-              style={{
-                color: 'var(--ink-80)',
-                background: 'var(--surface-2)',
-                border: '1px solid var(--hairline)',
-              }}
+              className="py-1 text-xs font-sans cursor-pointer focus:outline-none transition-colors duration-200 bg-transparent"
+              style={{ color: 'var(--ink-60)', border: 'none' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-100)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-60)')}
             >
               {BIBLE_VERSIONS.map((v) => (
                 <option key={v.id} value={v.id} style={{ background: '#0f0e12', color: '#fff' }}>

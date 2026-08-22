@@ -63,6 +63,8 @@ export function HymnDisplay({
             color: 'var(--theme-accent)',
             opacity: 0.85,
             lineHeight: 1.5,
+            // long titles wrap; balance keeps the second line from orphaning
+            textWrap: 'balance',
           }}
         >
           {displayItem.hymnDisplayNumber || displayItem.hymnNumber} &nbsp;·&nbsp; {displayItem.hymnTitle}

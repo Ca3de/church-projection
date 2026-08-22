@@ -2258,6 +2258,30 @@
       ]
     },
     {
+      "title": "There's Not A Friend Like The Lowly Jesus",
+      "number": "827",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "There's not a friend like the lowly Jesus,\nNo, not one, No not one!\nNone else could heal all our soul's distress\nNo, not one, no not one."
+        },
+        {
+          "verse": 2,
+          "text": "No friend like Him is so high and holy,\nNo, not one, No not one\nAnd yet no friend is so meek and lowly\nNo, not one, no not one."
+        },
+        {
+          "verse": 3,
+          "text": "There's not an hour that He is not near us\nNo, not one, No not one\nNo night was dark but His love can cheer us\nNo, not one, no not one."
+        },
+        {
+          "verse": 4,
+          "text": "Was there a gift like the Saviour?\nNo, not one, No not one\nWill He refuse us a home in heaven?\nNo, not one, no not one."
+        }
+      ],
+      "refrain": "Jesus knows all about our struggle\nHe will guide till the day is done\nThere's not a friend like the lowly Jesus\nNo, not one, No not one"
+    },
+    {
       "title": "Jesus Calls Us O'er The Tumult",
       "number": "556",
       "type": "hymn",

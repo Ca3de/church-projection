@@ -631,7 +631,7 @@ function App() {
       )}
 
       {view === 'search' ? (
-        <div className="min-h-screen flex flex-col items-center justify-center px-5 py-24 sm:py-16 relative">
+        <div className="plate-mark min-h-screen flex flex-col items-center justify-center px-5 pt-24 pb-28 sm:pt-16 sm:pb-24 relative">
           {/* Top toolbar */}
           <div
             className="fixed top-0 left-0 right-0 z-50 flex items-center justify-end gap-1 px-4 py-3"
@@ -731,18 +731,18 @@ function App() {
             <p className="eyebrow">Scripture &amp; Hymnal Projection</p>
           </header>
 
-          {/* Tab Switcher */}
-          <TabSwitcher
-            activeTab={contentMode === 'scripture' || contentMode === 'hymn' ? contentMode : 'scripture'}
-            onTabChange={handleTabChange}
-          />
+          {/* One centred column — rules organise it, boxes do not enclose it */}
+          <div className="w-full max-w-[34rem]">
+            <TabSwitcher
+              activeTab={contentMode === 'scripture' || contentMode === 'hymn' ? contentMode : 'scripture'}
+              onTabChange={handleTabChange}
+            />
 
-          {/* Search input */}
-          <div
-            className="w-full max-w-[38rem]"
-            style={{ animation: 'slideUp 0.8s var(--ease-out) 0.06s both' }}
-          >
-            <div className="panel p-6 sm:p-8">
+            {/* Search */}
+            <div
+              className="mt-8"
+              style={{ animation: 'slideUp 0.8s var(--ease-out) 0.06s both' }}
+            >
               {(contentMode === 'scripture' || contentMode === 'liturgy' || contentMode === 'quick') ? (
                 <ScriptureInput
                   onSubmit={handleScriptureSearch}
@@ -758,7 +758,7 @@ function App() {
                     isLoading={isLoading}
                     autoFocus
                   />
-                  <div className="text-center mt-5">
+                  <div className="text-center mt-4">
                     <button
                       onClick={() => setShowHymnManager(true)}
                       className="text-xs font-sans tracking-wide transition-colors duration-300"
@@ -775,10 +775,10 @@ function App() {
               {/* Error message */}
               {error && (
                 <div
-                  className="mt-5 px-4 py-3.5 rounded-xl text-center text-sm font-sans animate-scale-in"
+                  className="mt-5 px-4 py-3 text-center text-sm font-sans animate-scale-in"
                   style={{
-                    background: 'rgba(239, 68, 68, 0.07)',
-                    border: '1px solid rgba(239, 68, 68, 0.18)',
+                    borderLeft: '2px solid rgba(239, 68, 68, 0.5)',
+                    background: 'rgba(239, 68, 68, 0.05)',
                     color: 'rgba(252, 165, 165, 0.92)',
                   }}
                 >
@@ -786,22 +786,22 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Quick Actions */}
-          <div className="mt-5 w-full max-w-[38rem]" style={{ animation: 'slideUp 0.8s var(--ease-out) 0.14s both' }}>
-            <QuickActions
-              onSelectLiturgy={handleSelectLiturgy}
-              onPasteContent={handlePasteContent}
-              onVideoContent={handleVideoContent}
-              onImageContent={handleImageContent}
-              onTextContent={handleTextContent}
-            />
+            {/* Quick Actions */}
+            <div className="mt-10" style={{ animation: 'slideUp 0.8s var(--ease-out) 0.14s both' }}>
+              <QuickActions
+                onSelectLiturgy={handleSelectLiturgy}
+                onPasteContent={handlePasteContent}
+                onVideoContent={handleVideoContent}
+                onImageContent={handleImageContent}
+                onTextContent={handleTextContent}
+              />
+            </div>
           </div>
 
           {/* Tips */}
           <div
-            className="mt-9 text-center font-sans"
+            className="mt-12 text-center font-sans"
             style={{ animation: 'fadeIn 1.4s var(--ease-out) 0.3s both' }}
           >
             {hasExternalDisplay && (

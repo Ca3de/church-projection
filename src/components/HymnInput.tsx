@@ -91,7 +91,7 @@ export function HymnInput({
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="relative">
-        <div className="flex gap-2.5">
+        <div className="flex items-end gap-4">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -101,26 +101,25 @@ export function HymnInput({
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Hymn number or title"
-              className="input-field pr-12"
+              placeholder="Number or title"
+              className="field pr-9"
               disabled={isLoading}
             />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="absolute right-0 bottom-3 pointer-events-none">
               <span className="kbd">/</span>
             </div>
           </div>
           <button
             type="submit"
             disabled={isLoading || !value.trim()}
-            className="btn-primary disabled:opacity-35 disabled:cursor-not-allowed disabled:transform-none min-w-[108px] flex items-center justify-center"
+            className="btn-primary disabled:cursor-not-allowed disabled:transform-none min-w-[104px] flex items-center justify-center shrink-0 mb-1"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
                   <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <span>Loading</span>
               </span>
             ) : (
               'Display'
@@ -176,7 +175,7 @@ export function HymnInput({
         )}
       </div>
 
-      <p className="text-xs mt-4 font-sans" style={{ color: 'var(--ink-40)' }}>
+      <p className="text-xs mt-3.5 font-sans" style={{ color: 'var(--ink-40)' }}>
         821 &middot; YS1 &middot; Amazing Grace
       </p>
     </form>
