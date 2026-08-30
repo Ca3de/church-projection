@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { HymnDisplayItem } from '../types/hymn';
+import { ScaleSlider } from './DisplayAdjust';
 
 interface HymnDisplayProps {
   displayItem: HymnDisplayItem;
@@ -14,6 +15,8 @@ interface HymnDisplayProps {
   onJumpToVerse: (verseNumber: number) => void;
   canGoNext: boolean;
   canGoPrevious: boolean;
+  displayScale: number;
+  onDisplayScaleChange: (scale: number) => void;
 }
 
 export function HymnDisplay({
@@ -29,6 +32,8 @@ export function HymnDisplay({
   onJumpToVerse,
   canGoNext,
   canGoPrevious,
+  displayScale,
+  onDisplayScaleChange,
 }: HymnDisplayProps) {
   const [jumpValue, setJumpValue] = useState('');
 
@@ -133,8 +138,7 @@ export function HymnDisplay({
 
       {/* ── Fullscreen jump field ── */}
       {isFullscreen && (
-        <form
-          onSubmit={handleJump}
+        <div
           className="fixed top-5 right-5 z-50 flex items-center gap-2.5 transition-opacity duration-300"
           style={{ opacity: jumpValue ? 1 : 0.15 }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
@@ -142,6 +146,8 @@ export function HymnDisplay({
             if (!jumpValue) e.currentTarget.style.opacity = '0.15';
           }}
         >
+          <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} compact />
+          <form onSubmit={handleJump} className="flex items-center gap-2.5">
           <label className="eyebrow">Verse</label>
           <input
             type="text"
@@ -158,7 +164,8 @@ export function HymnDisplay({
             }}
             title={`Type a verse number (1-${displayItem.totalVerses}) and press Enter`}
           />
-        </form>
+          </form>
+        </div>
       )}
 
       {/* ── Control bar ── */}
@@ -249,7 +256,13 @@ export function HymnDisplay({
           </div>
 
           {!isFullscreen && (
-            <div className="hidden md:flex items-center justify-center gap-2.5 mt-4 text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
+            <div className="flex items-center justify-center mt-3">
+              <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} />
+            </div>
+          )}
+
+          {!isFullscreen && (
+            <div className="hidden md:flex items-center justify-center gap-2.5 mt-3.5 text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
               <span className="kbd">Space</span>
               <span>next</span>
               <span style={{ color: 'var(--ink-20)' }}>·</span>
@@ -258,6 +271,10 @@ export function HymnDisplay({
               <span style={{ color: 'var(--ink-20)' }}>·</span>
               <span className="kbd">F</span>
               <span>fullscreen</span>
+              <span style={{ color: 'var(--ink-20)' }}>·</span>
+              <span className="kbd">+</span>
+              <span className="kbd">−</span>
+              <span>size</span>
               <span style={{ color: 'var(--ink-20)' }}>·</span>
               <span className="kbd">Esc</span>
               <span>back</span>

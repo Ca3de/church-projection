@@ -6,6 +6,8 @@ interface KeyboardShortcuts {
   onFullscreen?: () => void;
   onEscape?: () => void;
   onSearch?: () => void;
+  onIncreaseFont?: () => void;
+  onDecreaseFont?: () => void;
 }
 
 export function useKeyboardShortcuts({
@@ -14,6 +16,8 @@ export function useKeyboardShortcuts({
   onFullscreen,
   onEscape,
   onSearch,
+  onIncreaseFont,
+  onDecreaseFont,
 }: KeyboardShortcuts) {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -54,9 +58,20 @@ export function useKeyboardShortcuts({
           event.preventDefault();
           onSearch?.();
           break;
+        // Text size: '+' commonly arrives as '=' unshifted, '-' as itself
+        case '+':
+        case '=':
+          event.preventDefault();
+          onIncreaseFont?.();
+          break;
+        case '-':
+        case '_':
+          event.preventDefault();
+          onDecreaseFont?.();
+          break;
       }
     },
-    [onNext, onPrevious, onFullscreen, onEscape, onSearch]
+    [onNext, onPrevious, onFullscreen, onEscape, onSearch, onIncreaseFont, onDecreaseFont]
   );
 
   useEffect(() => {

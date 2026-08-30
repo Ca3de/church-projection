@@ -106,8 +106,11 @@ export function usePresentationWindow() {
               max-width: 90%;
               text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             }
+            .content.scripture {
+              font-size: calc(clamp(2.5rem, 5.5vh, 7rem) * var(--display-scale, 1));
+            }
             .content.hymn {
-              font-size: clamp(3rem, 6vh, 8rem);
+              font-size: calc(clamp(3rem, 6vh, 8rem) * var(--display-scale, 1));
               line-height: 1.4;
               max-width: 96%;
               width: 96%;
@@ -121,13 +124,13 @@ export function usePresentationWindow() {
               margin: 0.4em 0;
             }
             .content.liturgy {
-              font-size: clamp(2.5rem, 5vh, 6rem);
+              font-size: calc(clamp(2.5rem, 5vh, 6rem) * var(--display-scale, 1));
               max-width: 96%;
               width: 96%;
             }
             .hymn-title {
               color: var(--accent, #fbbf24);
-              font-size: clamp(1.8rem, 3vh, 3rem);
+              font-size: calc(clamp(1.8rem, 3vh, 3rem) * var(--display-scale, 1));
               margin: 0;
               padding-top: 1vh;
               opacity: 0.9;
@@ -135,7 +138,7 @@ export function usePresentationWindow() {
             }
             .verse-indicator {
               color: var(--accent, #fbbf24);
-              font-size: clamp(1.2rem, 2vh, 2rem);
+              font-size: calc(clamp(1.2rem, 2vh, 2rem) * var(--display-scale, 1));
               margin: 0;
               padding-bottom: 1vh;
               opacity: 0.7;
@@ -238,6 +241,10 @@ export function usePresentationWindow() {
       targetWindow.document.body.style.setProperty('--bg-end', theme.backgroundEnd || '#1c1917');
       targetWindow.document.body.style.setProperty('--accent', theme.accent || '#fbbf24');
     }
+
+    // Mirror the operator's text-size setting onto the projection window
+    const scale = getComputedStyle(document.documentElement).getPropertyValue('--display-scale').trim();
+    targetWindow.document.body.style.setProperty('--display-scale', scale || '1');
 
     // Render content based on type
     // Reset root class
