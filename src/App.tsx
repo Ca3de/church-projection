@@ -19,6 +19,7 @@ import {
 import type { HistoryItem } from './components';
 import type { Verse } from './types/bible';
 import { DEFAULT_BIBLE_VERSION } from './types/bible';
+import { clampDisplayScale, DISPLAY_SCALE_STEP } from './components/DisplayAdjust';
 import type { Hymn, HymnDisplayItem } from './types/hymn';
 import {
   parseScriptureReference,
@@ -79,10 +80,46 @@ function App() {
     return localStorage.getItem('church-projection-bible-version') || DEFAULT_BIBLE_VERSION;
   });
 
-  const handleBibleVersionChange = useCallback((versionId: string) => {
-    setBibleVersion(versionId);
-    localStorage.setItem('church-projection-bible-version', versionId);
+  // Text size for the projected copy, applied as a CSS multiplier
+  const [displayScale, setDisplayScale] = useState<number>(() =>
+    clampDisplayScale(parseFloat(localStorage.getItem('church-projection-display-scale') || '1'))
+  );
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--display-scale', String(displayScale));
+    localStorage.setItem('church-projection-display-scale', String(displayScale));
+  }, [displayScale]);
+
+  const handleDisplayScaleChange = useCallback((scale: number) => {
+    setDisplayScale(clampDisplayScale(scale));
   }, []);
+
+  const adjustDisplayScale = useCallback((delta: number) => {
+    setDisplayScale((prev) => clampDisplayScale(parseFloat((prev + delta).toFixed(2))));
+  }, []);
+
+  // Switching translation re-fetches whatever is on screen, so the operator can
+  // change version mid-projection without losing their place.
+  const handleBibleVersionChange = useCallback(
+    async (versionId: string) => {
+      setBibleVersion(versionId);
+      localStorage.setItem('church-projection-bible-version', versionId);
+
+      if (!currentVerse) return;
+      try {
+        const updated = await fetchSingleVerse(
+          currentVerse.book,
+          currentVerse.chapter,
+          currentVerse.verse,
+          versionId
+        );
+        if (updated) setCurrentVerse(updated);
+      } catch (err) {
+        console.error('Error switching version:', err);
+      }
+    },
+    [currentVerse]
+  );
 
   // Hymn state
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
@@ -523,7 +560,9 @@ function App() {
   }, [
     isWindowOpen, view, contentMode, currentVerse, currentHymn, currentHymnDisplayItem,
     hymnDisplayIndex, hymnTotalItems, currentLiturgy, quickContent, quickContentType,
-    currentTheme, sendToPresentation
+    currentTheme, sendToPresentation,
+    // re-sync so the projection window picks up a text-size change
+    displayScale
   ]);
 
   // Sync content to OBS overlay (via BroadcastChannel)
@@ -612,6 +651,8 @@ function App() {
     onFullscreen: view === 'display' ? toggleFullscreen : undefined,
     onEscape: handleEscape,
     onSearch: handleSearchFocus,
+    onIncreaseFont: view === 'display' ? () => adjustDisplayScale(DISPLAY_SCALE_STEP) : undefined,
+    onDecreaseFont: view === 'display' ? () => adjustDisplayScale(-DISPLAY_SCALE_STEP) : undefined,
   });
 
   return (
@@ -845,6 +886,10 @@ function App() {
           onJumpTo={handleScriptureJump}
           isLoadingNext={isLoadingNext}
           isLoadingPrevious={isLoadingPrevious}
+          bibleVersion={bibleVersion}
+          onBibleVersionChange={handleBibleVersionChange}
+          displayScale={displayScale}
+          onDisplayScaleChange={handleDisplayScaleChange}
         />
       ) : contentMode === 'hymn' && currentHymnDisplayItem ? (
         <HymnDisplay
@@ -861,6 +906,8 @@ function App() {
           onJumpToVerse={handleHymnJump}
           canGoNext={canGoNextHymn}
           canGoPrevious={canGoPreviousHymn}
+          displayScale={displayScale}
+          onDisplayScaleChange={handleDisplayScaleChange}
         />
       ) : contentMode === 'liturgy' && currentLiturgy ? (
         <LiturgyDisplay

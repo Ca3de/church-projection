@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Verse } from '../types/bible';
 import { formatReference } from '../services/bibleApi';
+import { ScaleSlider, VersionSelect } from './DisplayAdjust';
 
 interface VerseDisplayProps {
   verse: Verse;
@@ -13,6 +14,10 @@ interface VerseDisplayProps {
   onJumpTo: (chapter: number, verse: number) => void;
   isLoadingNext: boolean;
   isLoadingPrevious: boolean;
+  bibleVersion: string;
+  onBibleVersionChange: (version: string) => void;
+  displayScale: number;
+  onDisplayScaleChange: (scale: number) => void;
 }
 
 function Spinner() {
@@ -35,6 +40,10 @@ export function VerseDisplay({
   onJumpTo,
   isLoadingNext,
   isLoadingPrevious,
+  bibleVersion,
+  onBibleVersionChange,
+  displayScale,
+  onDisplayScaleChange,
 }: VerseDisplayProps) {
   const [jumpValue, setJumpValue] = useState('');
 
@@ -120,10 +129,9 @@ export function VerseDisplay({
         </div>
       </div>
 
-      {/* ── Fullscreen jump field ── */}
+      {/* ── Fullscreen strip: jump, version and text size, revealed on hover ── */}
       {isFullscreen && (
-        <form
-          onSubmit={handleJump}
+        <div
           className="fixed top-5 right-5 z-50 flex items-center gap-2.5 transition-opacity duration-300"
           style={{ opacity: jumpValue ? 1 : 0.15 }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
@@ -131,22 +139,26 @@ export function VerseDisplay({
             if (!jumpValue) e.currentTarget.style.opacity = '0.15';
           }}
         >
-          <label className="eyebrow">Go to</label>
-          <input
-            type="text"
-            value={jumpValue}
-            onChange={(e) => setJumpValue(e.target.value)}
-            placeholder={`${verse.chapter}:${verse.verse}`}
-            className="w-24 px-3 py-2 rounded-lg text-center text-sm font-sans tabular-nums focus:outline-none"
-            style={{
-              color: 'var(--ink-100)',
-              background: 'rgba(0, 0, 0, 0.6)',
-              border: '1px solid var(--hairline-strong)',
-              backdropFilter: 'blur(12px)',
-            }}
-            title="Verse number (e.g. 29) or chapter:verse (e.g. 6:1)"
-          />
-        </form>
+          <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} compact />
+          <VersionSelect version={bibleVersion} onVersionChange={onBibleVersionChange} compact />
+          <form onSubmit={handleJump} className="flex items-center gap-2.5">
+            <label className="eyebrow">Go to</label>
+            <input
+              type="text"
+              value={jumpValue}
+              onChange={(e) => setJumpValue(e.target.value)}
+              placeholder={`${verse.chapter}:${verse.verse}`}
+              className="w-24 px-3 py-2 rounded-lg text-center text-sm font-sans tabular-nums focus:outline-none"
+              style={{
+                color: 'var(--ink-100)',
+                background: 'rgba(0, 0, 0, 0.6)',
+                border: '1px solid var(--hairline-strong)',
+                backdropFilter: 'blur(12px)',
+              }}
+              title="Verse number (e.g. 29) or chapter:verse (e.g. 6:1)"
+            />
+          </form>
+        </div>
       )}
 
       {/* ── Control bar ── */}
@@ -244,8 +256,16 @@ export function VerseDisplay({
             </button>
           </div>
 
+          {/* Translation + text size */}
           {!isFullscreen && (
-            <div className="hidden md:flex items-center justify-center gap-2.5 mt-4 text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
+            <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+              <VersionSelect version={bibleVersion} onVersionChange={onBibleVersionChange} />
+              <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} />
+            </div>
+          )}
+
+          {!isFullscreen && (
+            <div className="hidden md:flex items-center justify-center gap-2.5 mt-3.5 text-xs font-sans" style={{ color: 'var(--ink-40)' }}>
               <span className="kbd">Space</span>
               <span>next</span>
               <span style={{ color: 'var(--ink-20)' }}>·</span>
@@ -254,6 +274,10 @@ export function VerseDisplay({
               <span style={{ color: 'var(--ink-20)' }}>·</span>
               <span className="kbd">F</span>
               <span>fullscreen</span>
+              <span style={{ color: 'var(--ink-20)' }}>·</span>
+              <span className="kbd">+</span>
+              <span className="kbd">−</span>
+              <span>size</span>
               <span style={{ color: 'var(--ink-20)' }}>·</span>
               <span className="kbd">Esc</span>
               <span>back</span>

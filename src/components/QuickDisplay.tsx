@@ -14,51 +14,96 @@ interface TextPage {
   lines: string[];
 }
 
-// Parse text into pages based on numbered sections
-function parseTextIntoPages(text: string): TextPage[] {
-  const lines = text.split('\n');
+// Pattern for a line that opens a numbered section: "1.", "2)", "3:", "4 "
+const LINE_NUMBER_PATTERN = /^(\d+)[.):\s]\s*/;
+
+// Split lines on leading numbers — "1. First stanza" / "2. Second stanza"
+function splitOnNumberedLines(text: string): TextPage[] {
   const pages: TextPage[] = [];
   let currentPage: TextPage | null = null;
+  let sawNumber = false;
 
-  // Pattern to match numbered sections: "1.", "1)", "1 ", or just a number at start of line
-  const numberPattern = /^(\d+)[\.\)\s:]\s*/;
-
-  for (const line of lines) {
+  for (const line of text.split('\n')) {
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    const match = trimmedLine.match(numberPattern);
-
+    const match = trimmedLine.match(LINE_NUMBER_PATTERN);
     if (match) {
-      // Start a new page
-      if (currentPage) {
-        pages.push(currentPage);
-      }
-      const number = parseInt(match[1], 10);
+      sawNumber = true;
+      if (currentPage) pages.push(currentPage);
       const remainingText = trimmedLine.slice(match[0].length).trim();
       currentPage = {
-        number,
+        number: parseInt(match[1], 10),
         lines: remainingText ? [remainingText] : [],
       };
     } else if (currentPage) {
-      // Add to current page
       currentPage.lines.push(trimmedLine);
     } else {
-      // No number yet, start first page without number
-      currentPage = {
-        lines: [trimmedLine],
-      };
+      currentPage = { lines: [trimmedLine] };
     }
   }
 
-  // Push the last page
-  if (currentPage && currentPage.lines.length > 0) {
-    pages.push(currentPage);
+  if (currentPage && currentPage.lines.length > 0) pages.push(currentPage);
+  return sawNumber ? pages : [];
+}
+
+// Split on blank lines — how hymn stanzas and paragraphs are normally pasted
+function splitOnBlankLines(text: string): TextPage[] {
+  const blocks = text
+    .split(/\n\s*\n+/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  if (blocks.length < 2) return [];
+
+  return blocks.map((block, i) => ({
+    number: i + 1,
+    lines: block.split('\n').map((l) => l.trim()).filter(Boolean),
+  }));
+}
+
+// Split on inline verse numbers — "16 For God so loved… 17 For God sent…"
+// Deliberately conservative: the number must start the text or follow whitespace
+// AND be followed by a capitalised word, so prices, dates and ordinary figures
+// inside prose don't shatter the passage. Needs two or more hits to apply.
+function splitOnInlineVerseNumbers(text: string): TextPage[] {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  const marks: { numberAt: number; bodyAt: number; number: number }[] = [];
+
+  for (const match of flat.matchAll(/(?:^|\s)(\d{1,3})\s+(?=[A-Z"“'‘])/g)) {
+    const offset = match.index ?? 0;
+    marks.push({
+      numberAt: offset + match[0].indexOf(match[1]),
+      bodyAt: offset + match[0].length,
+      number: parseInt(match[1], 10),
+    });
   }
 
-  // If we only have one page with no number, return it as-is (don't paginate)
-  // But if we have multiple pages or numbered sections, use pagination
+  if (marks.length < 2) return [];
+
+  const pages: TextPage[] = [];
+  marks.forEach((mark, i) => {
+    const end = i + 1 < marks.length ? marks[i + 1].numberAt : flat.length;
+    const body = flat.slice(mark.bodyAt, end).trim();
+    if (body) pages.push({ number: mark.number, lines: [body] });
+  });
   return pages;
+}
+
+// Parse pasted text into pages, trying the most explicit signal first.
+function parseTextIntoPages(text: string): TextPage[] {
+  const numbered = splitOnNumberedLines(text);
+  if (numbered.length > 1) return numbered;
+
+  const blocks = splitOnBlankLines(text);
+  if (blocks.length > 1) return blocks;
+
+  const inline = splitOnInlineVerseNumbers(text);
+  if (inline.length > 1) return inline;
+
+  // Nothing to split on — show it as a single page
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  return lines.length ? [{ lines }] : [];
 }
 
 interface VideoEmbed {
