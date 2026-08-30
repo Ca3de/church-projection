@@ -2258,6 +2258,26 @@
       ]
     },
     {
+      "title": "Safe In The Arms Of Jesus",
+      "number": "824",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Safe in the arms of Jesus\nSafe on His gentle-breast\nThere by His love o'er-shadowed\nSweetly my soul shall rest\nHark, 'tis the voice of angels,\nBorne in a song to me,\nOver the field of glory\nOver the crystal sea,"
+        },
+        {
+          "verse": 2,
+          "text": "Safe in the arms of Jesus\nSafe from corroding care\nSafe from the world's temptations\nSin cannot harm me there.\nFree from the blight of sorrow,\nFree from my doubts and fears\nOnly a few more trials\nOnly a few more tears."
+        },
+        {
+          "verse": 3,
+          "text": "Jesus, is my heart's refuge\nJesus has died for me\nFor on the Rock of Ages,\nEver my trust shall be.\nHere let me wait with patience\nWait till the night is o'er\nWait till I see the morning\nBreak on the golden shore. Amen"
+        }
+      ],
+      "refrain": "Safe in the arms of Jesus\nSafe on His gentle-breast\nThere by His love o'er-shadowed\nSweetly my soul shall rest."
+    },
+    {
       "title": "There's Not A Friend Like The Lowly Jesus",
       "number": "827",
       "type": "hymn",
