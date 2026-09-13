@@ -974,68 +974,6 @@
       ]
     },
     {
-      "title": "To Thee, O Comforter Divine",
-      "number": "370",
-      "type": "Withdrawal Hymn",
-      "verses": [
-        {
-          "verse": 1,
-          "text": "To you, O Comforter divine,\nfor all thy grace and power benign,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 2,
-          "text": "To you, whose faithful love had place\nin God's great covenant of grace,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 3,
-          "text": "To you, whose faithful voice does win\nthe wandering from the way of sin,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 4,
-          "text": "To you, whose faithful power does seal,\nenlighten, sanctify, and seal,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 5,
-          "text": "To you, whose faithful truth is shown\nBy every promise made our own,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 6,
-          "text": "To you, our teacher and our friend\nour faithful leader to the end,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 7,
-          "text": "To you, by Jesus Christ sent down,\nof all his gifts the sum and crown,\nsing we alleluia! Alleluia!"
-        },
-        {
-          "verse": 8,
-          "text": "To you, who are with God and Son\nand God the father ever one,\nsing we alleluia! Alleluia!"
-        }
-      ]
-    },
-    {
-      "title": "Three in One and One in Three",
-      "number": "113",
-      "type": "Processional Hymn",
-      "verses": [
-        {
-          "verse": 1,
-          "text": "Three in One, and One in Three,\nRuler of the earth and sea,\nHear us while we lift to Thee\nHoly chant and psalm."
-        },
-        {
-          "verse": 2,
-          "text": "Light of lights! with morning-shine,\nLift on us Thy light divine;\nAnd let charity benign\nBreathe on us her balm."
-        },
-        {
-          "verse": 3,
-          "text": "Light of lights! when falls the even,\nLet it close on sin forgiven;\nFold us in the peace of heaven;\nShed a holy calm."
-        },
-        {
-          "verse": 4,
-          "text": "Three in One, and One in Three,\nDimly here we worship Thee;\nWith the saints hereafter we\nHope to bear the palm."
-        }
-      ]
-    },
-    {
       "title": "Lord Dismiss Us with Your Blessing",
       "number": "490",
       "type": "Withdrawal Hymn",
@@ -1617,37 +1555,6 @@
         }
       ],
       "refrain": "Lift up your heart,\nLift up your voice!\nRejoice, again I say, rejoice!"
-    },
-    {
-      "title": "Forth In Thy Name O Lord I Go",
-      "number": "120",
-      "type": "Hymn",
-      "verses": [
-        {
-          "verse": 1,
-          "text": "Forth in your name, O Lord, I go,\nMy daily labor to pursue,\nThee only thee to know\nIn all I think or speak or do."
-        },
-        {
-          "verse": 2,
-          "text": "Preserve me from my calling's snare,\nAnd hide my simple heart above,\nAbove the thorns of choking care,\nThe gilded baits of worldly love."
-        },
-        {
-          "verse": 3,
-          "text": "The task thine wisdom has assigned,\nO let me cheerfully fulfill;\nIn all my works your presence find,\nAnd prove your good and perfect will."
-        },
-        {
-          "verse": 4,
-          "text": "Thee I have set at my right hand,\nWhose eyes mine inmost substance see,\nAnd labor on at your command,\nAnd for thee all my works shall be."
-        },
-        {
-          "verse": 5,
-          "text": "Give me to bear your easy yoke\nAnd ev'ry moment watch and pray\nAnd still to things eternal look,\nAnd hasten to your glorious day."
-        },
-        {
-          "verse": 6,
-          "text": "For thy delightful employ\nWhate'er thy bounteous grace have giv'n:\nAnd run my course with even joy\nAnd closely walk with thee to heav'n."
-        }
-      ]
     },
     {
       "title": "Rescue The Perishing, Care For The Dying",
@@ -2258,6 +2165,64 @@
       ]
     },
     {
+      "title": "Take My Life And Let It Be",
+      "number": "602",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Take my life and let it be,\nConsecrated, Lord to Thee\nTake my moments and my days\nLet them flow in ceaseless praise."
+        },
+        {
+          "verse": 2,
+          "text": "Take my hands, and let them move.\nAt the impulse of Thy love,\nTake my feet, and let them be,\nSwift and beautiful for Thee."
+        },
+        {
+          "verse": 3,
+          "text": "Take my voice, and let me sing\nAlways, only, for my King,\nTake my lips and let them be\nFilled with messages from Thee"
+        },
+        {
+          "verse": 4,
+          "text": "Take my silver and my gold\nNot a mite would I withhold\nTake my intellect and use,\nEvery power as Thou shall choose."
+        },
+        {
+          "verse": 5,
+          "text": "Take my will and make it Thine\nIt shall be no longer mine,\nTake my heart it is Thy own,\nIt shall be Thy royal throne."
+        },
+        {
+          "verse": 6,
+          "text": "Take my love, my Lord, I pour\nAt Thy feet its treasure store,\nTake myself, and I will be\nEver, only, all for Thee. Amen"
+        }
+      ]
+    },
+    {
+      "title": "O Jesus, I Have Promised",
+      "number": "598",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "O Jesus, I have promised,\nTo serve Thee to the end\nBe Thou for ever near me,\nMy Master and my Friend.\nI shall not fear the battle\nIf Thou art by my side,\nNor wander from the pathway\nIf Thou wilt be my Guide."
+        },
+        {
+          "verse": 2,
+          "text": "O let me feel Thee near me\nThe world is ever near,\nI see the sights that dazzle,\nThe tempting sounds I hear.\nMy foes are ever near me,\nAround me and within,\nBut Jesus O draw nearer\nAnd shield my soul from sin."
+        },
+        {
+          "verse": 3,
+          "text": "O let me hear Thee speaking\nIn accents clear and still\nAbove the storms of passion\nThe murmur of self-will\nO speak to reassure me\nTo hasten, or control\nO speak, and make me listen,\nLord, Guardian of my soul."
+        },
+        {
+          "verse": 4,
+          "text": "O Jesus, Thou hast promised\nTo all who follow Thee\nThat where Thou art in glory\nThere shall Thine servants be,\nAnd Jesus, I have promised\nTo serve Thee to the end,\nO give me grace to follow\nMy Master and my Friend."
+        },
+        {
+          "verse": 5,
+          "text": "O let me see Thy footmarks\nAnd in them plant mine own\nMy hope to follow duly\nIs in Thy strength alone.\nO guide me, call me, draw me,\nUphold me to the end,\nAnd then in heaven receive me,\nMy Saviour and my Friend. Amen"
+        }
+      ]
+    },
+    {
       "title": "Safe In The Arms Of Jesus",
       "number": "824",
       "type": "hymn",
@@ -2407,7 +2372,7 @@
     }
   ],
   "summary": {
-    "total_hymns": 79,
+    "total_hymns": 93,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
