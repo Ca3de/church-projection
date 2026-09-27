@@ -2369,10 +2369,202 @@
           "text": "When ends life's transient dream\nWhen death's cold, sullen stream\nShall o'er me roll,\nBlest Saviour, then in love\nFear and distrust remove\nO bear me safe above,\nA ransomed soul."
         }
       ]
+    },
+    {
+      "title": "Are You Weary, Are You Heavy Hearted?",
+      "number": "837",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Are you weary, are you heavy-hearted?\nTell it to Jesus, tell it to Jesus;\nAre you grieving over joys departed?\nTell it to Jesus alone."
+        },
+        {
+          "verse": 2,
+          "text": "Do the tears flow down your cheeks unbidden?\nTell it to Jesus, tell it to Jesus;\nHave you sins that to men's eyes are hidden?\nTell it to Jesus alone."
+        },
+        {
+          "verse": 3,
+          "text": "Do you fear the gathering clouds of sorrow?\nTell it to Jesus, tell it to Jesus;\nAre you anxious what shall be tomorrow?\nTell it to Jesus alone."
+        },
+        {
+          "verse": 4,
+          "text": "Are you troubled at the thought of dying?\nTell it to Jesus, tell it to Jesus;\nFor Christ's coming kingdom are you sighing?\nTell it to Jesus alone."
+        }
+      ],
+      "refrain": "Tell it to Jesus, tell it to Jesus,\nHe is a friend that's well known;\nYou've no other such a friend or brother,\nTell it to Jesus alone."
+    },
+    {
+      "title": "Abide With Me! Fast Falls The Eventide",
+      "number": "15",
+      "type": "hymn",
+      "book": "IOM",
+      "secondaryLanguage": "Yorùbá",
+      "secondaryTitle": "Wa bami gbe! Ale Fere le tan",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Abide with me! fast falls the eventide;\nThe darkness deepens; Lord, with me abide!\nWhen other helpers fail and comforts flee,\nHelp of the helpless, oh, abide with me.",
+          "secondaryText": "Wà ba mi gbe! alẹ fẹrẹ lẹ tan,\nOkuukun nṣú; Oluwa ba mi gbe,\nBi oluranlọwọ miran ba yẹ̀,\nIranwọ alaini, wà ba mi gbe!"
+        },
+        {
+          "verse": 2,
+          "text": "Swift to its close ebbs out life’s little day;\nEarth’s joys grow dim, its glories pass away;\nChange and decay in all around I see;\nO Thou who changest not, abide with me.",
+          "secondaryText": "Ọjo aiye mi nsare lọ s’opin,\nAyọ aiye nkú, ogo rẹ̀ nwọmi;\nAyida at’ ibajẹ ni mo nri;\n‘Wọ ti ki yipada wá ba mi gbe."
+        },
+        {
+          "verse": 3,
+          "text": "Come not in terrors, as the King of kings;\nBut kind and good, with healing in Thy wings:\nTears for all woes, a heart for every plea;\nCome, Friend of sinners, thus abide with me.",
+          "secondaryText": "Má wá l’ẹrù b’Ọba awọn ọba,\nṢugbọn ki o ma bọ̀ b’oninure;\nKi o si ma kanu fun ègbé mi;\nWa, Ọrẹ eleṣe, wa ba mi gbe."
+        },
+        {
+          "verse": 4,
+          "text": "I need Thy presence every passing hour:\nWhat but Thy grace can foil the tempter’s power?\nWho like Thyself my guide and stay can be?\nThrough cloud and sunshine, oh, abide with me.",
+          "secondaryText": "Mo nfẹ Ọ ri, ni wakati gbogbo:\nKi l’o le ṣẹgun Eṣu b’ore Rẹ?\nTal’ o le ṣe amọna mi bi Rẹ?\nN’nu ‘banujẹ at’ ayọ, ba bi gbe!"
+        },
+        {
+          "verse": 5,
+          "text": "I fear no foe, with Thee at hand to bless:\nIlls have no weight, and tears no bitterness:\nWhere is death’s sting? Where, grave, thy victory?\nI triumph still, if Thou abide with me.",
+          "secondaryText": "Pẹlu ‘bukun Rẹ, ẹ̀ru ko ba mi:\nIbi kò wuwo, ẹkún kò korò;\nOró ikú da? ‘ṣegun isà da?\nNgo ṣẹgun sibẹ, b’ Iwọ ba mi gbe."
+        },
+        {
+          "verse": 6,
+          "text": "Hold thou Thy cross before my closing eyes.\nShine through the gloom, and point me to the skies;\nHeaven's morning breaks, and earth's vain shadows flee;\nIn life, in death, O Lord, abide with me. Amen.",
+          "secondaryText": "Wa ba mi gbe ni wakati iku,\nṢe ‘mọlẹ mi, si tọka si ọrun:\nB’ aiye ti nkọja, k’ ilẹ ọrun mọ,\nNi yiyè, ni kiku, wà ba mi gbe. Amin."
+        }
+      ]
+    },
+    {
+      "title": "My God And Father While I Stray",
+      "number": "380",
+      "type": "hymn",
+      "book": "IOM",
+      "secondaryLanguage": "Yorùbá",
+      "secondaryTitle": "Baba mi gba mo nsako lo",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "My God and Father, while I stray\nFar from my home, on life’s rough way,\nOh teach me from my heart to say,\nThy will be done.",
+          "secondaryText": "Baba mi, ‘gba mo nṣako lọ\nKuro l’ṣna Rẹ l’ aiye yi;\nKọ mi ki nlè wi bayi pe,\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 2,
+          "text": "Though dark my path and sad my lot,\nLet me “be still,” and murmur not,\nOr breathe the prayer divinely taught,\nThy will be done.",
+          "secondaryText": "B’ ipin mi l’aiye ba buru,\nKọ mi ki ngba, ki nmaṣe kùn!\nKi ngbadura t’ o kọ mi, wipe,\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 3,
+          "text": "What though in lonely grief I sigh,\nFor friends beloved no longer nigh,\nSubmissive still would I reply,\nThy will be done.",
+          "secondaryText": "B’ o kù emi nikanṣoṣo,\nTi ará on ọ̀rẹ́ kò si;\nNi ‘tẹriba ngo ma wipe,\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 4,
+          "text": "If Thou should’st call me to resign\nWhat most I prize, it ne’er was mine;\nI only yield Thee what was Thine;\nThy will be done.",
+          "secondaryText": "B’o fẹ gba ohun ọwọ mi,\nOhun t’ o ṣe ọ̀wọ́n fun mi;\nNgo fi fun Ọ, ṣe Tirẹ ni?\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 5,
+          "text": "If but my fainting heart be blest\nWith Thy sweet Spirit for its guest,\nMy God, to Thee I leave the rest--\nThy will be done.",
+          "secondaryText": "Sa fi Ẹmi Rẹ tù mi n’nu,\nKi On k’o si ma ba mi gbe;\nEyi t’o kù, o d’ọwọ Rẹ,\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 6,
+          "text": "Renew my will from day to day,\nBlend it with Thine, and take away\nAll now that makes it hard to say,\nThy will be done.",
+          "secondaryText": "Tun ‘fẹ mi ṣe lojojumọ,\nK’ O si mu ohun na kuro,\nTi kò jẹ k’ emi le wipe,\nṢe ‘fẹ Tirẹ."
+        },
+        {
+          "verse": 7,
+          "text": "Then when on earth I breathe no more\nThe prayer oft mix’d with tears before,\nI’ll sing upon a happier shore,\nThy will be done. Amen.",
+          "secondaryText": "‘Gbat’ ẹ̀mi mi ba pin l’aiye,\nN’ ilu t’ o dara jù aiye,\nL’ em o ma kọrin na titi.\nṢe ‘fẹ Tirẹ. Amin."
+        }
+      ]
+    },
+    {
+      "title": "My Spirit On Thy Care",
+      "number": "308",
+      "type": "hymn",
+      "book": "IOM",
+      "secondaryLanguage": "Yorùbá",
+      "secondaryTitle": "Mo f’ emi mi sabe Itoju Re Jesu",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "My spirit on Thy care,\nBlest Saviour, I recline;\nThou wilt not leave me to despair,\nFor Thou art love divine.",
+          "secondaryText": "Mo f’ emi mi sabe\nItoju Re Jesu;\n‘Wo ko jo mi l’ ainireti,\n‘Wo l’ Olorun Ife."
+        },
+        {
+          "verse": 2,
+          "text": "In Thee I place my trust,\nOn Thee I calmly rest;\nI know Thee good, I know Thee just,\nAnd count Thy choice the best.",
+          "secondaryText": "‘Wo ni mo gbekele\n‘Wo ni mo f’ara ti:\nRere at’ Otitio ni O,\nEyi t’ O se l’ o to."
+        },
+        {
+          "verse": 3,
+          "text": "Whate'er events betide,\nThy will they all perform:\nSafe in Thy breast my head I hide,\nNor fear the coming storm.",
+          "secondaryText": "Ohun t’o wu k’o de,\nIfe re ni nwon nse:\nMo f’ ori pamo saiya Re,\nNko foiya iji yi."
+        },
+        {
+          "verse": 4,
+          "text": "Let good or ill befall,\nIt must be good for me;\nSecure of having Thee in all,\nOf having all in Thee.",
+          "secondaryText": "B’ ibi tab’ ire de,\nY’o dara fun mi sa!\nKi nsa ni O l’ ohun gbogbo,\nOhun gbogbo n’nu Re. Amin."
+        }
+      ]
+    },
+    {
+      "title": "Work, For The Night Is Coming",
+      "number": "386",
+      "type": "hymn",
+      "book": "IOM",
+      "secondaryLanguage": "Yorùbá",
+      "secondaryTitle": "Ṣiṣẹ tori oru mbọ̀! Ṣiṣẹ li owurọ",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Work, for the night is coming, work through the morning hours;\nWork while the dew is sparkling, work 'mid springing flowers;\nWork when the day grows brighter, work in the glowing sun;\nWork, for the night is coming, when man's work is done.",
+          "secondaryText": "Ṣiṣẹ tori oru mbọ̀ ! Ṣiṣẹ li owurọ;\nṢiṣẹ nigba ìri nsẹ̀, ṣiṣẹ n’nu ‘tanná;\nṢiṣẹ ki ọsan to pọn, ṣiṣẹ nigb’ òrun nràn;\nṢiṣẹ tori oru mbọ̀ ! ‘gba ṣẹ o pari."
+        },
+        {
+          "verse": 2,
+          "text": "Work, for the night is coming! Work through the sunny noon;\nFill brightest hours with labor, rest comes sure and soon.\nGive every flying minute something to keep in store;\nWork, for the night is coming, when man works no more.",
+          "secondaryText": "Ṣiṣẹ tori oru mbọ̀ ! Ṣiṣẹ lọsangangan,\nF’akoko rere fun ‘ṣẹ, isimi daju.\nF’ olukuluku ìgba, ni nkan lati pamọ;\nṢiṣẹ tori oru mbọ̀ ! ‘gba ‘ṣẹ o pari."
+        },
+        {
+          "verse": 3,
+          "text": "Work, for the night is coming, under the sunset skies;\nWhile their bright tints are glowing, work, for daylight flies.\nWork till the last beam fadeth, fadeth to shine no more;\nWork, while the night is darkening, when man's work is o'er. Amen.",
+          "secondaryText": "Ṣiṣẹ tori oru mbọ̀ ! orùn fẹrẹ̀ wọ̀ na,\nṢiṣẹ ‘gbat’ imọlẹ wà, ọjọ bù lọ tan,\nṢiṣẹ titi de opin, ṣiṣẹ titi d’alẹ,\nṢiṣẹ gbat’ ilẹ ba nṣu, ‘gba ‘ṣẹ o pari. Amin."
+        }
+      ]
+    },
+    {
+      "title": "The Lord's My Shepherd",
+      "number": "319",
+      "type": "hymn",
+      "book": "A & M",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "The Lord’s my shepherd, I’ll not want.\nHe makes me down to lie\nIn pastures green: he leadeth me\nThe quiet waters by."
+        },
+        {
+          "verse": 2,
+          "text": "My soul he doth restore again;\nAnd me to walk doth make\nWithin the paths of righteousness,\nEv’n for his own name’s sake."
+        },
+        {
+          "verse": 3,
+          "text": "Yea, though I walk in death’s dark vale,\nYet will I fear none ill:\nFor thou art with me; and thy rod\nAnd staff me comfort still."
+        },
+        {
+          "verse": 4,
+          "text": "My table thou hast furnishèd\nIn presence of my foes;\nMy head thou dost with oil anoint,\nAnd my cup overflows."
+        },
+        {
+          "verse": 5,
+          "text": "Goodness and mercy all my life\nShall surely follow me,\nAnd in God’s house forever more\nMy dwelling place shall be."
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 93,
+    "total_hymns": 99,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",

@@ -6,6 +6,14 @@ export interface PresentationState {
   theme: unknown;
 }
 
+// Everything rendered into the projection window goes through innerHTML, and
+// some of it (pasted clipboard text, URLs) is not ours — escape all of it.
+function esc(value: unknown): string {
+  return String(value ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+  );
+}
+
 export function usePresentationWindow() {
   const [presentationWindow, setPresentationWindow] = useState<Window | null>(null);
   const [isWindowOpen, setIsWindowOpen] = useState(false);
@@ -120,8 +128,38 @@ export function usePresentationWindow() {
               align-items: center;
               flex: 1;
             }
-            .content.hymn p {
-              margin: 0.4em 0;
+            .content.hymn .line {
+              display: block;
+            }
+            .content.hymn.parallel {
+              position: relative;
+              display: grid;
+              grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+              column-gap: 5vw;
+              row-gap: 0.1em;
+              align-content: center;
+              align-items: center;
+              font-size: calc(clamp(1.6rem, 3.6vh, 5rem) * var(--display-scale, 1));
+              line-height: 1.3;
+            }
+            .content.hymn.parallel::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              left: 50%;
+              width: 1px;
+              background: var(--accent, #fbbf24);
+              opacity: 0.25;
+            }
+            .parallel-title {
+              align-self: end;
+              margin-bottom: 2vh;
+              color: var(--accent, #fbbf24);
+              font-size: calc(clamp(0.9rem, 1.9vh, 1.8rem) * var(--display-scale, 1));
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              opacity: 0.85;
             }
             .content.liturgy {
               font-size: calc(clamp(2.5rem, 5vh, 6rem) * var(--display-scale, 1));
@@ -254,47 +292,77 @@ export function usePresentationWindow() {
       case 'scripture': {
         const verse = state.data as { book: string; chapter: number; verse: number; text: string };
         root.innerHTML = `
-          <p class="reference">${verse.book} ${verse.chapter}:${verse.verse}</p>
-          <p class="content">${verse.text}</p>
+          <p class="reference">${esc(verse.book)} ${esc(verse.chapter)}:${esc(verse.verse)}</p>
+          <p class="content scripture">${esc(verse.text)}</p>
         `;
         break;
       }
       case 'hymn': {
         root.className = 'hymn-display';
-        const hymn = state.data as { title: string; lines: string[]; verseLabel: string; index: number; total: number };
-        root.innerHTML = `
-          <p class="hymn-title">${hymn.title}</p>
-          <div class="content hymn">
-            ${hymn.lines.map(line => `<p>${line}</p>`).join('')}
-          </div>
-          <p class="verse-indicator">${hymn.verseLabel} (${hymn.index + 1}/${hymn.total})</p>
-        `;
+        const hymn = state.data as {
+          label?: string;
+          title: string;
+          lines: string[];
+          secondaryTitle?: string;
+          secondaryLines?: string[];
+          verseLabel: string;
+          index: number;
+          total: number;
+        };
+        const indicator = `<p class="verse-indicator">${esc(hymn.verseLabel)} (${hymn.index + 1}/${hymn.total})</p>`;
+        const secondary = hymn.secondaryLines ?? [];
+
+        if (secondary.length > 0) {
+          // English | Yoruba side by side, paired line-for-line when the shapes match
+          const paired = secondary.length === hymn.lines.length;
+          const body = paired
+            ? hymn.lines.map((line, i) => `<span>${esc(line)}</span><span lang="yo">${esc(secondary[i])}</span>`).join('')
+            : `<span>${hymn.lines.map(esc).join('<br>')}</span><span lang="yo">${secondary.map(esc).join('<br>')}</span>`;
+          root.innerHTML = `
+            <p class="hymn-title">${esc(hymn.label ?? '')}</p>
+            <div class="content hymn parallel">
+              <span class="parallel-title">${esc(hymn.title)}</span>
+              <span class="parallel-title" lang="yo">${esc(hymn.secondaryTitle ?? '')}</span>
+              ${body}
+            </div>
+            ${indicator}
+          `;
+        } else {
+          const heading = hymn.label ? `${esc(hymn.label)} &middot; ${esc(hymn.title)}` : esc(hymn.title);
+          root.innerHTML = `
+            <p class="hymn-title">${heading}</p>
+            <div class="content hymn">
+              ${hymn.lines.map((line) => `<span class="line">${esc(line)}</span>`).join('')}
+            </div>
+            ${indicator}
+          `;
+        }
         break;
       }
       case 'liturgy': {
         const liturgy = state.data as { title: string; content: string; pageLabel: string; index: number; total: number };
         root.innerHTML = `
-          <p class="hymn-title">${liturgy.title}</p>
+          <p class="hymn-title">${esc(liturgy.title)}</p>
           <div class="content liturgy">
-            <p>${liturgy.content}</p>
+            <p>${esc(liturgy.content)}</p>
           </div>
-          <p class="verse-indicator">${liturgy.pageLabel} (${liturgy.index + 1}/${liturgy.total})</p>
+          <p class="verse-indicator">${esc(liturgy.pageLabel)} (${liturgy.index + 1}/${liturgy.total})</p>
         `;
         break;
       }
       case 'quick': {
         const quick = state.data as { content: string; contentType: 'text' | 'image' | 'video'; pageIndex?: number; totalPages?: number };
         if (quick.contentType === 'image') {
-          root.innerHTML = `<img src="${quick.content}" class="quick-image" alt="Display content" />`;
+          root.innerHTML = `<img src="${esc(quick.content)}" class="quick-image" alt="Display content" />`;
         } else if (quick.contentType === 'video') {
-          root.innerHTML = `<div class="quick-video"><iframe src="${quick.content}" allowfullscreen></iframe></div>`;
+          root.innerHTML = `<div class="quick-video"><iframe src="${esc(quick.content)}" allowfullscreen></iframe></div>`;
         } else {
           const pageInfo = quick.totalPages && quick.totalPages > 1
             ? `<p class="verse-indicator">Page ${(quick.pageIndex || 0) + 1} of ${quick.totalPages}</p>`
             : '';
           root.innerHTML = `
             <div class="content liturgy">
-              <p>${quick.content}</p>
+              <p>${esc(quick.content)}</p>
             </div>
             ${pageInfo}
           `;

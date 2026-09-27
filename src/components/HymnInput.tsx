@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { searchHymns } from '../services/hymnService';
-import type { HymnSearchResult } from '../types/hymn';
+import { searchHymns, resolveHymn, describeHymnQuery, formatHymnLabel } from '../services/hymnService';
+import { HYMN_BOOKS, getHymnBook } from '../data/hymnBooks';
+import type { HymnBookId, HymnSearchResult } from '../types/hymn';
+
+const BOOK_KEY = 'church-projection-hymn-book';
 
 interface HymnInputProps {
-  onSubmit: (hymnNumber: number) => void;
+  /** Internal hymn number; `label` is what to call it if it isn't found */
+  onSubmit: (hymnNumber: number, label?: string) => void;
   isLoading: boolean;
   autoFocus?: boolean;
 }
@@ -14,6 +18,10 @@ export function HymnInput({
   autoFocus = false,
 }: HymnInputProps) {
   const [value, setValue] = useState('');
+  const [book, setBook] = useState<HymnBookId>(() => {
+    const saved = localStorage.getItem(BOOK_KEY);
+    return HYMN_BOOKS.some((b) => b.id === saved) ? (saved as HymnBookId) : 'main';
+  });
   const [suggestions, setSuggestions] = useState<HymnSearchResult[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -25,12 +33,9 @@ export function HymnInput({
     }
   }, [autoFocus]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-
-    if (newValue.length > 0) {
-      const matches = searchHymns(newValue);
+  const updateSuggestions = (query: string, activeBook: HymnBookId) => {
+    if (query.length > 0) {
+      const matches = searchHymns(query, activeBook);
       setSuggestions(matches);
       setShowSuggestions(matches.length > 0);
       setSelectedIndex(0);
@@ -40,22 +45,38 @@ export function HymnInput({
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    updateSuggestions(e.target.value, book);
+  };
+
+  const handleBookChange = (next: HymnBookId) => {
+    setBook(next);
+    localStorage.setItem(BOOK_KEY, next);
+    updateSuggestions(value, next);
+    inputRef.current?.focus();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.trim() && !isLoading) {
-      const numberValue = parseInt(value.trim(), 10);
-      if (!isNaN(numberValue)) {
-        onSubmit(numberValue);
-        setShowSuggestions(false);
-      } else if (suggestions.length > 0) {
-        onSubmit(suggestions[0].number);
-        setShowSuggestions(false);
-      }
+    const query = value.trim();
+    if (!query || isLoading) return;
+
+    // An exact number or identifier wins; otherwise take the best title match
+    const exact = resolveHymn(query, book);
+    if (exact) {
+      onSubmit(exact.number);
+    } else if (suggestions.length > 0 && !/^\d+$/.test(query)) {
+      onSubmit(suggestions[0].number);
+    } else {
+      // Nothing matches — let the caller report it by name ("IOM 999")
+      onSubmit(-1, describeHymnQuery(query, book));
     }
+    setShowSuggestions(false);
   };
 
   const handleSuggestionClick = (hymn: HymnSearchResult) => {
-    setValue(`${hymn.number}`);
+    setValue(formatHymnLabel(hymn));
     setSuggestions([]);
     setShowSuggestions(false);
     onSubmit(hymn.number);
@@ -90,6 +111,43 @@ export function HymnInput({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
+      {/* Which hymnbook a bare number refers to */}
+      <div className="flex items-center justify-center gap-1 mb-5 flex-wrap" role="radiogroup" aria-label="Hymnbook">
+        {HYMN_BOOKS.map((b, i) => {
+          const isActive = b.id === book;
+          return (
+            <span key={b.id} className="flex items-center">
+              {i > 0 && (
+                <span aria-hidden="true" className="mx-1.5 text-[10px]" style={{ color: 'var(--ink-20)' }}>
+                  ◆
+                </span>
+              )}
+              <button
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => handleBookChange(b.id)}
+                className="px-2 py-1.5 font-display uppercase transition-colors duration-300 focus:outline-none"
+                style={{
+                  fontSize: '0.64rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.2em',
+                  color: isActive ? 'var(--theme-accent)' : 'var(--ink-40)',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.color = 'var(--ink-80)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.color = 'var(--ink-40)';
+                }}
+              >
+                {b.name}
+              </button>
+            </span>
+          );
+        })}
+      </div>
+
       <div className="relative">
         <div className="flex items-end gap-4">
           <div className="relative flex-1">
@@ -101,7 +159,7 @@ export function HymnInput({
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Number or title"
+              placeholder={book === 'main' ? 'Number or title' : `${getHymnBook(book).prefix} number or title`}
               className="field pr-9"
               disabled={isLoading}
             />
@@ -154,7 +212,7 @@ export function HymnInput({
                 }
               >
                 <span
-                  className="text-[11px] font-medium px-1.5 py-1 rounded-md shrink-0 tabular-nums min-w-[2.6rem] text-center"
+                  className="text-[11px] font-medium px-1.5 py-1 rounded-md shrink-0 tabular-nums min-w-[2.6rem] text-center whitespace-nowrap"
                   style={{
                     background: 'rgba(0,0,0,0.35)',
                     border: '1px solid var(--hairline)',
@@ -163,7 +221,14 @@ export function HymnInput({
                 >
                   {hymn.displayNumber || hymn.number}
                 </span>
-                <span className="flex-1 truncate">{hymn.title}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block truncate">{hymn.title}</span>
+                  {hymn.secondaryTitle && (
+                    <span className="block truncate text-[12px] italic font-serif" style={{ color: 'var(--ink-40)' }}>
+                      {hymn.secondaryTitle}
+                    </span>
+                  )}
+                </span>
                 {hymn.author && (
                   <span className="text-[11px] shrink-0 truncate max-w-[7rem]" style={{ color: 'var(--ink-40)' }}>
                     {hymn.author}
@@ -176,7 +241,13 @@ export function HymnInput({
       </div>
 
       <p className="text-xs mt-3.5 font-sans" style={{ color: 'var(--ink-40)' }}>
-        821 &middot; YS1 &middot; Amazing Grace
+        {book === 'main' ? (
+          <>821 &middot; YS1 &middot; Amazing Grace</>
+        ) : book === 'iom' ? (
+          <>15 &middot; Abide with me &middot; Wa ba mi gbe</>
+        ) : (
+          <>319 &middot; The Lord&rsquo;s my shepherd</>
+        )}
       </p>
     </form>
   );

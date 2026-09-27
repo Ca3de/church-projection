@@ -1,5 +1,6 @@
 import { HYMNS } from '../data/hymns';
-import type { Hymn, HymnDisplayItem, HymnSearchResult } from '../types/hymn';
+import { HYMN_BOOKS, getHymnBook } from '../data/hymnBooks';
+import type { Hymn, HymnBookId, HymnDisplayItem, HymnSearchResult } from '../types/hymn';
 
 // Custom hymns stored in localStorage
 const CUSTOM_HYMNS_KEY = 'church-projection-custom-hymns';
@@ -179,6 +180,7 @@ export function getDisplayItemAtIndex(
       verseNumber: isRefrain ? undefined : verseIndex + 1,
       totalVerses: hymn.verses.length,
       hasRefrain: true,
+      ...secondaryFor(hymn, isRefrain ? hymn.secondaryRefrain : hymn.secondaryVerses?.[verseIndex]),
     };
   } else {
     // No refrain: just verses in sequence
@@ -191,60 +193,152 @@ export function getDisplayItemAtIndex(
       verseNumber: index + 1,
       totalVerses: hymn.verses.length,
       hasRefrain: false,
+      ...secondaryFor(hymn, hymn.secondaryVerses?.[index]),
     };
   }
 }
 
-/**
- * Search hymns by number, special identifier (YS1), or title.
- * Returns matching hymns, prioritizing exact matches.
- */
-export function searchHymns(query: string): HymnSearchResult[] {
-  const normalizedQuery = query.toLowerCase().trim();
+// Parallel-text fields for a display item — omitted when this stanza has none
+function secondaryFor(hymn: Hymn, text: string | null | undefined): Partial<HymnDisplayItem> {
+  if (!text) return {};
+  return {
+    secondaryText: text,
+    secondaryTitle: hymn.secondaryTitle,
+    secondaryLanguage: hymn.secondaryLanguage,
+  };
+}
 
-  if (!normalizedQuery) {
-    return [];
+// ── Search & lookup ─────────────────────────────────────────────────
+
+/** Lowercase and strip diacritics, so "sise" matches "Ṣiṣẹ" and "wa" matches "Wà". */
+function fold(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
+/** Letters and digits only — "A & M 319", "a&m319" and "am 319" all become "am319". */
+function compact(text: string): string {
+  return fold(text).replace(/[^a-z0-9]/g, '');
+}
+
+function bookOf(hymn: Hymn): HymnBookId {
+  return hymn.book ?? 'main';
+}
+
+/** The number printed in the hymnbook, e.g. 15 for IOM 15. */
+function bookNumber(hymn: Hymn): number {
+  return hymn.number - getHymnBook(bookOf(hymn)).offset;
+}
+
+/**
+ * Detect an explicit book prefix: "IOM 15", "iom", "A & M 319", "am319".
+ * A bare "am" only counts when followed by a number, so typing "amazing"
+ * still searches titles.
+ */
+function parseBookPrefix(query: string): { book: HymnBookId; number?: number } | null {
+  const q = compact(query);
+  for (const book of HYMN_BOOKS) {
+    for (const alias of book.aliases) {
+      const match = q.match(new RegExp(`^${alias}(\\d*)$`));
+      if (!match) continue;
+      const digits = match[1];
+      if (!digits && alias === 'am' && fold(query).trim() === 'am') continue;
+      return { book: book.id, number: digits ? parseInt(digits, 10) : undefined };
+    }
+  }
+  return null;
+}
+
+/** "Hymn 821", "YS1", "IOM 15", "A & M 319" — the label an operator recognises. */
+export function formatHymnLabel(hymn: Pick<Hymn, 'number' | 'displayNumber'>): string {
+  return hymn.displayNumber ?? String(hymn.number);
+}
+
+/** Label for a number that may not exist, used in "not found" messages. */
+export function describeHymnQuery(query: string, activeBook: HymnBookId = 'main'): string {
+  const explicit = parseBookPrefix(query);
+  const book = getHymnBook(explicit?.book ?? activeBook);
+  const number = explicit?.number ?? parseInt(query, 10);
+  if (isNaN(number)) return `"${query.trim()}"`;
+  return book.prefix ? `${book.prefix} ${number}` : `Hymn ${number}`;
+}
+
+/**
+ * Resolve what the operator typed to a single hymn, if it names one exactly.
+ * A bare number is read in the active book; a prefix ("IOM 15") overrides it.
+ */
+export function resolveHymn(query: string, activeBook: HymnBookId = 'main'): Hymn | null {
+  const trimmed = query.trim();
+  if (!trimmed) return null;
+  const all = getAllHymnsInternal();
+
+  const explicit = parseBookPrefix(trimmed);
+  if (explicit?.number !== undefined) {
+    return all.find((h) => bookOf(h) === explicit.book && bookNumber(h) === explicit.number) ?? null;
   }
 
-  // Check if it's a number search
-  const numberQuery = parseInt(normalizedQuery, 10);
+  if (/^\d+$/.test(trimmed)) {
+    const n = parseInt(trimmed, 10);
+    return all.find((h) => bookOf(h) === activeBook && bookNumber(h) === n) ?? null;
+  }
 
-  // Check if it's a YS search
-  const isYsSearch = normalizedQuery.toUpperCase().startsWith('YS');
+  // Special identifiers such as "YS1"
+  const key = compact(trimmed);
+  return all.find((h) => h.displayNumber && compact(h.displayNumber) === key) ?? null;
+}
 
-  const allHymns = getAllHymnsInternal();
-  const results = allHymns.filter((hymn) => {
-    // Match by displayNumber (e.g., "YS1")
-    if (hymn.displayNumber) {
-      if (hymn.displayNumber.toLowerCase().includes(normalizedQuery)) {
-        return true;
-      }
-    }
+/**
+ * Search hymns by number, identifier (YS1, IOM 15), or title in either language.
+ * Numbers are read in the active book; titles are searched across every book,
+ * with the active book's matches listed first.
+ */
+export function searchHymns(query: string, activeBook: HymnBookId = 'main'): HymnSearchResult[] {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
 
-    // Match by number (exact or prefix)
-    if (!isNaN(numberQuery)) {
-      if (hymn.number.toString().startsWith(normalizedQuery)) {
-        return true;
-      }
-    }
+  const all = getAllHymnsInternal();
+  const explicit = parseBookPrefix(trimmed);
+  const isNumber = /^\d+$/.test(trimmed);
+  const needle = fold(trimmed);
+  const needleKey = compact(trimmed);
 
-    // Match by title (contains)
-    return hymn.title.toLowerCase().includes(normalizedQuery);
-  });
+  let results: Hymn[];
+  if (explicit) {
+    results = all.filter(
+      (h) =>
+        bookOf(h) === explicit.book &&
+        (explicit.number === undefined || String(bookNumber(h)).startsWith(String(explicit.number)))
+    );
+  } else if (isNumber) {
+    results = all.filter(
+      (h) => bookOf(h) === activeBook && String(bookNumber(h)).startsWith(trimmed)
+    );
+  } else {
+    results = all.filter(
+      (h) =>
+        fold(h.title).includes(needle) ||
+        (h.secondaryTitle && fold(h.secondaryTitle).includes(needle)) ||
+        (h.displayNumber && compact(h.displayNumber).includes(needleKey))
+    );
+  }
 
-  // Sort: exact matches first, then by hymn number
+  const exactNumber = explicit?.number ?? (isNumber ? parseInt(trimmed, 10) : undefined);
   results.sort((a, b) => {
-    // Exact displayNumber match comes first
-    if (isYsSearch && a.displayNumber?.toLowerCase() === normalizedQuery) return -1;
-    if (isYsSearch && b.displayNumber?.toLowerCase() === normalizedQuery) return 1;
+    // An exact identifier match ("YS1", "IOM 15") first
+    const aExact = a.displayNumber && compact(a.displayNumber) === needleKey;
+    const bExact = b.displayNumber && compact(b.displayNumber) === needleKey;
+    if (aExact !== bExact) return aExact ? -1 : 1;
 
-    // Exact number match comes next
-    if (!isNaN(numberQuery)) {
-      if (a.number === numberQuery) return -1;
-      if (b.number === numberQuery) return 1;
+    if (exactNumber !== undefined) {
+      const aHit = bookNumber(a) === exactNumber;
+      const bHit = bookNumber(b) === exactNumber;
+      if (aHit !== bHit) return aHit ? -1 : 1;
     }
 
-    // Then sort by hymn number
+    // Title searches span every book; the active one leads
+    const aHome = bookOf(a) === activeBook;
+    const bHome = bookOf(b) === activeBook;
+    if (aHome !== bHome) return aHome ? -1 : 1;
+
     return a.number - b.number;
   });
 
@@ -253,28 +347,17 @@ export function searchHymns(query: string): HymnSearchResult[] {
     displayNumber: hymn.displayNumber,
     title: hymn.title,
     author: hymn.author,
+    book: bookOf(hymn),
+    secondaryTitle: hymn.secondaryTitle,
   }));
 }
 
 /**
- * Get a hymn by its number or displayNumber.
+ * Get a hymn by its internal number, or by an identifier such as "YS1" or "IOM 15".
  */
 export function getHymnByNumber(numberOrId: number | string): Hymn | null {
-  const allHymns = getAllHymnsInternal();
-  if (typeof numberOrId === 'string') {
-    // Check if it's a YS identifier
-    const upper = numberOrId.toUpperCase();
-    if (upper.startsWith('YS')) {
-      return allHymns.find((h) => h.displayNumber?.toUpperCase() === upper) || null;
-    }
-    // Try parsing as number
-    const num = parseInt(numberOrId, 10);
-    if (!isNaN(num)) {
-      return allHymns.find((h) => h.number === num) || null;
-    }
-    return null;
-  }
-  return allHymns.find((h) => h.number === numberOrId) || null;
+  if (typeof numberOrId === 'string') return resolveHymn(numberOrId);
+  return getAllHymnsInternal().find((h) => h.number === numberOrId) || null;
 }
 
 /**

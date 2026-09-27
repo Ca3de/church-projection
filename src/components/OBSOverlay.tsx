@@ -6,6 +6,8 @@ interface OverlayContent {
   type: 'scripture' | 'hymn' | 'liturgy' | 'quick' | 'none';
   title?: string;
   text: string;
+  /** Parallel translation (Iwe Orin Mimo), shown beside the main text */
+  secondaryText?: string;
   subtitle?: string;
   theme?: Theme;
   visible?: boolean;
@@ -113,10 +115,15 @@ export function OBSOverlay() {
           </p>
         )}
 
-        {/* Main text */}
-        <p className="obs-text">
-          {content.text}
-        </p>
+        {/* Main text — side by side with the translation when there is one */}
+        {content.secondaryText ? (
+          <div className="obs-parallel">
+            <p className="obs-text">{content.text}</p>
+            <p className="obs-text" lang="yo">{content.secondaryText}</p>
+          </div>
+        ) : (
+          <p className="obs-text">{content.text}</p>
+        )}
 
         {/* Subtitle (verse indicator, etc.) */}
         {content.subtitle && (
@@ -218,6 +225,16 @@ export function OBSOverlay() {
 
         .obs-subtitle {
           opacity: 0.8;
+        }
+
+        .obs-parallel {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          column-gap: 3vw;
+        }
+
+        .obs-parallel .obs-text {
+          font-size: 0.82em;
         }
       `}</style>
     </div>

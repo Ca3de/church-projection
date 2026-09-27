@@ -32,6 +32,7 @@ import {
   getHymnByNumber,
   getTotalDisplayItems,
   getDisplayItemAtIndex,
+  formatHymnLabel,
 } from './services/hymnService';
 import { useFullscreen } from './hooks/useFullscreen';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -42,6 +43,12 @@ import { ThemeAnimation } from './animations';
 import type { LiturgyItem } from './data/liturgy';
 
 type ContentMode = 'scripture' | 'hymn' | 'liturgy' | 'quick';
+
+/** "Hymn 821", "Hymn YS1", "IOM 15", "A & M 319" */
+function hymnHeading(hymn: Hymn): string {
+  const label = formatHymnLabel(hymn);
+  return hymn.book && hymn.book !== 'main' ? label : `Hymn ${label}`;
+}
 type AppView = 'search' | 'display';
 
 function App() {
@@ -238,14 +245,14 @@ function App() {
   }, [currentVerse, isLoadingPrevious, bibleVersion]);
 
   // Hymn handlers
-  const handleHymnSearch = useCallback((hymnNumber: number) => {
+  const handleHymnSearch = useCallback((hymnNumber: number, label?: string) => {
     setIsLoading(true);
     setError(null);
 
     const hymn = getHymnByNumber(hymnNumber);
 
     if (!hymn) {
-      setError(`Hymn #${hymnNumber} not found. Please try a different hymn.`);
+      setError(`${label ?? `Hymn ${hymnNumber}`} not found. Please try a different hymn.`);
       setIsLoading(false);
       return;
     }
@@ -259,7 +266,7 @@ function App() {
     // Add to history
     addToHistory({
       type: 'hymn',
-      title: `Hymn ${hymn.displayNumber || hymn.number} - ${hymn.title}`,
+      title: `${hymnHeading(hymn)} - ${hymn.title}`,
       data: hymn,
     });
   }, [addToHistory]);
@@ -524,8 +531,11 @@ function App() {
         sendToPresentation({
           type: 'hymn',
           data: {
-            title: `${currentHymn.number}. ${currentHymn.title}`,
-            lines: [currentHymnDisplayItem.text],
+            label: hymnHeading(currentHymn),
+            title: currentHymn.title,
+            lines: currentHymnDisplayItem.text.split('\n'),
+            secondaryTitle: currentHymnDisplayItem.secondaryText ? currentHymnDisplayItem.secondaryTitle : undefined,
+            secondaryLines: currentHymnDisplayItem.secondaryText?.split('\n'),
             verseLabel: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
             index: hymnDisplayIndex,
             total: hymnTotalItems,
@@ -580,8 +590,9 @@ function App() {
       } else if (contentMode === 'hymn' && currentHymnDisplayItem && currentHymn) {
         sendToOBSOverlay({
           type: 'hymn',
-          title: `Hymn ${currentHymn.number} - ${currentHymn.title}`,
+          title: `${hymnHeading(currentHymn)} - ${currentHymn.title}`,
           text: currentHymnDisplayItem.text,
+          secondaryText: currentHymnDisplayItem.secondaryText,
           subtitle: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
           theme: currentTheme,
           visible: true,
