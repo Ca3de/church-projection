@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { HymnDisplayItem } from '../types/hymn';
 import { ScaleSlider } from './DisplayAdjust';
 
@@ -48,6 +48,15 @@ export function HymnDisplay({
 
   const isRefrain = displayItem.type === 'refrain';
 
+  // Bilingual hymns (Iwe Orin Mimo) show the translation side by side.
+  const isParallel = Boolean(displayItem.secondaryText);
+  const primaryLines = displayItem.text.split('\n');
+  const secondaryLines = displayItem.secondaryText?.split('\n') ?? [];
+  // Pair line-for-line only when both sides have the same shape
+  const linesAlign = isParallel && primaryLines.length === secondaryLines.length;
+  const secondaryLang = displayItem.secondaryLanguage?.toLowerCase().startsWith('yor') ? 'yo' : undefined;
+  const hymnLabel = displayItem.hymnDisplayNumber || displayItem.hymnNumber;
+
   return (
     <div
       className={`relative flex flex-col min-h-screen ${isFullscreen ? 'fullscreen-mode' : ''} ${
@@ -72,24 +81,59 @@ export function HymnDisplay({
             textWrap: 'balance',
           }}
         >
-          {displayItem.hymnDisplayNumber || displayItem.hymnNumber} &nbsp;·&nbsp; {displayItem.hymnTitle}
+          {/* Parallel hymns carry their titles over each column instead */}
+          {isParallel ? hymnLabel : <>{hymnLabel} &nbsp;·&nbsp; {displayItem.hymnTitle}</>}
         </p>
       </header>
 
       {/* ── The stanza ── */}
-      <div className="flex-1 flex items-center justify-center px-[6vw] py-[3vh] min-h-0">
-        <p
-          key={currentIndex}
-          className="hymn-text text-center whitespace-pre-line animate-reveal max-w-[46ch]"
-          style={{ color: 'var(--ink-100)' }}
-        >
-          {displayItem.text}
-        </p>
-      </div>
+      {isParallel ? (
+        <div className="flex-1 flex items-center justify-center px-[5vw] py-[3vh] min-h-0">
+          <div
+            key={currentIndex}
+            className="hymn-parallel animate-reveal w-full max-w-[112rem]"
+            style={{ color: 'var(--ink-100)' }}
+          >
+            <p className="hymn-parallel-title">{displayItem.hymnTitle}</p>
+            <p className="hymn-parallel-title" lang={secondaryLang}>
+              {displayItem.secondaryTitle}
+            </p>
+            {linesAlign ? (
+              primaryLines.map((line, i) => (
+                <Fragment key={i}>
+                  <span>{line}</span>
+                  <span lang={secondaryLang}>{secondaryLines[i]}</span>
+                </Fragment>
+              ))
+            ) : (
+              <>
+                <span className="whitespace-pre-line">{displayItem.text}</span>
+                <span className="whitespace-pre-line" lang={secondaryLang}>
+                  {displayItem.secondaryText}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center px-[6vw] py-[3vh] min-h-0">
+          <p
+            key={currentIndex}
+            className="hymn-text text-center whitespace-pre-line animate-reveal max-w-[46ch]"
+            style={{ color: 'var(--ink-100)' }}
+          >
+            {displayItem.text}
+          </p>
+        </div>
+      )}
 
       {/* ── Stanza label + progress ── */}
       <div
-        className="shrink-0 pb-[clamp(6.5rem,14vh,9.5rem)] px-[6vw] flex flex-col items-center gap-[clamp(0.6rem,1.4vh,1.1rem)]"
+        className={`shrink-0 px-[6vw] flex flex-col items-center gap-[clamp(0.6rem,1.4vh,1.1rem)] ${
+          // Windowed, the control bar is always there — clear its full height.
+          // Fullscreen, it only appears on hover, so the label can sit lower.
+          isFullscreen ? 'pb-[clamp(3.5rem,9vh,7rem)]' : 'pb-[10rem]'
+        }`}
         style={{ animation: 'fadeIn 1s var(--ease-out) 0.35s both' }}
       >
         {isRefrain ? (
@@ -253,13 +297,10 @@ export function HymnDisplay({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
-          </div>
 
-          {!isFullscreen && (
-            <div className="flex items-center justify-center mt-3">
-              <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} />
-            </div>
-          )}
+            {/* Inline with the buttons, so the bar stays one row tall */}
+            {!isFullscreen && <ScaleSlider scale={displayScale} onScaleChange={onDisplayScaleChange} />}
+          </div>
 
           {!isFullscreen && (
             <div className="hidden md:flex items-center justify-center gap-2.5 mt-3.5 text-xs font-sans" style={{ color: 'var(--ink-40)' }}>

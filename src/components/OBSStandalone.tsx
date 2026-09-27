@@ -1,5 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getHymnByNumber, getDisplayItemAtIndex, getTotalDisplayItems } from '../services/hymnService';
+import {
+  resolveHymn,
+  describeHymnQuery,
+  formatHymnLabel,
+  getDisplayItemAtIndex,
+  getTotalDisplayItems,
+} from '../services/hymnService';
 import { parseScriptureReference, fetchVerses } from '../services/bibleApi';
 import type { Hymn, HymnDisplayItem } from '../types/hymn';
 import type { Verse } from '../types/bible';
@@ -42,18 +48,18 @@ export function OBSStandalone() {
   }, [currentHymn, hymnIndex]);
 
   const loadHymn = useCallback(async () => {
-    const num = parseInt(hymnInput, 10);
-    if (isNaN(num)) {
-      setError('Enter a valid hymn number');
+    if (!hymnInput.trim()) {
+      setError('Enter a hymn number, e.g. 821, YS1 or IOM 15');
       return;
     }
 
     setIsLoading(true);
     setError('');
 
-    const hymn = getHymnByNumber(num);
+    // Accepts "821", "YS1", "IOM 15", "A & M 319"
+    const hymn = resolveHymn(hymnInput);
     if (!hymn) {
-      setError(`Hymn #${num} not found`);
+      setError(`${describeHymnQuery(hymnInput)} not found`);
       setIsLoading(false);
       return;
     }
@@ -140,7 +146,7 @@ export function OBSStandalone() {
           <div className="control-row">
             <input
               type="text"
-              placeholder="Hymn #"
+              placeholder="Hymn # (821, IOM 15)"
               value={hymnInput}
               onChange={e => setHymnInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && loadHymn()}
@@ -183,8 +189,18 @@ export function OBSStandalone() {
       {/* Display Area */}
       {mode === 'hymn' && hymnDisplayItem && currentHymn && (
         <div className="display hymn-display">
-          <div className="title">Hymn {currentHymn.number} - {currentHymn.title}</div>
-          <div className="text">{hymnDisplayItem.text}</div>
+          <div className="title">
+            {currentHymn.book && currentHymn.book !== 'main' ? '' : 'Hymn '}
+            {formatHymnLabel(currentHymn)} - {currentHymn.title}
+          </div>
+          {hymnDisplayItem.secondaryText ? (
+            <div className="parallel">
+              <div className="text">{hymnDisplayItem.text}</div>
+              <div className="text" lang="yo">{hymnDisplayItem.secondaryText}</div>
+            </div>
+          ) : (
+            <div className="text">{hymnDisplayItem.text}</div>
+          )}
           <div className="subtitle">
             {hymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${hymnDisplayItem.verseNumber}`}
             {' '}({hymnIndex + 1}/{hymnTotal})
@@ -314,6 +330,17 @@ export function OBSStandalone() {
           color: #006600;
           font-size: 12px;
           font-family: sans-serif;
+        }
+      
+        .parallel {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          column-gap: 3vw;
+          width: 100%;
+        }
+
+        .parallel .text {
+          font-size: 0.82em;
         }
       `}</style>
     </div>
