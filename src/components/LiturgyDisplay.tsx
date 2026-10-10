@@ -80,8 +80,11 @@ export function LiturgyDisplay({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-screen p-8 transition-all duration-500 ${
-        isFullscreen ? 'fullscreen-mode' : ''
+      className={`flex flex-col items-center justify-center min-h-screen px-8 pt-8 transition-all duration-500 ${
+        // Windowed, the fixed control bar is always showing — clear its full
+        // height so the verse indicator isn't drawn underneath it. Fullscreen,
+        // the bar only appears on hover.
+        isFullscreen ? 'fullscreen-mode pb-8' : 'pb-40'
       } ${isCursorHidden ? 'cursor-none' : ''}`}
     >
       {/* Main content */}

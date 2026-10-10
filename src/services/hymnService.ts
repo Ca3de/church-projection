@@ -174,6 +174,7 @@ export function getDisplayItemAtIndex(
     return {
       hymnNumber: hymn.number,
       hymnDisplayNumber: hymn.displayNumber,
+      hymnUnnumbered: hymn.unnumbered,
       hymnTitle: hymn.title,
       text: isRefrain ? hymn.refrain : hymn.verses[verseIndex],
       type: isRefrain ? 'refrain' : 'verse',
@@ -187,6 +188,7 @@ export function getDisplayItemAtIndex(
     return {
       hymnNumber: hymn.number,
       hymnDisplayNumber: hymn.displayNumber,
+      hymnUnnumbered: hymn.unnumbered,
       hymnTitle: hymn.title,
       text: hymn.verses[index],
       type: 'verse',
@@ -248,8 +250,9 @@ function parseBookPrefix(query: string): { book: HymnBookId; number?: number } |
   return null;
 }
 
-/** "Hymn 821", "YS1", "IOM 15", "A & M 319" — the label an operator recognises. */
-export function formatHymnLabel(hymn: Pick<Hymn, 'number' | 'displayNumber'>): string {
+/** "821", "YS1", "IOM 15", "A & M 319" — or "" for a hymn with no number. */
+export function formatHymnLabel(hymn: Pick<Hymn, 'number' | 'displayNumber' | 'unnumbered'>): string {
+  if (hymn.unnumbered) return '';
   return hymn.displayNumber ?? String(hymn.number);
 }
 
@@ -278,7 +281,7 @@ export function resolveHymn(query: string, activeBook: HymnBookId = 'main'): Hym
 
   if (/^\d+$/.test(trimmed)) {
     const n = parseInt(trimmed, 10);
-    return all.find((h) => bookOf(h) === activeBook && bookNumber(h) === n) ?? null;
+    return all.find((h) => !h.unnumbered && bookOf(h) === activeBook && bookNumber(h) === n) ?? null;
   }
 
   // Special identifiers such as "YS1"
@@ -298,7 +301,8 @@ export function searchHymns(query: string, activeBook: HymnBookId = 'main'): Hym
   const all = getAllHymnsInternal();
   const explicit = parseBookPrefix(trimmed);
   const isNumber = /^\d+$/.test(trimmed);
-  const needle = fold(trimmed);
+  // Titles are matched on letters and digits only, so commas, hyphens and
+  // apostrophes never matter: "praise my soul" finds "Praise, My Soul, …"
   const needleKey = compact(trimmed);
 
   let results: Hymn[];
@@ -310,13 +314,13 @@ export function searchHymns(query: string, activeBook: HymnBookId = 'main'): Hym
     );
   } else if (isNumber) {
     results = all.filter(
-      (h) => bookOf(h) === activeBook && String(bookNumber(h)).startsWith(trimmed)
+      (h) => !h.unnumbered && bookOf(h) === activeBook && String(bookNumber(h)).startsWith(trimmed)
     );
   } else {
     results = all.filter(
       (h) =>
-        fold(h.title).includes(needle) ||
-        (h.secondaryTitle && fold(h.secondaryTitle).includes(needle)) ||
+        compact(h.title).includes(needleKey) ||
+        (h.secondaryTitle && compact(h.secondaryTitle).includes(needleKey)) ||
         (h.displayNumber && compact(h.displayNumber).includes(needleKey))
     );
   }
@@ -349,6 +353,7 @@ export function searchHymns(query: string, activeBook: HymnBookId = 'main'): Hym
     author: hymn.author,
     book: bookOf(hymn),
     secondaryTitle: hymn.secondaryTitle,
+    unnumbered: hymn.unnumbered,
   }));
 }
 

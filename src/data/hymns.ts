@@ -34,6 +34,7 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
 
   let hymnNumber: number;
   let displayNumber: string | undefined;
+  let unnumbered = false;
 
   const numStr = jsonHymn.number;
 
@@ -57,6 +58,7 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
   } else {
     // Hymns with null or invalid numbers - auto-assign
     hymnNumber = autoNumberCounter++;
+    unnumbered = true;
   }
 
   // Extract verses in order (already numbered in the new format)
@@ -67,6 +69,7 @@ function convertJsonHymn(jsonHymn: JsonHymn): Hymn | null {
   return {
     number: hymnNumber,
     displayNumber,
+    ...(unnumbered && { unnumbered }),
     book: book.id,
     title: jsonHymn.title,
     verses,

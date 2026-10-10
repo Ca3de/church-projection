@@ -190,8 +190,9 @@ export function OBSStandalone() {
       {mode === 'hymn' && hymnDisplayItem && currentHymn && (
         <div className="display hymn-display">
           <div className="title">
-            {currentHymn.book && currentHymn.book !== 'main' ? '' : 'Hymn '}
-            {formatHymnLabel(currentHymn)} - {currentHymn.title}
+            {currentHymn.unnumbered
+              ? currentHymn.title
+              : `${currentHymn.book && currentHymn.book !== 'main' ? '' : 'Hymn '}${formatHymnLabel(currentHymn)} - ${currentHymn.title}`}
           </div>
           {hymnDisplayItem.secondaryText ? (
             <div className="parallel">
