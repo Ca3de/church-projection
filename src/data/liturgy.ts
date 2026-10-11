@@ -41,6 +41,32 @@ export const liturgyItems: LiturgyItem[] = [
     ],
   },
   {
+    id: 'introit-majesty',
+    title: 'Majesty',
+    shortTitle: 'Introit II',
+    type: 'hymn',
+    verses: [
+      {
+        number: 1,
+        lines: [
+          'Majesty, worship His Majesty',
+          'Unto Jesus be all glory, honour and praise',
+          'Majesty, kingdom authority,',
+          'Flow from His throne unto His own, His anthem raise.',
+        ],
+      },
+      {
+        number: 2,
+        lines: [
+          'So exalt, lift up on High the name of Jesus,',
+          'Magnify, come glorify, Christ Jesus the King',
+          'Majesty, worship His Majesty',
+          'Jesus who died, Now glorified, King of all kings.',
+        ],
+      },
+    ],
+  },
+  {
     id: 'nicene-creed',
     title: 'Nicene Creed',
     shortTitle: 'Nicene',
@@ -84,6 +110,50 @@ export const liturgyItems: LiturgyItem[] = [
           "In death's dread moments make me only thine;",
           'Call me and bid me come to thee on high',
           'Where I may praise thee with thy saints for ay.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'absolution-o-god-of-bethel',
+    title: 'O God of Bethel',
+    shortTitle: 'Absolution II',
+    type: 'hymn',
+    verses: [
+      {
+        number: 1,
+        lines: [
+          'O God of Bethel, by whose hand',
+          'thy people still are fed,',
+          'who through this weary pilgrimage',
+          'hast all our fathers led;',
+        ],
+      },
+      {
+        number: 2,
+        lines: [
+          'Our vows, our prayers, we now present',
+          'before thy throne of grace;',
+          'God of our fathers, be the God',
+          'of their succeeding race.',
+        ],
+      },
+      {
+        number: 3,
+        lines: [
+          'Through each perplexing path of life',
+          'our wandering footsteps guide;',
+          'give us each day our daily bread',
+          'and raiment fit provide.',
+        ],
+      },
+      {
+        number: 4,
+        lines: [
+          'O spread thy covering wings around',
+          'till all our wanderings cease,',
+          "and at our Father's loved abode",
+          'our souls arrive in peace. Amen',
         ],
       },
     ],

@@ -1235,7 +1235,7 @@
         },
         {
           "verse": 2,
-          "text": "Praise him for his grace and favor\nto our fatheers in distress.\nPraise him, still the same as ever,\nslow to chide, and swift to bless.\nPraise him, praise him!\nGlorious in his faithfulness!"
+          "text": "Praise him for his grace and favor\nto our fathers in distress.\nPraise him, still the same as ever,\nslow to chide, and swift to bless.\nPraise him, praise him!\nGlorious in his faithfulness!"
         },
         {
           "verse": 3,
@@ -1243,7 +1243,7 @@
         },
         {
           "verse": 4,
-          "text": "Frail as summer's flower we fourish,\nBlows the wind and it is gone\nBut while mortals rise and flourish\nGod endures unchanging on\nPraise Him! Praise Him!\nPraise the High Eternal one!"
+          "text": "Frail as summer's flower we flourish,\nBlows the wind and it is gone\nBut while mortals rise and flourish\nGod endures unchanging on\nPraise Him! Praise Him!\nPraise the High Eternal one!"
         },
         {
           "verse": 5,
@@ -2561,10 +2561,108 @@
           "text": "Goodness and mercy all my life\nShall surely follow me,\nAnd in God’s house forever more\nMy dwelling place shall be."
         }
       ]
+    },
+    {
+      "title": "Love Divine, All Loves Excelling",
+      "number": null,
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Love divine, all loves excelling,\nJoy of Heav'n to Earth come down,\nFix in us thy humble dwelling,\nAll thy faithful mercies crown;\nJesus, thou art all compassion,\nPure, unbounded love thou art;\nVisit us with thy salvation,\nEnter ev'ry trembling heart."
+        },
+        {
+          "verse": 2,
+          "text": "Breathe, O breathe thy loving Spirit\nInto ev'ry troubled breast;\nLet us all in thee inherit,\nLet us find thy promised rest;\nTake away our love of sinning;\nAlpha and Omega be;\nEnd of faith as its beginning,\nSet our hearts at liberty."
+        },
+        {
+          "verse": 3,
+          "text": "Come, Almighty to deliver;\nLet us all thy grace receive;\nSuddenly return, and never,\nNever more thy temples leave.\nThee we would be always blessing,\nServe thee as thy host above,\nPray, and praise thee without ceasing,\nGlory in thy perfect love."
+        }
+      ]
+    },
+    {
+      "title": "Praise, My Soul, The King Of Heaven (Alleluia)",
+      "number": null,
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Praise, my soul, the King of heaven;\nTo his feet your tribute bring.\nRansomed, healed, restored, forgiven,\nEvermore his praises sing.\nAlleluia, alleluia!\nPraise the everlasting King!"
+        },
+        {
+          "verse": 2,
+          "text": "Praise him for his grace and favor\nTo his people in distress.\nPraise him, still the same as ever,\nSlow to chide, and swift to bless.\nAlleluia, alleluia!\nGlorious in his faithfulness!"
+        },
+        {
+          "verse": 3,
+          "text": "Fatherlike he tends and spares us;\nWell our feeble frame he knows.\nIn his hand he gently bears us,\nRescues us from all our foes.\nAlleluia, alleluia!\nWidely yet his mercy flows!"
+        },
+        {
+          "verse": 4,
+          "text": "Angels, help us to adore him;\nYou behold him face to face.\nSun and moon, bow down before him,\nDwellers all in time and space.\nAlleluia, alleluia!\nPraise with us the God of grace!"
+        }
+      ]
+    },
+    {
+      "title": "Iyanu N'ife Re Si Gbogbo Wa",
+      "number": null,
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Iyanu n'ife Re si gbogbo wa,\nE korin ‘yin s’Oba Olore wa."
+        },
+        {
+          "verse": 2,
+          "text": "Kil‘ a fi san j’awon t'iku ti pa?\nIwo lo f’owo wo wa di oni\n‘Wo lo nso wa to ngba wa lo'ewu\nE korin 'yin s'Olutoju wa."
+        },
+        {
+          "verse": 3,
+          "text": "Gbogbo alaye I'O nfun l'onje won,\nIwo lo npese f‘onikaluku;\nIwo lo nsike eda Re gbogbo\nE korin ‘yin si Oni bu‐Ore."
+        },
+        {
+          "verse": 4,
+          "text": "Ohun wa ko dun to lati korin\nEnu wa ko gboro to fun ope\nB'awa n'egberun ahon nikokan\nNwon kere ju lati gb’ola Re ga."
+        },
+        {
+          "verse": 5,
+          "text": "Gbe wa leke ‘soro l‘ojo gbogbo\nFun wa l'ayo at'alafia Re,\nJe k'a ri bukun gba lo ‘le wa,\nK'a ba le wa f'ogo f’oruko Re."
+        },
+        {
+          "verse": 6,
+          "text": "Enyin Angeli l‘orun wa ba wa gbe\nOrin iyin at’ope t'o ye wa\nS'Oba wa aiku Olola-julo\nOba wa Jehofa t'o joba. Amin"
+        }
+      ],
+      "refrain": "Halleluyah Ogo ni fun Baba\nA f'ijo, ilu yin Olorun wa,\nAlaye ni o yin O, bo ti ye\nHalleluya! Ogo ni fun Baba."
+    },
+    {
+      "title": "Ore-Ofe! Ohun Adun",
+      "number": null,
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Ore-ofe! Ohun\nAdun ni l’ eti wa;\nGbongbon re yio gba orun kan,\nAiye o gbo pelu."
+        },
+        {
+          "verse": 2,
+          "text": "Ore-ofe l’ o ko\nOruko mi l’ orun;\nL’ o fi mi Od’-agutan,\nT’ O gba iya mi je."
+        },
+        {
+          "verse": 3,
+          "text": "Ore-ofe to mi\nS’ ona alafia;\nO ntoju mi l’ ojojumo,\nNi irin ajo mi."
+        },
+        {
+          "verse": 4,
+          "text": "Ore-ofe ko mi\nBi a ti gb’ adura;\nO pa mi mo titi d’ oni,\nKo si jeki nsako"
+        }
+      ],
+      "refrain": "Ore-ofe sa, N’ igbekele mi;\nJesu-ku fun araiye, O ku fun mi pelu."
     }
   ],
   "summary": {
-    "total_hymns": 99,
+    "total_hymns": 103,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",

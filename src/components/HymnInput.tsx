@@ -76,7 +76,7 @@ export function HymnInput({
   };
 
   const handleSuggestionClick = (hymn: HymnSearchResult) => {
-    setValue(formatHymnLabel(hymn));
+    setValue(formatHymnLabel(hymn) || hymn.title);
     setSuggestions([]);
     setShowSuggestions(false);
     onSubmit(hymn.number);
@@ -219,7 +219,7 @@ export function HymnInput({
                     color: 'var(--theme-accent)',
                   }}
                 >
-                  {hymn.displayNumber || hymn.number}
+                  {hymn.unnumbered ? '—' : hymn.displayNumber || hymn.number}
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block truncate">{hymn.title}</span>

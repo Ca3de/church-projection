@@ -55,7 +55,9 @@ export function HymnDisplay({
   // Pair line-for-line only when both sides have the same shape
   const linesAlign = isParallel && primaryLines.length === secondaryLines.length;
   const secondaryLang = displayItem.secondaryLanguage?.toLowerCase().startsWith('yor') ? 'yo' : undefined;
-  const hymnLabel = displayItem.hymnDisplayNumber || displayItem.hymnNumber;
+  const hymnLabel = displayItem.hymnUnnumbered
+    ? null
+    : displayItem.hymnDisplayNumber || displayItem.hymnNumber;
 
   return (
     <div
@@ -82,7 +84,13 @@ export function HymnDisplay({
           }}
         >
           {/* Parallel hymns carry their titles over each column instead */}
-          {isParallel ? hymnLabel : <>{hymnLabel} &nbsp;·&nbsp; {displayItem.hymnTitle}</>}
+          {isParallel ? (
+            hymnLabel
+          ) : hymnLabel === null ? (
+            displayItem.hymnTitle
+          ) : (
+            <>{hymnLabel} &nbsp;·&nbsp; {displayItem.hymnTitle}</>
+          )}
         </p>
       </header>
 

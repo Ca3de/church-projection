@@ -8,6 +8,8 @@ export interface Hymn {
    */
   number: number;
   displayNumber?: string; // What the congregation sees: "YS1", "IOM 15", "A & M 319"
+  /** No number in any book — `number` is an internal id and must never be shown */
+  unnumbered?: boolean;
   book?: HymnBookId; // Defaults to 'main'
   title: string;
   author?: string;
@@ -25,6 +27,7 @@ export interface Hymn {
 export interface HymnDisplayItem {
   hymnNumber: number;
   hymnDisplayNumber?: string; // Original identifier like "YS1"
+  hymnUnnumbered?: boolean;
   hymnTitle: string;
   text: string;
   type: 'verse' | 'refrain';
@@ -43,4 +46,5 @@ export interface HymnSearchResult {
   author?: string;
   book?: HymnBookId;
   secondaryTitle?: string;
+  unnumbered?: boolean;
 }

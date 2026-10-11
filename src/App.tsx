@@ -44,10 +44,17 @@ import type { LiturgyItem } from './data/liturgy';
 
 type ContentMode = 'scripture' | 'hymn' | 'liturgy' | 'quick';
 
-/** "Hymn 821", "Hymn YS1", "IOM 15", "A & M 319" */
+/** "Hymn 821", "Hymn YS1", "IOM 15", "A & M 319" — or "" when the hymn has no number */
 function hymnHeading(hymn: Hymn): string {
   const label = formatHymnLabel(hymn);
+  if (!label) return '';
   return hymn.book && hymn.book !== 'main' ? label : `Hymn ${label}`;
+}
+
+/** "Hymn 821 - Title", or just the title for an unnumbered hymn */
+function hymnCaption(hymn: Hymn): string {
+  const heading = hymnHeading(hymn);
+  return heading ? `${heading} - ${hymn.title}` : hymn.title;
 }
 type AppView = 'search' | 'display';
 
@@ -266,7 +273,7 @@ function App() {
     // Add to history
     addToHistory({
       type: 'hymn',
-      title: `${hymnHeading(hymn)} - ${hymn.title}`,
+      title: hymnCaption(hymn),
       data: hymn,
     });
   }, [addToHistory]);
@@ -590,7 +597,7 @@ function App() {
       } else if (contentMode === 'hymn' && currentHymnDisplayItem && currentHymn) {
         sendToOBSOverlay({
           type: 'hymn',
-          title: `${hymnHeading(currentHymn)} - ${currentHymn.title}`,
+          title: hymnCaption(currentHymn),
           text: currentHymnDisplayItem.text,
           secondaryText: currentHymnDisplayItem.secondaryText,
           subtitle: currentHymnDisplayItem.type === 'refrain' ? 'Refrain' : `Verse ${currentHymnDisplayItem.verseNumber}`,
