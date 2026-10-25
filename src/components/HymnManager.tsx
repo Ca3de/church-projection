@@ -1,19 +1,37 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { parseHymnText, suggestTitle, hymnToText, type ParsedStanza } from '../services/hymnParser';
+import { getBuiltInHymn, getHymnByNumber, formatHymnLabel } from '../services/hymnService';
 import {
-  addCustomHymn,
-  deleteCustomHymn,
-  getCustomHymnsList,
-  getBuiltInHymn,
-  getHymnByNumber,
-  exportCustomHymns,
-  importCustomHymns,
-  formatHymnLabel,
-} from '../services/hymnService';
+  HymnStoreError,
+  deleteHymn,
+  exportHymns,
+  getCustomHymns,
+  getLocalOnlyHymns,
+  getSyncStatus,
+  hasPasscode,
+  importHymns,
+  isSharedHymn,
+  onHymnsChanged,
+  saveHymn,
+  setPasscode,
+  shareLocalHymns,
+  syncSharedHymns,
+  type SaveResult,
+} from '../services/hymnStore';
 import { HYMN_BOOKS, hymnIdentity, printedNumber } from '../data/hymnBooks';
 import type { Hymn, HymnBookId } from '../types/hymn';
 
 const BOOK_KEY = 'church-projection-hymn-book';
+
+const readStore = () => ({ ...getSyncStatus(), saved: getCustomHymns(), localOnly: getLocalOnlyHymns() });
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+function savedText(name: string, where: SaveResult): string {
+  if (where === 'shared') return `Saved ${name} for every device.`;
+  if (where === 'local') return `Saved ${name}.`;
+  return `Saved ${name} on this computer only — the shared list couldn’t be reached. Share it from the Saved tab once you’re back online.`;
+}
 
 interface HymnManagerProps {
   onClose: () => void;
@@ -32,6 +50,7 @@ function labelFor(hymn: Pick<Hymn, 'number' | 'displayNumber' | 'unnumbered' | '
 
 const inputStyle = { padding: '0.65rem 0.9rem', fontSize: '0.9375rem' } as const;
 const textareaStyle = { padding: '0.85rem 1rem', fontSize: '0.875rem', lineHeight: 1.6 } as const;
+const noticeStyle = { background: 'rgba(251, 191, 36, 0.06)', border: '1px solid rgba(251, 191, 36, 0.22)', color: 'var(--ink-80)' } as const;
 
 export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
   const [tab, setTab] = useState<'add' | 'saved'>('add');
@@ -48,8 +67,26 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingUnnumbered, setEditingUnnumbered] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
-  const [saved, setSaved] = useState<Hymn[]>(getCustomHymnsList);
+  const [store, setStore] = useState(readStore);
+  const [passcode, setPasscodeInput] = useState('');
+  const [passcodeRejected, setPasscodeRejected] = useState(false);
+  const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Stay current with other devices while the editor is open
+  useEffect(() => {
+    const unsubscribe = onHymnsChanged(() => setStore(readStore()));
+    void syncSharedHymns();
+    return unsubscribe;
+  }, []);
+
+  const saved = store.saved;
+  const sharedMode = store.state !== 'local';
+  const editingLocked = store.state === 'shared' && !store.editable;
+  const askPasscode =
+    (store.state === 'shared' || store.state === 'checking') && store.editable && (passcodeRejected || !hasPasscode());
+  const needsPasscode = askPasscode && !passcode.trim();
+  const localOnlyNumbers = useMemo(() => new Set(store.localOnly.map((h) => h.number)), [store.localOnly]);
 
   const isBilingual = book === 'iom';
   const dirty = text.trim() !== '' || secondaryText.trim() !== '';
@@ -72,7 +109,7 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
   const numberInvalid = effectiveNumber !== '' && !identity;
   const existing = identity ? getHymnByNumber(identity.number) : null;
   const replacing = existing && existing.number !== editingId ? existing : null;
-  const canSave = primary.verses.length > 0 && !numberInvalid && effectiveTitle !== '';
+  const canSave = primary.verses.length > 0 && !numberInvalid && effectiveTitle !== '' && !editingLocked && !needsPasscode;
 
   const savingAs = labelFor({
     number: identity?.number ?? 0,
@@ -166,13 +203,37 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
     setTab('add');
   };
 
+  // Runs a change that may need the shared list: remembers a typed passcode, handles the answer
+  const write = async (change: () => Promise<void>) => {
+    if (askPasscode && passcode.trim()) setPasscode(passcode);
+    const sentPasscode = hasPasscode();
+    setBusy(true);
+    try {
+      await change();
+      setPasscodeRejected(false);
+      setPasscodeInput('');
+    } catch (err) {
+      if (err instanceof HymnStoreError) {
+        if (err.code === 'passcode') {
+          setPasscodeRejected(true);
+          setPasscodeInput('');
+        }
+        const text = err.code === 'passcode' && !sentPasscode ? 'Enter the editor passcode to save for every device.' : err.message;
+        setMessage({ kind: 'error', text });
+      } else {
+        setMessage({ kind: 'error', text: 'Something went wrong. Please try again.' });
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleSave = () => {
-    if (!canSave) return;
+    if (!canSave || busy) return;
     const id = identity
       ? identity.number
       : editingId !== null && editingUnnumbered
         ? editingId
-        // eslint-disable-next-line react-hooks/purity -- runs on click, not during render
         : Date.now();
 
     const hymn: Hymn = {
@@ -194,31 +255,48 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
     };
 
     // Renumbered while editing: the old entry goes
-    if (editingId !== null && editingId !== id) deleteCustomHymn(editingId);
-    addCustomHymn(hymn);
-    setSaved(getCustomHymnsList());
-
+    const replaces = editingId !== null && editingId !== id ? editingId : null;
     const label = labelFor(hymn);
-    setMessage({ kind: 'success', text: `Saved ${label ? `${label} · ` : ''}${hymn.title}.`, hymnNumber: id });
-    resetForm();
+    void write(async () => {
+      const where = await saveHymn(hymn, replaces);
+      setMessage({ kind: 'success', text: savedText(`${label ? `${label} · ` : ''}${hymn.title}`, where), hymnNumber: id });
+      resetForm();
+    });
+  };
+
+  const passcodeFirst = () => {
+    if (!needsPasscode) return false;
+    setMessage({ kind: 'error', text: 'Enter the editor passcode below first.' });
+    return true;
   };
 
   const handleDelete = (hymn: Hymn) => {
     const label = labelFor(hymn);
     const name = `${label ? `${label} · ` : ''}${hymn.title}`;
     const original = getBuiltInHymn(hymn.number);
+    const everywhere = isSharedHymn(hymn.number);
+    if (everywhere && passcodeFirst()) return;
     const question = original
-      ? `Remove your changes to ${name}? The version that came with the app returns.`
-      : `Delete ${name} from this computer?`;
+      ? `Remove the changes to ${name}${everywhere ? ' on every device' : ''}? The version that came with the app returns.`
+      : `Delete ${name} from ${everywhere ? 'every device' : 'this computer'}?`;
     if (!window.confirm(question)) return;
-    deleteCustomHymn(hymn.number);
-    setSaved(getCustomHymnsList());
-    if (editingId === hymn.number) resetForm();
-    setMessage({ kind: 'success', text: original ? `Restored the original ${name}.` : `Deleted ${name}.` });
+    void write(async () => {
+      await deleteHymn(hymn.number);
+      if (editingId === hymn.number) resetForm();
+      setMessage({ kind: 'success', text: original ? `Restored the original ${name}.` : `Deleted ${name}.` });
+    });
+  };
+
+  const handleShareLocal = () => {
+    if (passcodeFirst()) return;
+    void write(async () => {
+      const count = await shareLocalHymns();
+      setMessage({ kind: 'success', text: `Shared ${plural(count, 'hymn')} with every device.` });
+    });
   };
 
   const handleBackup = () => {
-    const blob = new Blob([exportCustomHymns()], { type: 'application/json' });
+    const blob = new Blob([exportHymns()], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -228,15 +306,24 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
   };
 
   const handleRestore = async (file: File) => {
-    try {
-      const count = importCustomHymns(await file.text());
-      setSaved(getCustomHymnsList());
-      setMessage({ kind: 'success', text: `Restored ${count} hymn${count === 1 ? '' : 's'} from the backup.` });
-    } catch (err) {
-      const text = err instanceof SyntaxError ? 'This file is not a Sanctum hymn backup.' : err instanceof Error ? err.message : 'Could not read that file.';
-      setMessage({ kind: 'error', text });
-    }
     if (fileRef.current) fileRef.current.value = '';
+    if (passcodeFirst()) return;
+    await write(async () => {
+      try {
+        const { count, where } = await importHymns(await file.text());
+        const n = plural(count, 'hymn');
+        const text =
+          where === 'shared'
+            ? `Restored ${n} for every device.`
+            : where === 'local'
+              ? `Restored ${n} from the backup.`
+              : `Restored ${n} on this computer only — the shared list couldn’t be reached.`;
+        setMessage({ kind: 'success', text });
+      } catch (err) {
+        if (err instanceof SyntaxError) throw new HymnStoreError('invalid', 'This file is not a Sanctum hymn backup.');
+        throw err;
+      }
+    });
   };
 
   const sortedSaved = useMemo(() => {
@@ -265,6 +352,43 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
     </p>
   );
 
+  // Where saves go, said plainly — shown in the footer when there's no message
+  const statusText = (() => {
+    if (store.state === 'checking') return 'Connecting to the shared hymn list…';
+    if (store.state === 'offline') return 'Can’t reach the shared hymn list, so saves stay on this computer for now.';
+    if (store.state === 'local') {
+      return tab === 'saved'
+        ? 'Kept in this browser only. Download a backup to move them to another computer.'
+        : 'Saved in this browser on this computer.';
+    }
+    if (editingLocked) return 'Editing isn’t switched on yet: add HYMN_EDITOR_PASSCODE in Vercel and redeploy.';
+    if (askPasscode) return 'Enter the editor passcode to save for every device.';
+    return tab === 'saved' ? 'Shared with every device that opens Sanctum.' : 'Saved for every device.';
+  })();
+
+  const statusLine = messageLine || (
+    <p className="text-xs" style={{ color: 'var(--ink-40)' }}>
+      {statusText}
+    </p>
+  );
+
+  const passcodeField = askPasscode && (
+    <input
+      id="hm-passcode"
+      type="password"
+      value={passcode}
+      onChange={(e) => {
+        setPasscodeInput(e.target.value);
+        setMessage(null);
+      }}
+      placeholder="Editor passcode"
+      aria-label="Editor passcode"
+      autoComplete="current-password"
+      className="input-field !w-44"
+      style={inputStyle}
+    />
+  );
+
   const tabButton = (id: 'add' | 'saved', label: string) => {
     const active = tab === id;
     return (
@@ -272,7 +396,10 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
         type="button"
         role="tab"
         aria-selected={active}
-        onClick={() => setTab(id)}
+        onClick={() => {
+          setTab(id);
+          setMessage(null);
+        }}
         className="relative pb-2 font-display uppercase transition-colors duration-300 focus:outline-none"
         style={{
           fontSize: '0.66rem',
@@ -321,7 +448,7 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
               className="font-display text-lg sm:text-xl mt-1 truncate"
               style={{ letterSpacing: '0.08em', color: 'var(--ink-100)' }}
             >
-              {tab === 'saved' ? 'Saved on this computer' : editingId !== null ? 'Edit hymn' : 'Add a hymn'}
+              {tab === 'saved' ? (sharedMode ? 'Saved hymns' : 'Saved on this computer') : editingId !== null ? 'Edit hymn' : 'Add a hymn'}
             </h2>
           </div>
           <div role="tablist" className="flex gap-5 shrink-0">
@@ -429,12 +556,9 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
                   </p>
                 )}
                 {replacing && (
-                  <div
-                    className="text-sm px-4 py-3 rounded-xl flex flex-wrap items-center gap-x-3 gap-y-1"
-                    style={{ background: 'rgba(251, 191, 36, 0.06)', border: '1px solid rgba(251, 191, 36, 0.22)', color: 'var(--ink-80)' }}
-                  >
+                  <div className="text-sm px-4 py-3 rounded-xl flex flex-wrap items-center gap-x-3 gap-y-1" style={noticeStyle}>
                     <span>
-                      {labelFor(replacing)} is already “{replacing.title}”. Saving replaces it on this computer.
+                      {labelFor(replacing)} is already “{replacing.title}”. Saving replaces it{sharedMode ? ' on every device' : ' on this computer'}.
                     </span>
                     <button
                       type="button"
@@ -449,7 +573,10 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
                 {editingId !== null && !replacing && (
                   <p className="text-sm" style={{ color: 'var(--ink-60)' }}>
                     Editing {labelFor({ number: editingId, displayNumber: existing?.displayNumber, unnumbered: editingUnnumbered, book }) || effectiveTitle}.
-                    {getBuiltInHymn(editingId) && ' Your changes are kept on this computer; removing them later brings back the original.'}
+                    {getBuiltInHymn(editingId) &&
+                      (sharedMode
+                        ? ' Removing your changes later brings back the original.'
+                        : ' Your changes are kept on this computer; removing them later brings back the original.')}
                   </p>
                 )}
 
@@ -567,26 +694,37 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
 
             {/* ── Footer ── */}
             <div className="flex flex-wrap items-center gap-3 px-5 sm:px-7 py-4 border-t" style={{ borderColor: 'var(--hairline)' }}>
-              <div className="flex-1 min-w-[12rem]">
-                {messageLine || (
-                  <p className="text-xs" style={{ color: 'var(--ink-40)' }}>
-                    Saved in this browser on this computer.
-                  </p>
-                )}
-              </div>
+              <div className="flex-1 min-w-[12rem]">{statusLine}</div>
+              {passcodeField}
               {editingId !== null && (
                 <button type="button" onClick={resetForm} className="btn-secondary">
                   Cancel
                 </button>
               )}
-              <button type="button" onClick={handleSave} disabled={!canSave} className="btn-primary disabled:cursor-not-allowed">
-                Save hymn
+              <button type="button" onClick={handleSave} disabled={!canSave || busy} className="btn-primary disabled:cursor-not-allowed">
+                {busy ? 'Saving…' : 'Save hymn'}
               </button>
             </div>
           </>
         ) : (
           <>
             <div className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-7 py-4">
+              {store.localOnly.length > 0 && (
+                <div className="text-sm px-4 py-3 mb-3 rounded-xl flex flex-wrap items-center gap-x-3 gap-y-1" style={noticeStyle}>
+                  <span>
+                    {plural(store.localOnly.length, 'hymn')} {store.localOnly.length === 1 ? 'is' : 'are'} saved only on this computer.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleShareLocal}
+                    disabled={busy}
+                    className="underline underline-offset-4 decoration-1 disabled:opacity-50"
+                    style={{ color: 'var(--theme-accent)' }}
+                  >
+                    Share with every device
+                  </button>
+                </div>
+              )}
               {sortedSaved.length === 0 ? (
                 <p className="py-12 text-center font-serif text-lg" style={{ color: 'var(--ink-40)' }}>
                   Hymns you add or change here appear in this list.
@@ -612,6 +750,7 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
                           {hymn.refrain ? ' · chorus' : ''}
                           {hymn.secondaryVerses?.some(Boolean) ? ' · with Yorùbá' : ''}
                           {replacesOriginal ? ' · replaces the version that came with the app' : ''}
+                          {localOnlyNumbers.has(hymn.number) ? ' · only on this computer' : ''}
                         </p>
                       </div>
                       <button type="button" onClick={() => loadForEditing(hymn)} className="btn-secondary !py-1.5 !px-3 text-xs shrink-0">
@@ -634,14 +773,9 @@ export function HymnManager({ onClose, onDisplayHymn }: HymnManagerProps) {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-3 px-5 sm:px-7 py-4 border-t" style={{ borderColor: 'var(--hairline)' }}>
-              <div className="flex-1 min-w-[12rem]">
-                {messageLine || (
-                  <p className="text-xs" style={{ color: 'var(--ink-40)' }}>
-                    Kept in this browser only. Download a backup to move them to another computer.
-                  </p>
-                )}
-              </div>
-              <button type="button" onClick={() => fileRef.current?.click()} className="btn-secondary">
+              <div className="flex-1 min-w-[12rem]">{statusLine}</div>
+              {passcodeField}
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="btn-secondary disabled:opacity-40">
                 Restore backup
               </button>
               <button type="button" onClick={handleBackup} disabled={saved.length === 0} className="btn-secondary disabled:opacity-40">

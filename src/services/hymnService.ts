@@ -1,37 +1,7 @@
 import { HYMNS } from '../data/hymns';
 import { HYMN_BOOKS, getHymnBook } from '../data/hymnBooks';
+import { getCustomHymns } from './hymnStore';
 import type { Hymn, HymnBookId, HymnDisplayItem, HymnSearchResult } from '../types/hymn';
-
-// Custom hymns stored in localStorage
-const CUSTOM_HYMNS_KEY = 'church-projection-custom-hymns';
-
-function isHymnLike(value: unknown): value is Hymn {
-  const h = value as Hymn;
-  return (
-    !!h &&
-    typeof h.number === 'number' &&
-    typeof h.title === 'string' &&
-    Array.isArray(h.verses) &&
-    h.verses.every((v) => typeof v === 'string')
-  );
-}
-
-function getCustomHymns(): Hymn[] {
-  try {
-    const stored = localStorage.getItem(CUSTOM_HYMNS_KEY);
-    if (stored) {
-      const parsed: unknown = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed.filter(isHymnLike);
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return [];
-}
-
-function saveCustomHymns(hymns: Hymn[]): void {
-  localStorage.setItem(CUSTOM_HYMNS_KEY, JSON.stringify(hymns));
-}
 
 // Get all hymns (built-in + custom)
 function getAllHymnsInternal(): Hymn[] {
@@ -41,60 +11,9 @@ function getAllHymnsInternal(): Hymn[] {
   return [...builtInFiltered, ...custom].sort((a, b) => a.number - b.number);
 }
 
-// Add a custom hymn
-export function addCustomHymn(hymn: Hymn): void {
-  const custom = getCustomHymns();
-  // Remove existing with same number if any
-  const filtered = custom.filter(h => h.number !== hymn.number);
-  filtered.push(hymn);
-  saveCustomHymns(filtered);
-}
-
-// Delete a custom hymn
-export function deleteCustomHymn(hymnNumber: number): boolean {
-  const custom = getCustomHymns();
-  const filtered = custom.filter(h => h.number !== hymnNumber);
-  if (filtered.length !== custom.length) {
-    saveCustomHymns(filtered);
-    return true;
-  }
-  return false;
-}
-
-// Check if a hymn is custom
-export function isCustomHymn(hymnNumber: number): boolean {
-  return getCustomHymns().some(h => h.number === hymnNumber);
-}
-
-// Export custom hymns list for management
-export function getCustomHymnsList(): Hymn[] {
-  return getCustomHymns();
-}
-
-/** The hymn as shipped with the app, ignoring any change saved on this computer. */
+/** The hymn as shipped with the app, ignoring any change made in the editor. */
 export function getBuiltInHymn(hymnNumber: number): Hymn | null {
   return HYMNS.find((h) => h.number === hymnNumber) ?? null;
-}
-
-/** Everything added or changed on this computer, as a file the operator can keep. */
-export function exportCustomHymns(): string {
-  return JSON.stringify({ app: 'sanctum', kind: 'hymns', version: 1, hymns: getCustomHymns() }, null, 2);
-}
-
-/**
- * Restore hymns from a backup file. Merges with what is already saved; a
- * hymn in the file replaces one with the same number. Returns how many were read.
- */
-export function importCustomHymns(fileText: string): number {
-  const data: unknown = JSON.parse(fileText);
-  const list = Array.isArray(data) ? data : (data as { hymns?: unknown })?.hymns;
-  if (!Array.isArray(list)) throw new Error('This file is not a Sanctum hymn backup.');
-  const incoming = list.filter(isHymnLike);
-  if (incoming.length === 0) throw new Error('No hymns were found in this file.');
-  const byNumber = new Map(getCustomHymns().map((h) => [h.number, h]));
-  incoming.forEach((h) => byNumber.set(h.number, h));
-  saveCustomHymns([...byNumber.values()]);
-  return incoming.length;
 }
 
 /**

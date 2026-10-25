@@ -77,6 +77,25 @@ The app accepts various scripture reference formats:
 5. Use `Space` or `→` to show the next verse as needed
 6. Press `Escape` to exit fullscreen and search for new verses
 
+## Shared Hymns
+
+Hymns added in **Hymns → Add or edit a hymn** are shared with every device
+through a small Upstash Redis database (free tier). Each device keeps a copy,
+so projection keeps working if the internet drops. Saves made while offline
+stay on that computer until someone presses **Share with every device**.
+
+To switch it on in Vercel:
+
+1. **Storage** tab → **Create Database** → **Upstash for Redis** (free plan) →
+   connect it to this project. This adds the URL and token automatically.
+2. **Settings → Environment Variables** → add `HYMN_EDITOR_PASSCODE` with the
+   passcode editors will type.
+3. Redeploy.
+
+Anyone can view hymns; adding, changing or deleting needs the passcode, which
+each device remembers once it works. Ten wrong guesses lock that address out
+for 15 minutes. Without the database the editor saves in the browser only.
+
 ## License
 
 MIT
