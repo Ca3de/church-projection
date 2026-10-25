@@ -5,11 +5,23 @@ import type { Hymn, HymnBookId, HymnDisplayItem, HymnSearchResult } from '../typ
 // Custom hymns stored in localStorage
 const CUSTOM_HYMNS_KEY = 'church-projection-custom-hymns';
 
+function isHymnLike(value: unknown): value is Hymn {
+  const h = value as Hymn;
+  return (
+    !!h &&
+    typeof h.number === 'number' &&
+    typeof h.title === 'string' &&
+    Array.isArray(h.verses) &&
+    h.verses.every((v) => typeof v === 'string')
+  );
+}
+
 function getCustomHymns(): Hymn[] {
   try {
     const stored = localStorage.getItem(CUSTOM_HYMNS_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed: unknown = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed.filter(isHymnLike);
     }
   } catch {
     // Ignore parse errors
@@ -54,92 +66,35 @@ export function isCustomHymn(hymnNumber: number): boolean {
   return getCustomHymns().some(h => h.number === hymnNumber);
 }
 
-// Parse hymn from text format
-export function parseHymnText(text: string): Hymn | null {
-  const lines = text.trim().split('\n');
-  if (lines.length < 2) return null;
-
-  const verses: string[] = [];
-  let refrain: string | null = null;
-  let currentVerseLines: string[] = [];
-  let isRefrain = false;
-  let title = '';
-  let number = Date.now(); // Default unique number
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    // Check for verse number pattern (e.g., "1.", "2.", etc.)
-    const verseMatch = line.match(/^(\d+)\.\s*(.*)$/);
-    if (verseMatch) {
-      // Save previous verse/refrain
-      if (currentVerseLines.length > 0) {
-        if (isRefrain) {
-          refrain = currentVerseLines.join('\n');
-        } else {
-          verses.push(currentVerseLines.join('\n'));
-        }
-      }
-      currentVerseLines = verseMatch[2] ? [verseMatch[2]] : [];
-      isRefrain = false;
-      continue;
-    }
-
-    // Check for refrain/chorus marker
-    if (line.toLowerCase().match(/^(refrain|chorus):?\s*$/)) {
-      // Save previous verse
-      if (currentVerseLines.length > 0 && !isRefrain) {
-        verses.push(currentVerseLines.join('\n'));
-      }
-      currentVerseLines = [];
-      isRefrain = true;
-      continue;
-    }
-
-    // Check for title with number (e.g., "523. Higher Ground" or "Hymn 523 - Higher Ground")
-    const titleMatch = line.match(/^(?:hymn\s+)?(\d+)[\.\-\s]+(.+)$/i);
-    if (titleMatch && i < 3 && verses.length === 0) {
-      number = parseInt(titleMatch[1], 10);
-      title = titleMatch[2].trim();
-      continue;
-    }
-
-    // If first non-empty line and no title yet, treat as title
-    if (!title && line && i < 2) {
-      title = line;
-      continue;
-    }
-
-    // Regular line - add to current verse/refrain
-    if (line) {
-      currentVerseLines.push(line);
-    }
-  }
-
-  // Save last verse/refrain
-  if (currentVerseLines.length > 0) {
-    if (isRefrain) {
-      refrain = currentVerseLines.join('\n');
-    } else {
-      verses.push(currentVerseLines.join('\n'));
-    }
-  }
-
-  if (!title || verses.length === 0) {
-    return null;
-  }
-
-  return {
-    number,
-    title,
-    verses,
-    refrain,
-  };
-}
-
 // Export custom hymns list for management
 export function getCustomHymnsList(): Hymn[] {
   return getCustomHymns();
+}
+
+/** The hymn as shipped with the app, ignoring any change saved on this computer. */
+export function getBuiltInHymn(hymnNumber: number): Hymn | null {
+  return HYMNS.find((h) => h.number === hymnNumber) ?? null;
+}
+
+/** Everything added or changed on this computer, as a file the operator can keep. */
+export function exportCustomHymns(): string {
+  return JSON.stringify({ app: 'sanctum', kind: 'hymns', version: 1, hymns: getCustomHymns() }, null, 2);
+}
+
+/**
+ * Restore hymns from a backup file. Merges with what is already saved; a
+ * hymn in the file replaces one with the same number. Returns how many were read.
+ */
+export function importCustomHymns(fileText: string): number {
+  const data: unknown = JSON.parse(fileText);
+  const list = Array.isArray(data) ? data : (data as { hymns?: unknown })?.hymns;
+  if (!Array.isArray(list)) throw new Error('This file is not a Sanctum hymn backup.');
+  const incoming = list.filter(isHymnLike);
+  if (incoming.length === 0) throw new Error('No hymns were found in this file.');
+  const byNumber = new Map(getCustomHymns().map((h) => [h.number, h]));
+  incoming.forEach((h) => byNumber.set(h.number, h));
+  saveCustomHymns([...byNumber.values()]);
+  return incoming.length;
 }
 
 /**

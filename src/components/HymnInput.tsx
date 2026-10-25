@@ -26,6 +26,11 @@ export function HymnInput({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Closing the list on blur is delayed so a click on a suggestion lands first.
+  // Any return of focus or new typing cancels it — otherwise typing just after
+  // clicking a book has its suggestions closed by the stale timer.
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(blurTimer.current), []);
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -46,6 +51,7 @@ export function HymnInput({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(blurTimer.current);
     setValue(e.target.value);
     updateSuggestions(e.target.value, book);
   };
@@ -157,8 +163,13 @@ export function HymnInput({
               value={value}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              onFocus={() => {
+                clearTimeout(blurTimer.current);
+                if (suggestions.length > 0) setShowSuggestions(true);
+              }}
+              onBlur={() => {
+                blurTimer.current = setTimeout(() => setShowSuggestions(false), 200);
+              }}
               placeholder={book === 'main' ? 'Number or title' : `${getHymnBook(book).prefix} number or title`}
               className="field pr-9"
               disabled={isLoading}

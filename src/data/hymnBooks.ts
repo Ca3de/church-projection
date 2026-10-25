@@ -33,3 +33,31 @@ export function resolveHymnBookId(value: string | undefined): HymnBookId {
   const book = HYMN_BOOKS.find((b) => b.aliases.includes(key));
   return book?.id ?? 'main';
 }
+
+/**
+ * The internal id and printed label for a number typed into a book:
+ * "788" → 788, "YS3" → 9003 / "YS3", "15" in IOM → 20015 / "IOM 15".
+ * Returns null for a blank or unusable value.
+ */
+export function hymnIdentity(bookId: HymnBookId, raw: string): { number: number; displayNumber?: string } | null {
+  const value = raw.trim();
+  if (!value) return null;
+  const book = getHymnBook(bookId);
+  if (book.id === 'main') {
+    const ys = value.match(/^ys\s*(\d{1,3})$/i);
+    if (ys) return { number: 9000 + parseInt(ys[1], 10), displayNumber: `YS${parseInt(ys[1], 10)}` };
+  }
+  if (!/^\d{1,4}$/.test(value)) return null;
+  const n = parseInt(value, 10);
+  // The main hymnal stays below the auto-numbered (8001+) and YS (9000+) ranges
+  if (n < 1 || (book.id === 'main' && n >= 8000)) return null;
+  return book.id === 'main' ? { number: n } : { number: book.offset + n, displayNumber: `${book.prefix} ${n}` };
+}
+
+/** The number as printed in its hymnbook: 15 for IOM 15, "YS3", or "" when unnumbered. */
+export function printedNumber(hymn: { number: number; displayNumber?: string; book?: HymnBookId; unnumbered?: boolean }): string {
+  if (hymn.unnumbered) return '';
+  const book = getHymnBook(hymn.book);
+  if (book.id !== 'main') return String(hymn.number - book.offset);
+  return hymn.displayNumber ?? String(hymn.number);
+}
