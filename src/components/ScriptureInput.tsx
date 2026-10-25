@@ -15,6 +15,9 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Delayed so a click on a suggestion lands first; cancelled by refocus or typing
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(blurTimer.current), []);
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -23,6 +26,7 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
   }, [autoFocus]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(blurTimer.current);
     const newValue = e.target.value;
     setValue(newValue);
 
@@ -94,8 +98,13 @@ export function ScriptureInput({ onSubmit, isLoading, autoFocus = false, bibleVe
               value={value}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              onFocus={() => suggestions.length > 0 && !value.includes(':') && setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              onFocus={() => {
+                clearTimeout(blurTimer.current);
+                if (suggestions.length > 0 && !value.includes(':')) setShowSuggestions(true);
+              }}
+              onBlur={() => {
+                blurTimer.current = setTimeout(() => setShowSuggestions(false), 200);
+              }}
               placeholder="John 3:16"
               className="field pr-9"
               disabled={isLoading}

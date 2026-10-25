@@ -2659,10 +2659,100 @@
         }
       ],
       "refrain": "Ore-ofe sa, N’ igbekele mi;\nJesu-ku fun araiye, O ku fun mi pelu."
+    },
+    {
+      "title": "When All Thy Mercies, O My God",
+      "number": "788",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "When all Thy mercies, O my God,\nMy rising soul surveys,\nTransported with the view, I'm lost\nIn wonder, love and praise."
+        },
+        {
+          "verse": 2,
+          "text": "Thy providence my life sustained,\nAnd all my wants redressed,\nWhile in the silent womb I lay,\nAnd hung upon the breast."
+        },
+        {
+          "verse": 3,
+          "text": "To all my weak complaints and cries\nThy mercy lent an ear,\nEre yet my feeble thoughts had learnt\nTo form themselves in prayer."
+        },
+        {
+          "verse": 4,
+          "text": "Unnumbered comforts to my soul\nThy tender care bestowed,\nBefore my infant heart conceived\nFrom Whom those comforts flowed."
+        },
+        {
+          "verse": 5,
+          "text": "When in the slippery paths of youth\nWith heedless steps I ran,\nThine arm unseen conveyed me safe,\nAnd led me up to man."
+        },
+        {
+          "verse": 6,
+          "text": "Through hidden dangers, toils, and deaths,\nIt gently cleared my way;\nAnd through the pleasing snares of vice,\nMore to be feared than they."
+        },
+        {
+          "verse": 7,
+          "text": "O how shall words with equal warmth\nThe gratitude declare,\nThat glows within my ravished heart?\nBut Thou canst read it there."
+        },
+        {
+          "verse": 8,
+          "text": "Thy great hand, Lord, with worldly bliss\nHas made my cup run o'er;\nAnd, in a kind and faithful Friend,\nHas doubled all my store."
+        },
+        {
+          "verse": 9,
+          "text": "Ten thousand thousands precious gifts\nMy daily thanks employ;\nNor is the last a cheerful heart\nThat tastes those gifts with joy."
+        },
+        {
+          "verse": 10,
+          "text": "When worn with sickness, oft have Thee\nWith health renewed my face\nAnd, when in sins and sorrows sunk,\nRevived my soul with grace."
+        },
+        {
+          "verse": 11,
+          "text": "Through every period of my life\nThy goodness I'll pursue\nAnd after death, in distant worlds,\nThe glorious theme renew."
+        },
+        {
+          "verse": 12,
+          "text": "When nature fails, and day and night\nDivide Thy works no more,\nMy ever grateful heart, O Lord,\nThine mercy shalt adore."
+        },
+        {
+          "verse": 13,
+          "text": "Through all eternity to Thee\nA joyful song I'll raise;\nFor, oh, eternity's too short\nTo utter all Thy praise!"
+        }
+      ]
+    },
+    {
+      "title": "Abide Among Us With Your Grace",
+      "number": "481",
+      "type": "hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Abide among us with Your grace,\nLord Jesus, evermore,\nNor let us e'er to sin give place\nNor grieve Him we adore."
+        },
+        {
+          "verse": 2,
+          "text": "Abide among us with Your word,\nRedeemer whom we love,\nYour help and mercy here afford,\nAnd life with You above."
+        },
+        {
+          "verse": 3,
+          "text": "Abide among us with Your ray,\nO Light that lightens all,\nAnd let Your truth preserve our way\nNor suffer us to fall."
+        },
+        {
+          "verse": 4,
+          "text": "Abide with us to bless us still,\nO bounteous Lord of peace,\nWith grace and power our spirits fill\nOur faith and love increase."
+        },
+        {
+          "verse": 5,
+          "text": "Abide among us as our shield,\nO Captain of Your host,\nThat to the world we may not yield\nNor e'er forsake our post."
+        },
+        {
+          "verse": 6,
+          "text": "Abide with us in faith and love\nOur God, and Saviour be,\nYour help in need, O let us prove,\nAnd You to us true keep,"
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 103,
+    "total_hymns": 105,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",

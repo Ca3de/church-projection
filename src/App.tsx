@@ -431,7 +431,7 @@ function App() {
   // Listen for paste events when on search view
   useEffect(() => {
     const handlePaste = async (e: ClipboardEvent) => {
-      if (view !== 'search') return;
+      if (view !== 'search' || showHymnManager) return;
 
       // Check if we're in an input field
       const target = e.target as HTMLElement;
@@ -478,7 +478,7 @@ function App() {
 
     document.addEventListener('paste', handlePaste);
     return () => document.removeEventListener('paste', handlePaste);
-  }, [view, isVideoUrl]);
+  }, [view, isVideoUrl, showHymnManager]);
 
   // Shared handlers
   const handleNewSearch = useCallback(() => {
@@ -825,7 +825,7 @@ function App() {
                       onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink-80)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-40)')}
                     >
-                      Manage custom hymns
+                      Add or edit a hymn
                     </button>
                   </div>
                 </>
@@ -949,7 +949,13 @@ function App() {
 
       {/* Hymn Manager Modal */}
       {showHymnManager && (
-        <HymnManager onClose={() => setShowHymnManager(false)} />
+        <HymnManager
+          onClose={() => setShowHymnManager(false)}
+          onDisplayHymn={(hymnNumber) => {
+            setShowHymnManager(false);
+            handleHymnSearch(hymnNumber);
+          }}
+        />
       )}
     </div>
   );
