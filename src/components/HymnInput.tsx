@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { searchHymns, resolveHymn, describeHymnQuery, formatHymnLabel } from '../services/hymnService';
+import { refreshHymnsSoon } from '../services/hymnStore';
 import { HYMN_BOOKS, getHymnBook } from '../data/hymnBooks';
 import type { HymnBookId, HymnSearchResult } from '../types/hymn';
 
@@ -165,6 +166,8 @@ export function HymnInput({
               onKeyDown={handleKeyDown}
               onFocus={() => {
                 clearTimeout(blurTimer.current);
+                // Pick up a hymn just added on another device
+                refreshHymnsSoon();
                 if (suggestions.length > 0) setShowSuggestions(true);
               }}
               onBlur={() => {
