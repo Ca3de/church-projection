@@ -7,7 +7,7 @@
  * environment variable.
  */
 import { createHash, timingSafeEqual } from 'node:crypto';
-import type { Hymn } from '../src/types/hymn';
+import type { Hymn } from '../src/types/hymn.js';
 
 const HYMNS_KEY = 'sanctum:hymns';
 const MAX_FAILURES = 10;
