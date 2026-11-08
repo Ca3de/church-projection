@@ -2749,10 +2749,100 @@
           "text": "Abide with us in faith and love\nOur God, and Saviour be,\nYour help in need, O let us prove,\nAnd You to us true keep,"
         }
       ]
+    },
+    {
+      "title": "Come, Ye Thankful People, Come",
+      "number": "171",
+      "type": "Processional Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Come, ye thankful people, come,\nRaise the song of harvest home!\nAll is safely gathered in\nEre the winter storms begin.\nGod, our Maker, doth provide\nFor our wants to be supplied.\nCome to God's own temple, come,\nRaise the song of harvest home."
+        },
+        {
+          "verse": 2,
+          "text": "We ourselves are God's own field,\nFruit unto His praise to yield;\nWheat and tares together sown,\nUnto joy or sorrow grown.\nFirst the blade, and then the ear,\nThen the full corn shall appear;\nLord of harvest, grant that we\nWholesome grain and pure may be."
+        },
+        {
+          "verse": 3,
+          "text": "For the Lord our God shall come,\nAnd shall take His harvest home;\nFrom His field shall purge away\nAll that doth offend that day.\nGive His angels charge at last\nIn the fire the tares to cast;\nBut the fruitful ears to store\nIn His garner evermore."
+        },
+        {
+          "verse": 4,
+          "text": "Even so, Lord, quickly come,\nBring Thy final harvest home;\nGather Thou Thy people in,\nFree from sorrow, free from sin.\nThere, forever purified,\nIn Thy presence to abide;\nCome, with all Thine angels, come,\nRaise the glorious harvest home"
+        }
+      ]
+    },
+    {
+      "title": "Iwo To Fe Wa La O Ma Sin Titi",
+      "number": null,
+      "type": "Hymn Before Sermon",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Iwo to fe wa la o ma sin titi\nOluwa Olore wa\nIwo to n so wa n’nu idanwo aye\nMimo, logo ola re"
+        },
+        {
+          "verse": 2,
+          "text": "Iwo to nsure s’ohun t’a gbin s’aye\nT’aye fi nrohun je o\nAwon to mura lati ma s’oto\nWon tun nyo n’nu ise re."
+        },
+        {
+          "verse": 3,
+          "text": "Iwo to nf’agan lomo to npe ranse\nNinu ola re to ga\nEni t’o ti s’alaileso si dupe\nFun ‘se ogo ola re"
+        },
+        {
+          "verse": 4,
+          "text": "Eni t’ebi npa le ri ayo ninu\nAgbara nla re to ga\nAwon to ti nwoju re fun anu\nWon tun nyo n’nu ise re."
+        },
+        {
+          "verse": 5,
+          "text": "F’alafia re fun ijo re l’aye\nK’ore-ofe re ma ga;\nk’awon eni tire ko ma yo titi\nninu ogo ise re. Amin."
+        }
+      ],
+      "refrain": "Baba, iwo l’a o ma sin\nBaba, iwo l’a o ma bo\nIwo to fe wa l’a o ma sin titi\nMimo l’ogo ola re."
+    },
+    {
+      "title": "Now Thank We All Our God",
+      "number": null,
+      "type": "Thanksgiving Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "Now thank we all our God\nwith heart and hands and voices,\nwho wondrous things has done,\nin whom his world rejoices;\nwho from our mothers' arms\nhas blessed us on our way\nwith countless gifts of love,\nand still is ours today."
+        },
+        {
+          "verse": 2,
+          "text": "O may this bounteous God\nthrough all our life be near us,\nwith ever joyful hearts\nand blessed peace to cheer us,\nto keep us in his grace,\nand guide us when perplexed,\nand free us from all ills\nin this world and the next."
+        },
+        {
+          "verse": 3,
+          "text": "All praise and thanks to God\nthe Father now be given,\nthe Son and Spirit blest,\nwho reign in highest heaven—\nthe one eternal God,\nwhom earth and heaven adore;\nfor thus it was, is now,\nand shall be evermore."
+        }
+      ]
+    },
+    {
+      "title": "We Plough The Fields And Scatter",
+      "number": "192",
+      "type": "Withdrawal Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "We plow the fields and scatter the good seed on the land,\nBut it is fed and watered by God’s almighty hand.\nHe sends the snow in winter, the warmth to swell the grain,\nThe breezes and the sunshine, and soft refreshing rain."
+        },
+        {
+          "verse": 2,
+          "text": "He only is the maker of all things near and far;\nHe paints the wayside flower, He lights the evening star.\nThe wind and waves obey Him, by Him the birds are fed;\nMuch more to us, His children, He gives our daily bread."
+        },
+        {
+          "verse": 3,
+          "text": "We thank You, our Creator, for all things bright and good:\nThe seedtime and the harvest, our life, our health, our food.\nAccept the gifts we offer for all Your love imparts;\nAccept what You most welcome: our humble, thankful hearts!"
+        }
+      ],
+      "refrain": "All good gifts around us are sent from heav’n above;\nThen thank the Lord, O thank the Lord for all His love."
     }
   ],
   "summary": {
-    "total_hymns": 105,
+    "total_hymns": 109,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
