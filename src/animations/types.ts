@@ -1,4 +1,4 @@
-export type AnimationType = 'snow' | 'flames' | 'sparkles' | 'leaves' | 'fireworks' | null;
+export type AnimationType = 'snow' | 'flames' | 'sparkles' | 'leaves' | 'fireworks' | 'harvest' | 'harvest-fields' | null;
 export type AnimationIntensity = 'light' | 'normal' | 'heavy';
 
 export interface AnimationConfig {

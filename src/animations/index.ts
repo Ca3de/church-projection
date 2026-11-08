@@ -4,6 +4,7 @@ export { SnowEffect } from './components/SnowEffect';
 export { FlameEffect } from './components/FlameEffect';
 export { SparkleEffect } from './components/SparkleEffect';
 export { LeavesEffect } from './components/LeavesEffect';
+export { HarvestEffect } from './components/HarvestEffect';
 
 // Hooks
 export { useMouseTracking } from './hooks/useMouseTracking';
