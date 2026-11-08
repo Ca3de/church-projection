@@ -5,6 +5,7 @@ import { SnowEffect } from './SnowEffect';
 import { FlameEffect } from './FlameEffect';
 import { SparkleEffect } from './SparkleEffect';
 import { LeavesEffect } from './LeavesEffect';
+import { HarvestEffect } from './HarvestEffect';
 
 interface ThemeAnimationProps {
   animationType: AnimationType;
@@ -81,6 +82,10 @@ export function ThemeAnimation({
         return <SparkleEffect {...animationProps} />;
       case 'leaves':
         return <LeavesEffect {...animationProps} />;
+      case 'harvest':
+        return <HarvestEffect {...animationProps} palette="gold" />;
+      case 'harvest-fields':
+        return <HarvestEffect {...animationProps} palette="fields" />;
       case 'fireworks':
         // Fireworks can use sparkles with different settings for now
         return <SparkleEffect {...animationProps} />;

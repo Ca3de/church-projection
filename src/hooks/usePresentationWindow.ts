@@ -1,4 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import type { AnimationIntensity, AnimationType } from '../animations/types';
+import { startHarvestScene, type HarvestPalette, type HarvestScene } from '../animations/harvestScene';
+
+// The harvest scenes are plain canvas code, so they can play in this window too
+const WINDOW_SCENES: Partial<Record<NonNullable<AnimationType>, HarvestPalette>> = {
+  harvest: 'gold',
+  'harvest-fields': 'fields',
+};
 
 export interface PresentationState {
   type: 'scripture' | 'hymn' | 'liturgy' | 'quick' | null;
@@ -18,6 +26,31 @@ export function usePresentationWindow() {
   const [presentationWindow, setPresentationWindow] = useState<Window | null>(null);
   const [isWindowOpen, setIsWindowOpen] = useState(false);
   const stateRef = useRef<PresentationState>({ type: null, data: null, theme: null });
+  const sceneRef = useRef<{ win: Window; key: string; scene: HarvestScene } | null>(null);
+
+  // Start, swap or stop the theme's scene behind the projected text
+  const syncScene = useCallback((win: Window, animation: AnimationType | undefined, intensity: AnimationIntensity = 'normal') => {
+    const palette = animation ? WINDOW_SCENES[animation] : undefined;
+    const reduceMotion = win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const key = palette && !reduceMotion ? `${palette}:${intensity}` : '';
+    const current = sceneRef.current;
+    if (current?.win === win && current.key === key) return;
+
+    if (current && !current.win.closed) {
+      current.scene.stop();
+      current.win.document.getElementById('theme-scene')?.remove();
+    }
+    sceneRef.current = null;
+    if (!palette || !key) return;
+
+    const canvas = win.document.createElement('canvas');
+    canvas.id = 'theme-scene';
+    canvas.setAttribute('aria-hidden', 'true');
+    // Below the text but above the page background
+    canvas.style.cssText = 'position: fixed; inset: 0; z-index: -1; pointer-events: none;';
+    win.document.body.prepend(canvas);
+    sceneRef.current = { win, key, scene: startHarvestScene(canvas, { palette, intensity }) };
+  }, []);
 
   // Check if window is still open
   useEffect(() => {
@@ -273,11 +306,14 @@ export function usePresentationWindow() {
     if (!root) return;
 
     // Apply theme
-    const theme = state.theme as { background?: string; backgroundEnd?: string; accent?: string } | undefined;
+    const theme = state.theme as
+      | { background?: string; backgroundEnd?: string; accent?: string; animation?: AnimationType; animationIntensity?: AnimationIntensity }
+      | undefined;
     if (theme) {
       targetWindow.document.body.style.setProperty('--bg-start', theme.background || '#0c0a09');
       targetWindow.document.body.style.setProperty('--bg-end', theme.backgroundEnd || '#1c1917');
       targetWindow.document.body.style.setProperty('--accent', theme.accent || '#fbbf24');
+      syncScene(targetWindow, theme.animation, theme.animationIntensity);
     }
 
     // Mirror the operator's text-size setting onto the projection window
@@ -375,7 +411,7 @@ export function usePresentationWindow() {
           <p class="waiting-hint">Display content from the control window</p>
         `;
     }
-  }, [presentationWindow]);
+  }, [presentationWindow, syncScene]);
 
   // Send state update
   const sendToPresentation = useCallback((state: PresentationState) => {

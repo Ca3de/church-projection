@@ -525,6 +525,8 @@ function App() {
       background: currentTheme.colors.background,
       backgroundEnd: currentTheme.colors.backgroundEnd,
       accent: currentTheme.colors.accent,
+      animation: currentTheme.animation?.type ?? null,
+      animationIntensity: currentTheme.animation?.intensity,
     };
 
     if (view === 'display') {
