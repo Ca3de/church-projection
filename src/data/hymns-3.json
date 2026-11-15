@@ -2839,10 +2839,34 @@
         }
       ],
       "refrain": "All good gifts around us are sent from heav’n above;\nThen thank the Lord, O thank the Lord for all His love."
+    },
+    {
+      "title": "When Upon Life's Billow (Count Your Blessings)",
+      "number": "852",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "When upon life's billow\nyou are tempest tossed\nWhen you are discouraged\nthinking all is lost,\nCount your many blessings\nname them one by one,\nAnd it will surprise you\nwhat the Lord has done."
+        },
+        {
+          "verse": 2,
+          "text": "Are you ever burdened\nwith a load of care?\nDoes the cross seem heavy\nyou are called to bear?\nCount your many blessings\nevery doubt will fly,\nAnd you will be singing\nas the days go by."
+        },
+        {
+          "verse": 3,
+          "text": "When you look at others\nwith their lands and gold\nThink what Christ has promised\nyou is wealth untold,\nCount your many blessings\nmoney cannot buy,\nYour reward in heaven\nnor your home on high."
+        },
+        {
+          "verse": 4,
+          "text": "So amid the conflict\nwhether great or small,\nDo not be discouraged\nGod is over all,\nCount your many blessings\nangels will attend,\nHelp and comfort give you\nto your journey's end."
+        }
+      ],
+      "refrain": "Count your blessings\nName them one by one,\nCount your blessings\nSee what God has done,\nCount your blessings\nName them one by one,\nAnd it will surprise you\nWhat the Lord has done."
     }
   ],
   "summary": {
-    "total_hymns": 109,
+    "total_hymns": 110,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
