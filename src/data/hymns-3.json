@@ -2863,10 +2863,37 @@
         }
       ],
       "refrain": "Count your blessings\nName them one by one,\nCount your blessings\nSee what God has done,\nCount your blessings\nName them one by one,\nAnd it will surprise you\nWhat the Lord has done."
+    },
+    {
+      "title": "This Is The Day The Lord Has Made",
+      "number": "153",
+      "type": "Hymn",
+      "verses": [
+        {
+          "verse": 1,
+          "text": "This is the day the Lord has made,\nHe calls the hour His own,\nLet heaven rejoice, let earth be glad\nAnd praise surround the throne."
+        },
+        {
+          "verse": 2,
+          "text": "Today He rose and left the dead,\nAnd Satan's empire fell;\nToday the saints His triumph spread,\nAnd all His wonders tell."
+        },
+        {
+          "verse": 3,
+          "text": "Hosanna to th'Anointed King\nTo David's holy Son.\nHelp us, O Lord descend and bring\nSalvation from the throne."
+        },
+        {
+          "verse": 4,
+          "text": "Blest be the Lord who comes to men,\nWith messages of grace.\nWho comes in God His Father's name\nTo save our sinful race."
+        },
+        {
+          "verse": 5,
+          "text": "Hosanna in the highest strains\nThe Church on earth can raise;\nThe highest heavens, in which He reigns\nShall give Him nobler praise. Amen"
+        }
+      ]
     }
   ],
   "summary": {
-    "total_hymns": 110,
+    "total_hymns": 111,
     "sources": [
       "Untitled_presentation.pptx",
       "2nd_Untitled_presentation.pptx",
